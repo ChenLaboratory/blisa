@@ -1,0 +1,37 @@
+---
+title: "test_function"
+output: html_document
+---
+
+```{r}
+library(spdep)
+source("../../R/filterLRpairs.R")
+source("../../R/runBLISA.R")
+```
+
+```{r}
+spe <- readRDS("xenium380Cell_spe.rds")
+```
+
+
+```{r}
+coords_df <- as.data.frame(spe@int_colData$spatialCoords)
+counts_matrix <- spe@assays@data$counts
+
+library(CellChat)
+LR_pairs_filtered <- filterLRpairs(counts = counts_matrix, 
+                                   min_ligand = 1, min_receptor = 1, 
+                                   LR_df = CellChatDB.human$interaction) # LR pairs exiting in gene panel
+
+system.time(BLISAres <- runBLISA.old(coords_df, counts_matrix, LR_pairs_filtered))
+
+system.time(BLISAres2 <- runBLISA.old(coords_df, counts_matrix, LR_pairs_filtered, nsim = 9999))
+```
+
+
+```{r}
+BLISAres$LR_out
+
+BLISAres2$LR_out
+```
+
