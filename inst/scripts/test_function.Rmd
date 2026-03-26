@@ -9,10 +9,19 @@ source("../../R/filterLRpairs.R")
 source("../../R/runBLISA.R")
 ```
 
+# xenium
+
 ```{r}
 spe <- readRDS("xenium380Cell_spe.rds")
-```
 
+dim(spe)
+
+cell_type_colors <- c(RColorBrewer::brewer.pal(7, "Set1"), RColorBrewer::brewer.pal(6, "Set2"))
+names(cell_type_colors) <- unique(spe$cell_type)
+
+scider::plotSpatial(spe, group.by = "cell_type", pt.size = 0.2, pt.alpha = 0.9, cols = cell_type_colors)
+```
+## LR pairs
 
 ```{r}
 coords_df <- as.data.frame(spe@int_colData$spatialCoords)
@@ -22,16 +31,68 @@ library(CellChat)
 LR_pairs_filtered <- filterLRpairs(counts = counts_matrix, 
                                    min_ligand = 1, min_receptor = 1, 
                                    LR_df = CellChatDB.human$interaction) # LR pairs exiting in gene panel
-
-system.time(BLISAres <- runBLISA.old(coords_df, counts_matrix, LR_pairs_filtered))
-
-system.time(BLISAres2 <- runBLISA.old(coords_df, counts_matrix, LR_pairs_filtered, nsim = 9999))
+LR_pairs_filtered
 ```
 
+## run BLISA LRI
 
 ```{r}
+system.time(BLISAres <- runBLISA.old(coords_df, counts_matrix, LR_pairs_filtered))
+
 BLISAres$LR_out
 
-BLISAres2$LR_out
+#system.time(BLISAres2 <- runBLISA.old(coords_df, counts_matrix, LR_pairs_filtered, nsim = 9999))
+#BLISAres2$LR_out
 ```
+
+```{r, fig.width=6, fig.height=4}
+plotLRIsum(LR_out)
+
+```
+
+```{r, fig.width=15, fig.height=12}
+LR_out <- BLISAres$LR_out
+hex_sf <- BLISAres$hex_sf
+
+plots <- lapply(seq_len(nrow(LR_out)), function(i) {
+  plotLRI.sf(hex_sf, LR_out, index = i)
+})
+
+combined_plot <- patchwork::wrap_plots(plots, ncol = 3)
+
+combined_plot
+
+pdf("xenium_LRI_spatial_plots.pdf", width = 15, height = 12)
+print(combined_plot)
+dev.off()
+
+```
+
+## run BLISA CCI
+
+```{r}
+system.time(CCIres <- runCCI(spe, BLISAres))
+
+head(CCIres)
+```
+```{r, fig.height=22, fig.width=10, out.width="100%"}
+CCIheatmap(CCIres)
+```
+```{r, fig.height=10, fig.width=9}
+CCIheatmap(CCIres, include_celltypes = c("Invasive_Tumor"))
+```
+
+```{r, fig.height=5, fig.width=6, out.width="100%"}
+p <- CCIheatmapOneLR(CCIres, "CXCL12_CXCR4")
+
+draw(p, heatmap_legend_side = "right", padding = unit(c(5, 5, 10, 10), "mm"))
+
+```
+
+```{r, fig.height=8, fig.width=12, out.width="100%"}
+CCIspatial(spe, BLISAres, 2)
+```
+
+# visium
+
 
