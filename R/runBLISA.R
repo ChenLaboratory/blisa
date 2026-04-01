@@ -150,6 +150,12 @@ hex_binning_cells <- function(
 #     diffuse_category = c("Secreted Signaling", "Non-protein Signaling")
 # )
 
+#' Run BLISA analysis
+#'
+#' @param counts_matrix Gene expression matrix
+#' @param coords_df spatial coordimates dataframe
+#' @param LR_df Ligand-receptor dataframe
+#' @export
 runBLISA.old <- function(
     coords_df,
     counts_matrix,
@@ -189,7 +195,7 @@ runBLISA.old <- function(
   )
 
   # queen weight order = 1
-  queen_nb <- dnearneigh(centroids, 0, 1.2*hex_size)
+  queen_nb <- spdep::dnearneigh(centroids, 0, 1.2*hex_size)
   queen_wt <- spdep::nb2listwdist(queen_nb, centroids, type="idw", style="W", zero.policy = TRUE)
 
   ## ---------------------------
@@ -228,7 +234,7 @@ runBLISA.old <- function(
     # bivariate local moran
     res_bv <- spdep::localmoran_bv(x, y, wt, nsim = nsim)
 
-    hs <- hotspot(
+    hs <- spdep::hotspot(
       res_bv,
       Prname = "Pr(folded) Sim",
       cutoff = p_cutoff,

@@ -4,6 +4,13 @@ library(sf)
 
 LRI_spatial_colors <- c("#FFFFCC", "#FFD700", "#FF7F00", "#D7301F")
 
+#' Run BLISA analysis on bin level sf
+#'
+#' @param LR_out BLISA LRI result
+#' @param hex_sf Bin-level sf object
+#' @param index Ligand-receptor index
+#' @export
+#'
 plotLRI.sf <- function(hex_sf, LR_out, index, log_pval = TRUE) {
 
   # 1. Prepare Data
@@ -33,7 +40,7 @@ plotLRI.sf <- function(hex_sf, LR_out, index, log_pval = TRUE) {
   }
 
   # 2. Plot
-  p <- ggplot(hex_sf) +
+  p <- ggplot2::ggplot(hex_sf) +
     # Layer 1: The "Background" (Empty and Non-Significant bins)
     geom_sf(aes(fill = bin_status), color = NA) +
 

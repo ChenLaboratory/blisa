@@ -1,3 +1,8 @@
+#' plot dot plot ranking LR results from BLISA
+#'
+#' @param LR_out BLISA LRI result
+#' @export
+#'
 plotLRIsum <- function(LR_out, top = NULL, pt.size = 4) {
 
   if(!is.null(top)){

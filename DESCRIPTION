@@ -1,11 +1,17 @@
 Package: blisa
+Type: Package
 Title: Infer cell-cell communication from spatial transcriptomics
 Version: 0.1.0
-Authors@R:
-    person("Lei", "Qin", email = "qin.l@wehi.edu.au",
-           role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License:  `use_gpl3_license()`
+Author: Lei Qin
+Maintainer: Lei Qin <qin.l@wehi.edu.au>
+Description: Tools for spatial cell-cell communication analysis of spatial transcriptomics data.
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
+LazyData: false
+Imports:
+    sf,
+    spdep,
+    Matrix,
+    reshape2
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

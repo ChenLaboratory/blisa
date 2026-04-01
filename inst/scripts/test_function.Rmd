@@ -36,6 +36,7 @@ LR_pairs_filtered
 
 ## run BLISA LRI
 
+### runBLISA.old
 ```{r}
 system.time(BLISAres <- runBLISA.old(coords_df, counts_matrix, LR_pairs_filtered))
 
@@ -45,9 +46,21 @@ BLISAres$LR_out
 #BLISAres2$LR_out
 ```
 
-```{r, fig.width=6, fig.height=4}
-plotLRIsum(LR_out)
+### runBLISA.default
 
+```{r}
+
+system.time(BLISAres_new <- runBLISA.spe(spe, LR_df = LR_pairs_filtered))
+
+BLISAres_new$LR_out
+```
+
+
+# visualize
+
+```{r, fig.width=6, fig.height=4}
+plotLRIsum(BLISAres$LR_out)
+plotLRIsum(BLISAres_new$LR_out)
 ```
 
 ```{r, fig.width=15, fig.height=12}
@@ -63,6 +76,24 @@ combined_plot <- patchwork::wrap_plots(plots, ncol = 3)
 combined_plot
 
 pdf("xenium_LRI_spatial_plots.pdf", width = 15, height = 12)
+print(combined_plot)
+dev.off()
+
+```
+
+```{r, fig.width=15, fig.height=12}
+LR_out <- BLISAres_new$LR_out
+hex_sf <- BLISAres_new$bin_sf
+
+plots <- lapply(seq_len(nrow(LR_out)), function(i) {
+  plotLRI.sf(hex_sf, LR_out, index = i)
+})
+
+combined_plot <- patchwork::wrap_plots(plots, ncol = 3)
+
+combined_plot
+
+pdf("xenium_LRI_new_spatial_plots_260401.pdf", width = 15, height = 12)
 print(combined_plot)
 dev.off()
 

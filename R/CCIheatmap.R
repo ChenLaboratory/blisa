@@ -1,4 +1,10 @@
-library(ComplexHeatmap)
+#library(ComplexHeatmap)
+
+#' plot heatmap of cell-cell interaction scores for all LR pairs
+#'
+#' @param CCI_df dataframe of cell-cell interaction scores from CCI anlaysis
+#' @export
+#'
 CCIheatmap <- function(CCI_df, include_celltypes = NULL) {
   # Optional subsetting
   if (!is.null(include_celltypes)) {
@@ -35,7 +41,7 @@ CCIheatmap <- function(CCI_df, include_celltypes = NULL) {
   )
 
   f1 = viridisLite::viridis(10)
-  ht <- Heatmap(as.matrix(CCI_df),
+  ht <- ComplexHeatmap::Heatmap(as.matrix(CCI_df),
                 name = "Interaction\nScore",
                 col = f1,
                 cluster_rows = TRUE,

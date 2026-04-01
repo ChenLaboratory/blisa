@@ -41,7 +41,13 @@ cols <- c(
   "#FFB3BA"  # baby pink
 )
 
-
+#' plot spatial plot of cell-cell interaction pattern for a specific LR pair
+#'
+#' @param spe cell-level spe object
+#' @param BLISA_output result outout from runBLISA
+#' @param index LR index
+#' @export
+#'
 CCIspatial <- function(
     spe,
     BLISA_output,
@@ -72,9 +78,9 @@ CCIspatial <- function(
   # 3. Efficient Mapping
   cell_to_hex <- get_cell_hex_mapping(spe, hex_sf)
 
-  cell_data <- data.table(
+  cell_data <- data.table::data.table(
     hex_id = as.integer(cell_to_hex),
-    ct = as.character(colData(spe)[[ct_group]]),
+    ct = as.character(SummarizedExperiment::colData(spe)[[ct_group]]),
     ligand_expr = as.numeric(counts(spe)[interaction[1], ]),
     receptor_expr = as.numeric(counts(spe)[interaction[2], ])
   )
@@ -82,7 +88,7 @@ CCIspatial <- function(
   # 4. Interaction Scoring (Receiver in HH, Sender in Neighbors)
   rcpt_summary <- cell_data[hex_id %in% sigHH, .(r_sum = sum(receptor_expr)), by = .(hex_id, ct_r = ct)]
 
-  hh_nb_map <- data.table(
+  hh_nb_map <- data.table::data.table(
     hh_hex = rep(sigHH, sapply(nb_list[sigHH], length)),
     nb_hex = unlist(nb_list[sigHH])
   )
