@@ -1,5 +1,3 @@
-# NOTE: use ligand/receptor.symbol as gene name, ligand/receptor columns are bilogical entity names which may not be a gene, e.g. RA-ALDH1A3
-
 filter_genes <- function(gene_column, gene_list) { # function to filter out the whole interaction if missing any L/R subunits
   sapply(strsplit(as.character(gene_column), ", "), function(genes) {
     filtered_genes <- genes[genes %in% gene_list]
@@ -22,6 +20,10 @@ getLRpairs <- function(gene_panel, LR_df = CellChatDB.human$interaction){
   return(LR_included)
 }
 
+# NOTE: use ligand/receptor.symbol as gene name, ligand/receptor columns are bilogical entity names which may not be a gene, e.g. RA-ALDH1A3
+#' Filter ligand-receptor pairs
+#' ...
+#' @export
 filterLRpairs <- function(counts, min_ligand = 10, min_receptor = 10, LR_df = CellChatDB.human$interaction) {
   #counts = spe@assays@data$counts
 

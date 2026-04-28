@@ -20,9 +20,9 @@ runBLISA.spe(
 )
 }
 \arguments{
-\item{LR_df}{Ligand-receptor dataframe}
+\item{spe}{cell-level spe object}
 
-\item{counts_matrix}{Gene expression matrix}
+\item{LR_df}{Ligand-receptor dataframe}
 
 \item{bin_sf}{Bin-level sf object}
 }

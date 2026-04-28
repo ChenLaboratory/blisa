@@ -1,0 +1,160 @@
+---
+title: "BLISA Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{BLISA Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 4
+)
+```
+
+# Introduction
+
+BLISA identifies spatially enriched ligand–receptor interactions from spatial transcriptomics data using local bivariate Moran’s I statistics.
+
+This vignette demonstrates a typical BLISA workflow using Xenium data.
+
+# Load Package
+
+```{r}
+library(blisa)
+library(scider)
+library(CellChat)
+library(patchwork)
+```
+
+# Load Example Data
+
+Example Xenium dataset distributed with the package:
+
+```{r}
+spe <- readRDS(
+  system.file("extdata", "xenium380Cell_spe.rds", package = "blisa")
+)
+
+dim(spe)
+```
+
+# Visualize Spatial Cell Types
+
+```{r}
+cell_type_colors <- c(
+  RColorBrewer::brewer.pal(7, "Set1"),
+  RColorBrewer::brewer.pal(6, "Set2")
+)
+
+names(cell_type_colors) <- unique(spe$cell_type)
+
+scider::plotSpatial(
+  spe,
+  group.by = "cell_type",
+  pt.size = 0.2,
+  pt.alpha = 0.9,
+  cols = cell_type_colors
+)
+```
+
+# Filter Ligand–Receptor Pairs
+
+Restrict CellChat ligand–receptor database to genes present in the panel:
+
+```{r}
+counts_matrix <- SummarizedExperiment::assay(spe, "counts")
+
+LR_pairs_filtered <- filterLRpairs(
+  counts = counts_matrix,
+  min_ligand = 1,
+  min_receptor = 1,
+  LR_df = CellChatDB.human$interaction
+)
+
+head(LR_pairs_filtered)
+```
+
+# Run BLISA
+
+```{r}
+system.time(BLISAres<- runBLISA.spe.isolates.removed(
+    spe, 
+    LR_df = LR_pairs_filtered))
+
+BLISAres$LR_out
+```
+
+# Summarize Ligand–Receptor Interaction Enrichment
+
+```{r}
+plotLRIsum(BLISAres$LR_out)
+```
+
+# Visualize Spatial Distribution of Top LR Pairs
+
+```{r}
+plots <- lapply(seq_len(min(6, nrow(BLISAres$LR_out))), function(i) {
+  plotLRI.sf(
+    BLISAres$bin_sf,
+    BLISAres$LR_out,
+    index = i
+  )
+})
+
+patchwork::wrap_plots(plots, ncol = 3)
+```
+
+# Run Cell–Cell Interaction Analysis
+
+```{r}
+CCIres <- runCCI(
+  spe,
+  BLISAres
+)
+
+head(CCIres)
+```
+
+# Visualize CCI Heatmap
+
+```{r fig.height=8, fig.width=8}
+CCIheatmap(CCIres)
+```
+
+```{r, fig.height=10, fig.width=9}
+CCIheatmap(CCIres, include_celltypes = c("Invasive_Tumor"))
+```
+
+# Visualize One Ligand–Receptor Pair
+
+```{r fig.height=5, fig.width=6}
+p <- CCIheatmapOneLR(
+  CCIres,
+  "CXCL12_CXCR4"
+)
+
+draw(
+  p,
+  heatmap_legend_side = "right",
+  padding = unit(c(5, 5, 10, 10), "mm")
+)
+```
+
+```{r fig.height=7, fig.width=10}
+CCIspatial(
+  spe,
+  BLISAres,
+  index = 2
+)
+```
+
+# Session Information
+
+```{r}
+sessionInfo()
+```

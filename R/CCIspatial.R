@@ -1,7 +1,3 @@
-library(data.table)
-library(dplyr)
-library(ggplot2)
-library(SummarizedExperiment)
 
 cols <- c(
   # Highly distinct / saturated first

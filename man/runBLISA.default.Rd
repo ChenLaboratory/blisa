@@ -20,11 +20,30 @@ runBLISA.default(
 )
 }
 \arguments{
-\item{counts_matrix}{Gene expression matrix}
+\item{counts_matrix}{Gene-by-bin matrix of counts; columns must match \code{bin_sf} bins.}
 
-\item{bin_sf}{Bin-level sf object}
+\item{bin_sf}{\link[sf:sf]{sf::sf} object with bin polygons and matching row order to columns of \code{counts_matrix}.}
 
-\item{LR_df}{Ligand-receptor dataframe}
+\item{LR_df}{Data frame of ligand–receptor pairs (see Details).}
+
+\item{hex_size}{Numeric. Hexagon size in microns (same units as coordinates).}
+
+\item{dmax}{Maximum distance (microns) for distance-based neighbors.}
+
+\item{nsim}{Number of permutations for significance.}
+
+\item{p_cutoff}{P-value threshold.}
+
+\item{min_ligand, min_receptor}{Minimum counts required for ligand/receptor.}
+
+\item{col}{Column name in \code{LR_df} for interaction category.}
+
+\item{default_mode}{Default CCC mode when \code{col} is missing.}
+
+\item{diffuse_category}{Character vector of categories treated as “diffuse”.}
+}
+\value{
+A list with components \code{...} (describe structure).
 }
 \description{
 Run BLISA analysis on bin level sf

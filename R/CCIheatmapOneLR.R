@@ -1,6 +1,3 @@
-library(ComplexHeatmap)
-library(circlize)
-library(tidyr)
 
 # Define global color palette
 # heatmap_cols <- viridisLite::viridis(256, option = "viridis")
@@ -72,6 +69,9 @@ library(tidyr)
 #   return(p)
 # }
 
+#' CCI heatmap for one ligand-receptor pair
+#' ...
+#' @export
 CCIheatmapOneLR <- function(CCIres, lr_pair) {
   # CCIres: your pre-calculated dataframe (cell-cell pairs as rows, LR pairs as columns)
   # lr_pair: column name of the LR pair to visualize, e.g. "CD80_CD274"

@@ -1,10 +1,19 @@
 #' Run BLISA analysis on bin level sf
 #'
-#' @param counts_matrix Gene expression matrix
-#' @param bin_sf Bin-level sf object
-#' @param LR_df Ligand-receptor dataframe
-#' @export
+#' @param counts_matrix Gene-by-bin matrix of counts; columns must match `bin_sf` bins.
+#' @param bin_sf [sf::sf] object with bin polygons and matching row order to columns of `counts_matrix`.
+#' @param LR_df Data frame of ligand–receptor pairs (see Details).
+#' @param hex_size Numeric. Hexagon size in microns (same units as coordinates).
+#' @param dmax Maximum distance (microns) for distance-based neighbors.
+#' @param nsim Number of permutations for significance.
+#' @param p_cutoff P-value threshold.
+#' @param min_ligand,min_receptor Minimum counts required for ligand/receptor.
+#' @param col Column name in `LR_df` for interaction category.
+#' @param default_mode Default CCC mode when `col` is missing.
+#' @param diffuse_category Character vector of categories treated as “diffuse”.
 #'
+#' @return A list with components `...` (describe structure).
+#' @export
 runBLISA.default <- function( # bin-level
   counts_matrix,
   bin_sf,

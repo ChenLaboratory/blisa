@@ -54,21 +54,32 @@ system.time(BLISAres_new <- runBLISA.spe(spe, LR_df = LR_pairs_filtered))
 
 BLISAres_new$LR_out
 ```
+### runBLISA.default.isoaltes.removed
+
+```{r}
+system.time(BLISAres_new <- runBLISA.spe.isolates.removed(spe, LR_df = LR_pairs_filtered))
+
+BLISAres_new$LR_out
+```
 
 
 # visualize
 
+```{r}
+BLISAres <- BLISAres_new
+```
+
+
 ```{r, fig.width=6, fig.height=4}
 plotLRIsum(BLISAres$LR_out)
-plotLRIsum(BLISAres_new$LR_out)
 ```
 
 ```{r, fig.width=15, fig.height=12}
 LR_out <- BLISAres$LR_out
-hex_sf <- BLISAres$hex_sf
+bin_sf <- BLISAres$bin_sf
 
 plots <- lapply(seq_len(nrow(LR_out)), function(i) {
-  plotLRI.sf(hex_sf, LR_out, index = i)
+  plotLRI.sf(bin_sf, LR_out, index = i)
 })
 
 combined_plot <- patchwork::wrap_plots(plots, ncol = 3)

@@ -12,6 +12,20 @@ Imports:
     sf,
     spdep,
     Matrix,
-    reshape2
+    reshape2,
+    data.table,
+    SpatialExperiment,
+    SummarizedExperiment,
+    ComplexHeatmap,
+    circlize,
+    ggplot2,
+    viridisLite,
+    ggnewscale,
+    tidyr,
+    dplyr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+VignetteBuilder: knitr
+Suggests:
+    knitr,
+    rmarkdown

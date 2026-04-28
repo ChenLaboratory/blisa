@@ -61,6 +61,10 @@ LR_source_df_updated <- function(spe, LRI_sum, cell_to_hex, index, queen_nb, dis
   return(res_df)
 }
 
+#' run CCI analysis to get cell-cell interaction scores for all cell type pairs and ligand-receptor pairs
+#' ...
+#' @export
+#' 
 runCCI <- function(spe, BLISA_output, ct_group = "cell_type", hex_size = 50, dmax = 250) {
 
   # Extract components from your BLISA result list

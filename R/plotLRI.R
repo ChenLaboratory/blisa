@@ -1,7 +1,3 @@
-library(ggplot2)
-library(sf)
-
-
 LRI_spatial_colors <- c("#FFFFCC", "#FFD700", "#FF7F00", "#D7301F")
 
 #' Run BLISA analysis on bin level sf
