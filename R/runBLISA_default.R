@@ -12,7 +12,13 @@
 #' @param default_mode Default CCC mode when `col` is missing.
 #' @param diffuse_category Character vector of categories treated as “diffuse”.
 #'
-#' @return A list with components `...` (describe structure).
+#' @return A list with:
+#' \describe{
+#'   \item{LR_out}{Data frame of BLISA results. Columns include \code{ccc_mode},
+#'     \code{sig_numbers}, \code{sig_index}, \code{sig_pval}, \code{all_pval},
+#'     \code{all_lisa}, plus original columns from \code{LR_df}.}
+#'   \item{bin_sf}{Input \code{sf} object of bin polygons.}
+#' }
 #' @export
 runBLISA.default <- function( # bin-level
   counts_matrix,

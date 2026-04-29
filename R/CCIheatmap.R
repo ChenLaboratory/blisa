@@ -1,11 +1,23 @@
 #library(ComplexHeatmap)
 
-#' plot heatmap of cell-cell interaction scores for all LR pairs
+#' Heatmap of CCI scores across all ligand-receptor pairs
 #'
-#' @param CCI_df dataframe of cell-cell interaction scores from CCI anlaysis
+#' Draws a clustered heatmap (via \code{ComplexHeatmap}) with row annotations
+#' for sender and receiver cell types. Row annotations use \code{cell_type_colors},
+#' which must be a named character vector of colours defined in the calling
+#' environment or passed explicitly.
+#'
+#' @param CCI_df Data frame returned by \code{runCCI}. Rows are
+#'   \code{"Sender->Receiver"} cell-type pairs; columns are LR pairs.
+#' @param include_celltypes Character vector or \code{NULL}. If provided, only
+#'   rows where the sender or receiver appears in this vector are kept.
+#' @param cell_type_colors Named character vector mapping cell-type names to
+#'   colours, used for the sender/receiver row annotations.
+#'
+#' @return Invisibly returns the \code{Heatmap} object.
+#' @importFrom grid gpar unit
 #' @export
-#'
-CCIheatmap <- function(CCI_df, include_celltypes = NULL) {
+CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors) {
   # Optional subsetting
   if (!is.null(include_celltypes)) {
     # Parse sender and receiver from rownames

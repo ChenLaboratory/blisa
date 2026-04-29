@@ -37,13 +37,29 @@ cols <- c(
   "#FFB3BA"  # baby pink
 )
 
-#' plot spatial plot of cell-cell interaction pattern for a specific LR pair
+#' Spatial map of dominant sender-receiver cell-type pairs at BLISA hotspots
 #'
-#' @param spe cell-level spe object
-#' @param BLISA_output result outout from runBLISA
-#' @param index LR index
+#' Plots the dominant interacting cell-type pair at each hotspot hex bin for a
+#' selected ligand-receptor interaction. Receiver cells are those inside hotspot
+#' bins; sender cells are in the immediate neighbourhood.
+#'
+#' @param spe A cell-level \code{SpatialExperiment} object.
+#' @param BLISA_output Result list returned by \code{runBLISA.spe} or
+#'   \code{runBLISA.spe.isolates.removed}. Must contain \code{LR_out} and
+#'   \code{hex_sf}.
+#' @param index Integer. Row index into \code{BLISA_output$LR_out} selecting
+#'   the ligand-receptor pair to visualise.
+#' @param ct_group Character. Column name in \code{colData(spe)} containing
+#'   cell-type labels. Default \code{"cell_type"}.
+#' @param top Integer. Maximum number of distinct cell-type pairs to show in
+#'   the legend; remaining pairs are grouped as \code{"rare pairs"}. Default 30.
+#' @param hex_size Numeric. Hex bin spacing used to recompute queen neighbours
+#'   for nearby-mode interactions. Default 50.
+#' @param dmax Numeric. Maximum distance used to recompute distance neighbours
+#'   for diffuse-mode interactions. Default 250.
+#'
+#' @return A \code{ggplot} object.
 #' @export
-#'
 CCIspatial <- function(
     spe,
     BLISA_output,
@@ -110,7 +126,8 @@ CCIspatial <- function(
     legend_title <- paste0("Top ", top, " pairs (ordered)")
   }
 
-  top_pairs <- top_pairs %>% mutate(cell_pair_plot = ifelse(cell_pair %in% filtered_pairs, cell_pair, "rare pairs"))
+  # label pairs outside the top-N as "rare pairs" for legend clarity
+  top_pairs[, cell_pair_plot := ifelse(cell_pair %in% filtered_pairs, cell_pair, "rare pairs")]
 
   # 6. Categorize ALL hexagons
   # Start by identifying bins with cells vs empty bins

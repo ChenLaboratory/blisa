@@ -69,8 +69,17 @@
 #   return(p)
 # }
 
-#' CCI heatmap for one ligand-receptor pair
-#' ...
+#' Heatmap of CCI scores for a single ligand-receptor pair
+#'
+#' Reshapes the CCI data frame into a receiver-by-sender matrix for one LR pair
+#' and draws a clustered heatmap.
+#'
+#' @param CCIres Data frame returned by \code{runCCI}. Rows are
+#'   \code{"Sender->Receiver"} cell-type pairs; columns are LR pairs.
+#' @param lr_pair Character. Column name in \code{CCIres} corresponding to the
+#'   ligand-receptor pair to visualise (e.g. \code{"CD80_CD274"}).
+#'
+#' @return A \code{Heatmap} object.
 #' @export
 CCIheatmapOneLR <- function(CCIres, lr_pair) {
   # CCIres: your pre-calculated dataframe (cell-cell pairs as rows, LR pairs as columns)

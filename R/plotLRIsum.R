@@ -1,19 +1,24 @@
-#' plot dot plot ranking LR results from BLISA
+#' Dot plot ranking LR pairs by number of significant hotspot bins
 #'
-#' @param LR_out BLISA LRI result
+#' @param LR_out Data frame returned in the \code{LR_out} slot of a BLISA
+#'   result list. Rows are ligand-receptor pairs; must contain columns
+#'   \code{sig_numbers} and \code{annotation}.
+#' @param top Integer or \code{NULL}. If set, only the top \code{top} rows
+#'   (already ordered by \code{sig_numbers}) are plotted. Default \code{NULL}
+#'   plots all pairs.
+#' @param pt.size Numeric. Point size passed to \code{geom_point}. Default 4.
+#'
+#' @return A \code{ggplot} object.
 #' @export
-#'
 plotLRIsum <- function(LR_out, top = NULL, pt.size = 4) {
 
-  if(!is.null(top)){
-    LR_out <- LR_out[1:top,]
+  if (!is.null(top)) {
+    LR_out <- LR_out[seq_len(min(top, nrow(LR_out))), ]
   }
 
   LR_out$LR_pair <- rownames(LR_out)
-
-  LR_out <- LR_out %>%
-    arrange(desc(`sig_numbers`)) %>%
-    mutate(LR_pair = factor(LR_pair, levels = rev(LR_pair))) # reverse so high at top
+  LR_out <- LR_out[order(-LR_out$sig_numbers), ]
+  LR_out$LR_pair <- factor(LR_out$LR_pair, levels = rev(LR_out$LR_pair))
 
   p <- ggplot(LR_out, aes(x = `sig_numbers`, y = LR_pair, color = annotation)) +
     geom_point(size = pt.size)+

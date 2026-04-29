@@ -21,8 +21,25 @@ getLRpairs <- function(gene_panel, LR_df = CellChatDB.human$interaction){
 }
 
 # NOTE: use ligand/receptor.symbol as gene name, ligand/receptor columns are bilogical entity names which may not be a gene, e.g. RA-ALDH1A3
-#' Filter ligand-receptor pairs
-#' ...
+#' Filter ligand-receptor pairs by expression threshold
+#'
+#' Retains only LR pairs where at least one bin/spot has counts at or above
+#' \code{min_ligand} for every ligand subunit and \code{min_receptor} for every
+#' receptor subunit.
+#'
+#' @param counts Gene-by-bin count matrix (dense or sparse). Row names must be
+#'   gene symbols.
+#' @param min_ligand Numeric. Minimum count threshold for ligand genes. At least
+#'   one bin must meet or exceed this value. Default 10.
+#' @param min_receptor Numeric. Minimum count threshold for receptor genes. At
+#'   least one bin must meet or exceed this value. Default 10.
+#' @param LR_df Data frame of ligand-receptor pairs with columns
+#'   \code{ligand.symbol} and \code{receptor.symbol} (comma-separated gene
+#'   symbols for multi-subunit complexes). Defaults to
+#'   \code{CellChatDB.human$interaction}.
+#'
+#' @return A subset of \code{LR_df} containing only pairs that pass the
+#'   expression thresholds for both ligand and receptor.
 #' @export
 filterLRpairs <- function(counts, min_ligand = 10, min_receptor = 10, LR_df = CellChatDB.human$interaction) {
   #counts = spe@assays@data$counts

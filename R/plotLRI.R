@@ -1,12 +1,21 @@
 LRI_spatial_colors <- c("#FFFFCC", "#FFD700", "#FF7F00", "#D7301F")
 
-#' Run BLISA analysis on bin level sf
+#' Spatial significance map for one ligand-receptor pair
 #'
-#' @param LR_out BLISA LRI result
-#' @param hex_sf Bin-level sf object
-#' @param index Ligand-receptor index
+#' Plots each hex bin coloured by significance status: empty, non-significant,
+#' or significant (continuous gradient of -log10 p-value or 1-p-value).
+#'
+#' @param hex_sf An \code{sf} object of hex bin polygons. Must contain an
+#'   \code{n_cells} column (number of cells per bin).
+#' @param LR_out Data frame from the \code{LR_out} slot of a BLISA result.
+#'   Must contain \code{sig_index} and \code{sig_pval} list columns.
+#' @param index Integer. Row index into \code{LR_out} selecting the
+#'   ligand-receptor pair to visualise.
+#' @param log_pval Logical. If \code{TRUE} (default), colour significant bins
+#'   by -log10(p-value). If \code{FALSE}, use 1 - p-value.
+#'
+#' @return A \code{ggplot} object.
 #' @export
-#'
 plotLRI.sf <- function(hex_sf, LR_out, index, log_pval = TRUE) {
 
   # 1. Prepare Data
