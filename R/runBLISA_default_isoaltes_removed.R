@@ -1,3 +1,54 @@
+# =============================================================================
+# Expression utilities
+# =============================================================================
+
+# Split "A, B" or "A_B" into a character vector of gene symbols
+parse_units <- function(s) {
+  s <- gsub("\\s+", "", as.character(s))
+  unlist(strsplit(s, "[,_]"))
+}
+
+# Per-bin minimum expression across all subunits of a (possibly multi-unit) gene
+# hex_gene_counts: genes x bins matrix
+get_min_expr <- function(gene_str, hex_gene_counts) {
+  genes <- parse_units(gene_str)
+  genes <- genes[genes %in% rownames(hex_gene_counts)]
+  n     <- ncol(hex_gene_counts)
+  if (length(genes) == 0) return(rep(0, n))  # gene(s) absent -> 0
+  if (length(genes) == 1) return(as.numeric(hex_gene_counts[genes, ]))
+  # per-bin minimum across subunits
+  mat <- hex_gene_counts[genes, , drop = FALSE]
+  apply(mat, 2, min)
+}
+
+# Assign ccc_mode ("diffuse" / "nearby") based on annotation column
+LR_df_add_mode <- function(LR_df,
+                           col              = "annotation",
+                           default_mode     = "diffuse",
+                           diffuse_category = c("Secreted Signaling",
+                                                "Non-protein Signaling")) {
+  # Case 1: annotation column missing → all diffuse
+  if (!col %in% colnames(LR_df)) {
+    LR_df$ccc_mode <- default_mode
+    message(col, " column missing — setting ccc_mode='", default_mode, "' for all.")
+    return(LR_df)
+  }
+  
+  # Case 2: annotation exists
+  LR_df$ccc_mode <-
+    ifelse(
+      LR_df[[col]] %in% diffuse_category,
+      "diffuse",
+      "nearby"
+    )
+  
+  message("ccc_mode: 'diffuse' for [",
+          paste(diffuse_category, collapse = ", "),
+          "]; 'nearby' for others.")
+  LR_df
+}
+
+
 #' Run BLISA on Bin-Level Spatial Data with Isolate Removal
 #'
 #' Performs BLISA (Bivariate Local Indicator of Spatial Association) analysis
@@ -26,7 +77,10 @@
 #'   for a receptor to be retained in ligand-receptor filtering.
 #' @param min_cells_per_bin Integer. Minimum number of cells required for a bin
 #'   to be included in Moran's I calculation. Bins below this threshold are
-#'   excluded and assigned neutral statistics.
+#'   excluded and assigned neutral statistics. Ignored when \code{n_cells_col = NA}.
+#' @param n_cells_col Character or \code{NA}. Column name in \code{bin_sf}
+#'   holding per-bin cell counts used for \code{min_cells_per_bin} filtering.
+#'   Set to \code{NA} to skip cell-count filtering (default).
 #' @param col Character. Column name in \code{LR_df} specifying ligand-receptor
 #'   annotation/category used for communication mode assignment.
 #' @param default_mode Character. Default communication mode assigned to ligand-
@@ -41,12 +95,6 @@
 #'   pair, including significant hotspot counts, hotspot indices, p-values,
 #'   and local Moran's I statistics.}
 #'   \item{bin_sf}{Input bin-level \code{sf} object.}
-#'   \item{isolate_idx_queen}{Integer vector of bins with no queen-adjacent
-#'   neighbors.}
-#'   \item{isolate_idx_dist}{Integer vector of bins with no neighbors within
-#'   \code{dmax}.}
-#'   \item{low_cell_idx}{Integer vector of bins excluded for having fewer than
-#'   \code{min_cells_per_bin} cells.}
 #' }
 #'
 #' @export
@@ -69,95 +117,17 @@ runBLISA.default.isolates.removed <- function(
     p_cutoff = 0.05,
     min_ligand = 10, min_receptor = 10,
     min_cells_per_bin = 1,
+    n_cells_col = NA,
     col = "annotation",
     default_mode = "diffuse",
     diffuse_category = c("Secreted Signaling", "Non-protein Signaling")
 ) {
 
-  centroids <- sf::st_centroid(bin_sf)
-  coords <- sf::st_coordinates(centroids)
-
-  ## ---------------------------
-  ## Filter low-cell bins
-  ## ---------------------------
-
-  if (!"n_cells" %in% colnames(bin_sf)) {
-    stop("bin_sf must contain a 'n_cells' column for min_cells_per_bin filtering.")
-  }
-
-  low_cell_idx <- which(bin_sf$n_cells < min_cells_per_bin)
-
-  message(length(low_cell_idx),
-          " bins removed for having < ",
-          min_cells_per_bin,
-          " cells.")
-
-  ## ---------------------------
-  ## Queen spatial weights
-  ## ---------------------------
-
-  # queen neighboours of all bins
-  queen_nb_full <- spdep::dnearneigh(coords, 0, 1.2 * hex_size)
-
-  # isolates  bins with no queen neighboours
-  isolate_idx_queen <- which(spdep::card(queen_nb_full) == 0)
-
-  message(length(isolate_idx_queen),
-          " isolated bins with no nearby neighbors: ",
-          paste(isolate_idx_queen, collapse = ","))
-
-  # idx to use for queen weights: exclude isolates and low-cell bins
-  exclude_idx_queen <- union(isolate_idx_queen, low_cell_idx)
-  keep_idx_queen <- setdiff(seq_len(nrow(bin_sf)), exclude_idx_queen)
-  keep_logical_queen <- seq_len(nrow(bin_sf)) %in% keep_idx_queen
-
-  # queen neighboours of kept  bins
-  queen_nb <- spdep::subset.nb(
-    queen_nb_full,
-    subset = keep_logical_queen
-  )
-
-  # queen weights of kept bins
-  queen_wt <- spdep::nb2listwdist(
-    queen_nb,
-    centroids[keep_idx_queen, ],
-    type = "idw",
-    style = "W",
-    zero.policy = TRUE
-  )
-
-  ## ---------------------------
-  ## Distance spatial weights
-  ## ---------------------------
-
-  # distance neighboours of all bins
-  dist_nb_full <- spdep::dnearneigh(coords, 0, dmax)
-
-  # isolates  bins with no distance neighboours
-  isolate_idx_dist <- which(spdep::card(dist_nb_full) == 0)
-  message(length(isolate_idx_dist),
-          " isolated bins with no neighbors within ", dmax, " um: ",
-          paste(isolate_idx_dist, collapse = ","))
-
-  # idx to use for distance weights: exclude isolates and low-cell bins
-  exclude_idx_dist  <- union(isolate_idx_dist, low_cell_idx)
-
-  keep_idx_dist  <- setdiff(seq_len(nrow(bin_sf)), exclude_idx_dist)
-  keep_logical_dist  <- seq_len(nrow(bin_sf)) %in% keep_idx_dist
-
-  # distance neighboours of non-isolates  bins
-  dist_nb <- spdep::subset.nb(dist_nb_full, subset = keep_logical_dist)
-
-  # distance weights of non-isolates  bins
-  weight_at_dmax <- 0.01
-
-  dist_wt <- spdep::nb2listwdist(
-    dist_nb,
-    bin_sf[keep_idx_dist, ],
-    type = "exp",
-    style = "W",
-    alpha = -log(weight_at_dmax) / dmax
-  )
+  sw <- computeSpatialWeights(bin_sf, hex_size, dmax, min_cells_per_bin, n_cells_col)
+  queen_wt <- sw$queen_wt
+  dist_wt <- sw$dist_wt
+  keep_idx_queen <- sw$keep_idx_queen
+  keep_idx_dist <- sw$keep_idx_dist
 
   ## ---------------------------
   ## Filter LR pairs
@@ -194,14 +164,13 @@ runBLISA.default.isolates.removed <- function(
 
     mode <- LR_out$ccc_mode[i]
 
+    # Perform in subset with no isolates, then restore full-length vectors with neutral values for excluded bins.
     if (mode == "nearby") {
       wt <- queen_wt
       keep_idx <- keep_idx_queen
-      isolate_idx <- isolate_idx_queen
     } else {
       wt <- dist_wt
       keep_idx <- keep_idx_dist
-      isolate_idx <- isolate_idx_dist
     }
 
     message("ccc mode is ", mode)
@@ -229,10 +198,9 @@ runBLISA.default.isolates.removed <- function(
       p.adjust = "none"
     )
 
-    idx_keep <- (hs == "High-High")
-    idx_keep[is.na(idx_keep)] <- FALSE
+    hs_idx_hh <- !is.na(hs) & hs == "High-High"
 
-    HH_idx <- keep_idx[which(idx_keep)]
+    HH_idx <- keep_idx[which(hs_idx_hh)]
     HH_pval <- full_pval[HH_idx]
 
     LR_out$sig_numbers[i] <- length(HH_idx)
@@ -249,10 +217,5 @@ runBLISA.default.isolates.removed <- function(
 
   LR_out <- LR_out[, c(front_cols, setdiff(colnames(LR_out), front_cols))]
 
-  list(
-    LR_out = LR_out,
-    bin_sf = bin_sf,
-    isolate_idx_queen = isolate_idx_queen,
-    isolate_idx_dist = isolate_idx_dist
-  )
+  list(LR_out = LR_out, bin_sf = bin_sf, sw = sw)
 }

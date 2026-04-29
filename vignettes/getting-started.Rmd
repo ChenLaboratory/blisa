@@ -97,8 +97,8 @@ plotLRIsum(BLISAres$LR_out)
 
 # Visualize Spatial Distribution of Top LR Pairs
 
-```{r}
-plots <- lapply(seq_len(min(6, nrow(BLISAres$LR_out))), function(i) {
+```{r, fig.width=15, fig.height=12}
+plots <- lapply(seq_len(nrow(BLISAres$LR_out)), function(i) {
   plotLRI.sf(
     BLISAres$bin_sf,
     BLISAres$LR_out,
@@ -106,7 +106,13 @@ plots <- lapply(seq_len(min(6, nrow(BLISAres$LR_out))), function(i) {
   )
 })
 
-patchwork::wrap_plots(plots, ncol = 3)
+combined_plot <- patchwork::wrap_plots(plots, ncol = 3)
+
+combined_plot
+
+pdf("xenium_LRI_spatial_plots.pdf", width = 15, height = 12)
+print(combined_plot)
+dev.off()
 ```
 
 # Run Cell–Cell Interaction Analysis

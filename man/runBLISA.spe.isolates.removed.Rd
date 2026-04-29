@@ -14,10 +14,17 @@ runBLISA.spe.isolates.removed(
   p_cutoff = 0.05,
   min_ligand = 10,
   min_receptor = 10,
+  min_cells_per_bin = 1,
   col = "annotation",
   default_mode = "diffuse",
   diffuse_category = c("Secreted Signaling", "Non-protein Signaling")
 )
+}
+\arguments{
+\item{min_cells_per_bin}{Integer. Minimum number of cells a hex bin must
+contain to be included in spatial weight computation and Moran's I
+calculation. Bins below this threshold are excluded and assigned neutral
+statistics (p = 1, LISA = 0).}
 }
 \description{
 Run BLISA on Bin-Level Spatial Data with Isolate Removal

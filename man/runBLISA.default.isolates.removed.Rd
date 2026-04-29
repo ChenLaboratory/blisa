@@ -15,6 +15,7 @@ runBLISA.default.isolates.removed(
   min_ligand = 10,
   min_receptor = 10,
   min_cells_per_bin = 1,
+  n_cells_col = NA,
   col = "annotation",
   default_mode = "diffuse",
   diffuse_category = c("Secreted Signaling", "Non-protein Signaling")
@@ -50,7 +51,11 @@ for a receptor to be retained in ligand-receptor filtering.}
 
 \item{min_cells_per_bin}{Integer. Minimum number of cells required for a bin
 to be included in Moran's I calculation. Bins below this threshold are
-excluded and assigned neutral statistics.}
+excluded and assigned neutral statistics. Ignored when \code{n_cells_col = NA}.}
+
+\item{n_cells_col}{Character or \code{NA}. Column name in \code{bin_sf}
+holding per-bin cell counts used for \code{min_cells_per_bin} filtering.
+Set to \code{NA} to skip cell-count filtering (default).}
 
 \item{col}{Character. Column name in \code{LR_df} specifying ligand-receptor
 annotation/category used for communication mode assignment.}
@@ -69,12 +74,6 @@ A list containing:
 pair, including significant hotspot counts, hotspot indices, p-values,
 and local Moran's I statistics.}
 \item{bin_sf}{Input bin-level \code{sf} object.}
-\item{isolate_idx_queen}{Integer vector of bins with no queen-adjacent
-neighbors.}
-\item{isolate_idx_dist}{Integer vector of bins with no neighbors within
-\code{dmax}.}
-\item{low_cell_idx}{Integer vector of bins excluded for having fewer than
-\code{min_cells_per_bin} cells.}
 }
 }
 \description{
