@@ -1,5 +1,3 @@
-LRI_spatial_colors <- c("#FFFFCC", "#FFD700", "#FF7F00", "#D7301F")
-
 #' Spatial significance map for one ligand-receptor pair
 #'
 #' Plots each hex bin coloured by significance status: empty, non-significant,
