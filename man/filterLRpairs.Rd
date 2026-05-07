@@ -2,8 +2,7 @@
 % Please edit documentation in R/filterLRpairs.R
 \name{filterLRpairs}
 \alias{filterLRpairs}
-\title{Filter ligand-receptor pairs
-...}
+\title{Filter ligand-receptor pairs by expression threshold}
 \usage{
 filterLRpairs(
   counts,
@@ -12,7 +11,27 @@ filterLRpairs(
   LR_df = CellChatDB.human$interaction
 )
 }
+\arguments{
+\item{counts}{Gene-by-bin count matrix (dense or sparse). Row names must be
+gene symbols.}
+
+\item{min_ligand}{Numeric. Minimum count threshold for ligand genes. At least
+one bin must meet or exceed this value. Default 10.}
+
+\item{min_receptor}{Numeric. Minimum count threshold for receptor genes. At
+least one bin must meet or exceed this value. Default 10.}
+
+\item{LR_df}{Data frame of ligand-receptor pairs with columns
+\code{ligand.symbol} and \code{receptor.symbol} (comma-separated gene
+symbols for multi-subunit complexes). Defaults to
+\code{CellChatDB.human$interaction}.}
+}
+\value{
+A subset of \code{LR_df} containing only pairs that pass the
+expression thresholds for both ligand and receptor.
+}
 \description{
-Filter ligand-receptor pairs
-...
+Retains only LR pairs where at least one bin/spot has counts at or above
+\code{min_ligand} for every ligand subunit and \code{min_receptor} for every
+receptor subunit.
 }

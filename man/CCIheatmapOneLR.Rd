@@ -2,12 +2,21 @@
 % Please edit documentation in R/CCIheatmapOneLR.R
 \name{CCIheatmapOneLR}
 \alias{CCIheatmapOneLR}
-\title{CCI heatmap for one ligand-receptor pair
-...}
+\title{Heatmap of CCI scores for a single ligand-receptor pair}
 \usage{
 CCIheatmapOneLR(CCIres, lr_pair)
 }
+\arguments{
+\item{CCIres}{Data frame returned by \code{runCCI}. Rows are
+\code{"Sender->Receiver"} cell-type pairs; columns are LR pairs.}
+
+\item{lr_pair}{Character. Column name in \code{CCIres} corresponding to the
+ligand-receptor pair to visualise (e.g. \code{"CD80_CD274"}).}
+}
+\value{
+A \code{Heatmap} object.
+}
 \description{
-CCI heatmap for one ligand-receptor pair
-...
+Reshapes the CCI data frame into a receiver-by-sender matrix for one LR pair
+and draws a clustered heatmap.
 }

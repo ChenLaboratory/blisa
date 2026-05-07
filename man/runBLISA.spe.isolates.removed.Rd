@@ -2,7 +2,7 @@
 % Please edit documentation in R/runBLISA_spe.R
 \name{runBLISA.spe.isolates.removed}
 \alias{runBLISA.spe.isolates.removed}
-\title{Run BLISA on Bin-Level Spatial Data with Isolate Removal}
+\title{Run BLISA on a cell-level SpatialExperiment with isolate removal}
 \usage{
 runBLISA.spe.isolates.removed(
   spe,
@@ -21,11 +21,45 @@ runBLISA.spe.isolates.removed(
 )
 }
 \arguments{
+\item{spe}{A cell-level \code{SpatialExperiment} object.}
+
+\item{sf}{Unused; reserved for future gridding overrides.}
+
+\item{LR_df}{Data frame of ligand-receptor pairs (see \code{filterLRpairs}).}
+
+\item{hex_size}{Numeric. Hexagonal bin side length. Default 50.}
+
+\item{dmax}{Numeric. Maximum distance for diffuse-mode neighbours. Default 250.}
+
+\item{nsim}{Integer. Number of permutations for Moran's I. Default 999.}
+
+\item{p_cutoff}{Numeric. P-value threshold for hotspots. Default 0.05.}
+
+\item{min_ligand}{Numeric. Minimum ligand count threshold. Default 10.}
+
+\item{min_receptor}{Numeric. Minimum receptor count threshold. Default 10.}
+
 \item{min_cells_per_bin}{Integer. Minimum number of cells a hex bin must
 contain to be included in spatial weight computation and Moran's I
 calculation. Bins below this threshold are excluded and assigned neutral
-statistics (p = 1, LISA = 0).}
+statistics (p = 1, LISA = 0). Default 1.}
+
+\item{col}{Character. Column in \code{LR_df} for interaction category.
+Default \code{"annotation"}.}
+
+\item{default_mode}{Character. Default CCC mode when \code{col} is absent.
+Default \code{"diffuse"}.}
+
+\item{diffuse_category}{Character vector of annotation categories treated as
+diffuse signaling.}
+}
+\value{
+A list with \code{LR_out} and \code{bin_sf}; see
+\code{\link{runBLISA.default.isolates.removed}} for details.
 }
 \description{
-Run BLISA on Bin-Level Spatial Data with Isolate Removal
+Bins cells into hexagonal tiles via \code{hex_binning_cells}, removes empty
+bins, then runs \code{runBLISA.default.isolates.removed}. Isolated bins and
+bins below \code{min_cells_per_bin} are excluded from Moran's I and assigned
+neutral statistics (p = 1, LISA = 0).
 }

@@ -43,7 +43,13 @@ runBLISA.default(
 \item{diffuse_category}{Character vector of categories treated as “diffuse”.}
 }
 \value{
-A list with components \code{...} (describe structure).
+A list with:
+\describe{
+\item{LR_out}{Data frame of BLISA results. Columns include \code{ccc_mode},
+\code{sig_numbers}, \code{sig_index}, \code{sig_pval}, \code{all_pval},
+\code{all_lisa}, plus original columns from \code{LR_df}.}
+\item{bin_sf}{Input \code{sf} object of bin polygons.}
+}
 }
 \description{
 Run BLISA analysis on bin level sf

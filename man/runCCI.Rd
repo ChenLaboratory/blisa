@@ -2,12 +2,34 @@
 % Please edit documentation in R/runCCI.R
 \name{runCCI}
 \alias{runCCI}
-\title{run CCI analysis to get cell-cell interaction scores for all cell type pairs and ligand-receptor pairs
-...}
+\title{Score cell-cell interactions from BLISA hotspots}
 \usage{
 runCCI(spe, BLISA_output, ct_group = "cell_type", hex_size = 50, dmax = 250)
 }
+\arguments{
+\item{spe}{A cell-level \code{SpatialExperiment} object.}
+
+\item{BLISA_output}{Result list returned by \code{runBLISA.spe} or
+\code{runBLISA.spe.isolates.removed}. Must contain \code{LR_out} and
+\code{hex_sf}.}
+
+\item{ct_group}{Character. Column name in \code{colData(spe)} containing
+cell-type labels. Default \code{"cell_type"}.}
+
+\item{hex_size}{Numeric. Hex bin spacing used to compute queen neighbours for
+nearby-mode interactions. Default 50.}
+
+\item{dmax}{Numeric. Maximum distance used to compute distance neighbours for
+diffuse-mode interactions. Default 250.}
+}
+\value{
+A data frame with \code{"Sender->Receiver"} row names and one column
+per LR pair containing the interaction score.
+}
 \description{
-run CCI analysis to get cell-cell interaction scores for all cell type pairs and ligand-receptor pairs
-...
+For each significant ligand-receptor pair, aggregates ligand expression in
+sender cells (hotspot neighbourhood) and receptor expression in receiver cells
+(hotspot bins) by cell type, then computes a geometric-mean interaction score.
+Returns a wide data frame: rows are \code{"Sender->Receiver"} cell-type pairs,
+columns are LR pairs.
 }

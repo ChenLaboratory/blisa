@@ -2,7 +2,7 @@
 % Please edit documentation in R/runBLISA_spe.R
 \name{runBLISA.spe}
 \alias{runBLISA.spe}
-\title{Run BLISA analysis on cell-level spe}
+\title{Run BLISA on a cell-level SpatialExperiment}
 \usage{
 runBLISA.spe(
   spe,
@@ -20,12 +20,41 @@ runBLISA.spe(
 )
 }
 \arguments{
-\item{spe}{cell-level spe object}
+\item{spe}{A cell-level \code{SpatialExperiment} object with spatial
+coordinates in \code{spatialCoords} and counts in \code{assay(spe, "counts")}.}
 
-\item{LR_df}{Ligand-receptor dataframe}
+\item{sf}{Unused; reserved for future gridding overrides.}
 
-\item{bin_sf}{Bin-level sf object}
+\item{LR_df}{Data frame of ligand-receptor pairs (see \code{filterLRpairs}).}
+
+\item{hex_size}{Numeric. Hexagonal bin side length in coordinate units.
+Default 50.}
+
+\item{dmax}{Numeric. Maximum distance for diffuse-mode neighbours. Default 250.}
+
+\item{nsim}{Integer. Number of permutations for Moran's I significance.
+Default 999.}
+
+\item{p_cutoff}{Numeric. P-value threshold for High-High hotspots. Default 0.05.}
+
+\item{min_ligand}{Numeric. Minimum ligand count threshold. Default 10.}
+
+\item{min_receptor}{Numeric. Minimum receptor count threshold. Default 10.}
+
+\item{col}{Character. Column in \code{LR_df} for interaction category.
+Default \code{"annotation"}.}
+
+\item{default_mode}{Character. Default CCC mode when \code{col} is absent.
+Default \code{"diffuse"}.}
+
+\item{diffuse_category}{Character vector of annotation categories treated as
+diffuse signaling.}
+}
+\value{
+A list with \code{LR_out} and \code{bin_sf}; see
+\code{\link{runBLISA.default}} for details.
 }
 \description{
-Run BLISA analysis on cell-level spe
+Bins cells into hexagonal tiles via \code{hex_binning_cells}, removes empty
+bins, then runs \code{runBLISA.default}.
 }
