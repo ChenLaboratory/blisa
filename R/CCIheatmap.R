@@ -15,7 +15,6 @@
 #'   colours, used for the sender/receiver row annotations.
 #'
 #' @return Invisibly returns the \code{Heatmap} object.
-#' @importFrom grid gpar unit
 #' @export
 CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors) {
   # Optional subsetting

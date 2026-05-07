@@ -45,7 +45,7 @@ plotLRI.sf <- function(hex_sf, LR_out, index, log_pval = TRUE) {
   }
 
   # 2. Plot
-  p <- ggplot2::ggplot(hex_sf) +
+  p <- ggplot(hex_sf) +
     # Layer 1: The "Background" (Empty and Non-Significant bins)
     geom_sf(aes(fill = bin_status), color = NA) +
 

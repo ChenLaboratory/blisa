@@ -10,7 +10,12 @@ filter_genes <- function(gene_column, gene_list) { # function to filter out the 
 }
 
 
-getLRpairs <- function(gene_panel, LR_df = CellChatDB.human$interaction){
+getLRpairs <- function(gene_panel, LR_df = NULL){
+  if (is.null(LR_df)) {
+    if (!requireNamespace("CellChat", quietly = TRUE))
+      stop("Package 'CellChat' is required when LR_df is not supplied. Install it or pass LR_df explicitly.")
+    LR_df <- CellChat::CellChatDB.human$interaction
+  }
 
   LR_df$ligand.symbol <- filter_genes(LR_df$ligand.symbol, gene_panel)
   LR_df$receptor.symbol <- filter_genes(LR_df$receptor.symbol, gene_panel)
@@ -41,8 +46,12 @@ getLRpairs <- function(gene_panel, LR_df = CellChatDB.human$interaction){
 #' @return A subset of \code{LR_df} containing only pairs that pass the
 #'   expression thresholds for both ligand and receptor.
 #' @export
-filterLRpairs <- function(counts, min_ligand = 10, min_receptor = 10, LR_df = CellChatDB.human$interaction) {
-  #counts = spe@assays@data$counts
+filterLRpairs <- function(counts, min_ligand = 10, min_receptor = 10, LR_df = NULL) {
+  if (is.null(LR_df)) {
+    if (!requireNamespace("CellChat", quietly = TRUE))
+      stop("Package 'CellChat' is required when LR_df is not supplied. Install it or pass LR_df explicitly.")
+    LR_df <- CellChat::CellChatDB.human$interaction
+  }
 
   filtered_counts_ligand <- counts[Matrix::rowSums(counts >= min_ligand) > 0, ] # at least one spot has more than min_ligand counts
   filtered_counts_receptor <- counts[Matrix::rowSums(counts >= min_receptor) > 0, ]
