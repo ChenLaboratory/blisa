@@ -10,12 +10,8 @@ filter_genes <- function(gene_column, gene_list) { # function to filter out the 
 }
 
 
-getLRpairs <- function(gene_panel, LR_df = NULL){
-  if (is.null(LR_df)) {
-    if (!requireNamespace("CellChat", quietly = TRUE))
-      stop("Package 'CellChat' is required when LR_df is not supplied. Install it or pass LR_df explicitly.")
-    LR_df <- CellChat::CellChatDB.human$interaction
-  }
+getLRpairs <- function(gene_panel, LR_df = NULL, species = c("human", "mouse")){
+  if (is.null(LR_df)) LR_df <- .load_cellchat_db(species)
 
   LR_df$ligand.symbol <- filter_genes(LR_df$ligand.symbol, gene_panel)
   LR_df$receptor.symbol <- filter_genes(LR_df$receptor.symbol, gene_panel)
@@ -40,18 +36,17 @@ getLRpairs <- function(gene_panel, LR_df = NULL){
 #'   least one bin must meet or exceed this value. Default 10.
 #' @param LR_df Data frame of ligand-receptor pairs with columns
 #'   \code{ligand.symbol} and \code{receptor.symbol} (comma-separated gene
-#'   symbols for multi-subunit complexes). Defaults to
-#'   \code{CellChatDB.human$interaction}.
+#'   symbols for multi-subunit complexes). When \code{NULL}, the CellChatDB for
+#'   the chosen \code{species} is downloaded automatically.
+#' @param species Character. Which CellChatDB to download when \code{LR_df} is
+#'   \code{NULL}. One of \code{"human"} (default) or \code{"mouse"}.
 #'
 #' @return A subset of \code{LR_df} containing only pairs that pass the
 #'   expression thresholds for both ligand and receptor.
 #' @export
-filterLRpairs <- function(counts, min_ligand = 10, min_receptor = 10, LR_df = NULL) {
-  if (is.null(LR_df)) {
-    if (!requireNamespace("CellChat", quietly = TRUE))
-      stop("Package 'CellChat' is required when LR_df is not supplied. Install it or pass LR_df explicitly.")
-    LR_df <- CellChat::CellChatDB.human$interaction
-  }
+filterLRpairs <- function(counts, min_ligand = 10, min_receptor = 10,
+                          LR_df = NULL, species = c("human", "mouse")) {
+  if (is.null(LR_df)) LR_df <- .load_cellchat_db(species)
 
   filtered_counts_ligand <- counts[Matrix::rowSums(counts >= min_ligand) > 0, ] # at least one spot has more than min_ligand counts
   filtered_counts_receptor <- counts[Matrix::rowSums(counts >= min_receptor) > 0, ]

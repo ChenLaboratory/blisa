@@ -1,7 +1,7 @@
 Package: blisa
 Type: Package
 Title: Infer cell-cell communication from spatial transcriptomics
-Version: 0.1.1
+Version: 0.1.2
 Author: Lei Qin, Lizhong Chen, Yunshun Chen
 Maintainer: Lei Qin <qin.l@wehi.edu.au>, Yunshun Chen <yuchen@wehi.edu.au>
 Description: Tools for spatial cell-cell communication analysis of spatial transcriptomics data.
@@ -20,7 +20,6 @@ Imports:
     circlize,
     ggplot2,
     viridisLite,
-    ggnewscale,
     grid
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

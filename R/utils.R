@@ -38,6 +38,30 @@ cols <- c(
   "#FFB3BA"  # baby pink
 )
 
+# Session-level cache so CellChatDB is only downloaded once per R session
+.blisa_cache <- new.env(parent = emptyenv())
+
+.load_cellchat_db <- function(species = c("human", "mouse")) {
+  species <- match.arg(species)
+  key <- paste0("CellChatDB.", species)
+  if (!is.null(.blisa_cache[[key]])) return(.blisa_cache[[key]])
+  url <- sprintf(
+    "https://raw.githubusercontent.com/jinworks/CellChat/main/data/CellChatDB.%s.rda",
+    species
+  )
+  message("Downloading CellChatDB.", species, " from GitHub (once per session)...")
+  tmp <- new.env(parent = emptyenv())
+  tryCatch(
+    load(url(url), envir = tmp),
+    error = function(e) stop(
+      "Failed to download CellChatDB.", species, ". ",
+      "Check your internet connection or supply LR_df explicitly."
+    )
+  )
+  .blisa_cache[[key]] <- tmp[[key]]$interaction
+  .blisa_cache[[key]]
+}
+
 parse_units <- function(s) {
   s <- as.character(s)
   s <- gsub("\\s+", "", s)
