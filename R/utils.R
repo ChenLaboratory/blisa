@@ -50,15 +50,17 @@ cols <- c(
     species
   )
   message("Downloading CellChatDB.", species, " from GitHub (once per session)...")
-  tmp <- new.env(parent = emptyenv())
-  tryCatch(
-    load(url(url), envir = tmp),
-    error = function(e) stop(
-      "Failed to download CellChatDB.", species, ". ",
-      "Check your internet connection or supply LR_df explicitly."
-    )
-  )
-  .blisa_cache[[key]] <- tmp[[key]]$interaction
+  tmp_file <- tempfile(fileext = ".rda")
+  on.exit(unlink(tmp_file), add = TRUE)
+  tryCatch({
+    download.file(url, tmp_file, mode = "wb", quiet = TRUE)
+    tmp <- new.env(parent = emptyenv())
+    load(tmp_file, envir = tmp)
+    .blisa_cache[[key]] <- tmp[[key]]$interaction
+  }, error = function(e) stop(
+    "Failed to download CellChatDB.", species, ". ",
+    "Check your internet connection or supply LR_df explicitly."
+  ))
   .blisa_cache[[key]]
 }
 

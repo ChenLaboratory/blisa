@@ -2,13 +2,24 @@
 % Please edit documentation in R/plotLRIsum.R
 \name{plotLRIsum}
 \alias{plotLRIsum}
-\title{plot dot plot ranking LR results from BLISA}
+\title{Dot plot ranking LR pairs by number of significant hotspot bins}
 \usage{
 plotLRIsum(LR_out, top = NULL, pt.size = 4)
 }
 \arguments{
-\item{LR_out}{BLISA LRI result}
+\item{LR_out}{Data frame returned in the \code{LR_out} slot of a BLISA
+result list. Rows are ligand-receptor pairs; must contain columns
+\code{sig_numbers} and \code{annotation}.}
+
+\item{top}{Integer or \code{NULL}. If set, only the top \code{top} rows
+(already ordered by \code{sig_numbers}) are plotted. Default \code{NULL}
+plots all pairs.}
+
+\item{pt.size}{Numeric. Point size passed to \code{geom_point}. Default 4.}
+}
+\value{
+A \code{ggplot} object.
 }
 \description{
-plot dot plot ranking LR results from BLISA
+Dot plot ranking LR pairs by number of significant hotspot bins
 }

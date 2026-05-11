@@ -1,23 +1,18 @@
 #' Spatial map of dominant sender-receiver cell-type pairs at BLISA hotspots
 #'
-#' Plots the dominant interacting cell-type pair at each hotspot hex bin for a
+#' Plots the dominant interacting cell-type pair at each hotspot bin for a
 #' selected ligand-receptor interaction. Receiver cells are those inside hotspot
 #' bins; sender cells are in the immediate neighbourhood.
 #'
 #' @param spe A cell-level \code{SpatialExperiment} object.
-#' @param BLISA_output Result list returned by \code{runBLISA.spe} or
-#'   \code{runBLISA.spe.isolates.removed}. Must contain \code{LR_out} and
-#'   \code{hex_sf}.
+#' @param BLISA_output Result list returned by \code{\link{runBLISA}}. Must
+#'   contain \code{LR_out}, \code{bin_sf}, and \code{sw}.
 #' @param index Integer. Row index into \code{BLISA_output$LR_out} selecting
 #'   the ligand-receptor pair to visualise.
 #' @param ct_group Character. Column name in \code{colData(spe)} containing
 #'   cell-type labels. Default \code{"cell_type"}.
 #' @param top Integer. Maximum number of distinct cell-type pairs to show in
 #'   the legend; remaining pairs are grouped as \code{"rare pairs"}. Default 30.
-#' @param hex_size Numeric. Hex bin spacing used to recompute queen neighbours
-#'   for nearby-mode interactions. Default 50.
-#' @param dmax Numeric. Maximum distance used to recompute distance neighbours
-#'   for diffuse-mode interactions. Default 250.
 #'
 #' @return A \code{ggplot} object.
 #' @export
@@ -26,30 +21,22 @@ CCIspatial <- function(
     BLISA_output,
     index,
     ct_group = "cell_type",
-    top = 30,
-    hex_size = 50,
-    dmax = 250
+    top = 30
 ) {
   # 1. Setup Data
   LRI_sum <- BLISA_output$LR_out
-  hex_sf  <- BLISA_output$hex_sf # contains n_cells
+  bin_sf  <- BLISA_output$bin_sf
+  sw      <- BLISA_output$sw
 
   interaction <- unname(unlist(LRI_sum[index, c("ligand.symbol", "receptor.symbol")]))
   sigHH <- LRI_sum$sig_index[[index]]
   mode  <- LRI_sum$ccc_mode[index]
 
-  # 2. Neighbors logic (spdep)
-  centroids <- sf::st_centroid(hex_sf)
-  coords <- sf::st_coordinates(centroids)
+  # 2. Neighbour lookup (reuse pre-computed lists from runBLISA)
+  nb_list <- if (mode == "nearby") sw$queen_nb_full else sw$dist_nb_full
 
-  if (mode == "nearby") {
-    nb_list <- spdep::dnearneigh(centroids, 0, 1.2 * hex_size)
-  } else {
-    nb_list <- spdep::dnearneigh(coords, 0, dmax)
-  }
-
-  # 3. Efficient Mapping
-  cell_to_hex <- get_cell_hex_mapping(spe, hex_sf)
+  # 3. Map cells to bin row positions
+  cell_to_hex <- get_cell_hex_mapping(spe, bin_sf)
 
   cell_data <- data.table::data.table(
     hex_id = as.integer(cell_to_hex),
@@ -58,21 +45,16 @@ CCIspatial <- function(
     receptor_expr = as.numeric(counts(spe)[interaction[2], ])
   )
 
-  # 4. Interaction Scoring (Receiver in HH, Sender in Neighbors)
+  # 4. Interaction Scoring (Receiver in HH bins, Sender in neighbours)
   rcpt_summary <- cell_data[hex_id %in% sigHH, .(r_sum = sum(receptor_expr)), by = .(hex_id, ct_r = ct)]
 
-  hh_nb_map <- data.table::data.table(
-    hh_hex = rep(sigHH, sapply(nb_list[sigHH], length)),
-    nb_hex = unlist(nb_list[sigHH])
-  )
+  sigHH_ng <- unique(c(sigHH, unlist(nb_list[sigHH])))
+  lig_summary <- cell_data[hex_id %in% sigHH_ng, .(l_sum = sum(ligand_expr)), by = .(hh_hex = hex_id, ct_l = ct)]
 
-  lig_summary <- merge(hh_nb_map, cell_data, by.x = "nb_hex", by.y = "hex_id", allow.cartesian = TRUE)
-  lig_summary <- lig_summary[, .(l_sum = sum(ligand_expr)), by = .(hh_hex, ct_l = ct)]
-
-  # Merge and find top pair per hotspot
+  # Merge receiver and sender summaries and find top pair per hotspot
   merged_scores <- merge(rcpt_summary, lig_summary, by.x = "hex_id", by.y = "hh_hex", allow.cartesian = TRUE)
-  merged_scores[, product := (log10(r_sum + 1) + log10(l_sum + 1)) / 2]
-  merged_scores[, cell_pair := paste(ct_l, ct_r, sep = " → ")]
+  merged_scores[, product := 0.5 * log2(r_sum * l_sum + 1)]
+  merged_scores[, cell_pair := paste(ct_l, ct_r, sep = " -> ")]
 
   top_pairs <- merged_scores[merged_scores[, .I[which.max(product)], by = hex_id]$V1]
 
@@ -90,26 +72,26 @@ CCIspatial <- function(
   # label pairs outside the top-N as "rare pairs" for legend clarity
   top_pairs[, cell_pair_plot := ifelse(cell_pair %in% filtered_pairs, cell_pair, "rare pairs")]
 
-  # 6. Categorize ALL hexagons
-  # Start by identifying bins with cells vs empty bins
-  hex_sf$cell_pair_plot <- ifelse(hex_sf$n_cells > 0, "Non-Significant", "Empty")
+  # 6. Categorize ALL bins
+  bin_sf$cell_pair_plot <- ifelse(bin_sf$n_cells > 0, "Non-Significant", "Empty")
 
-  # Overwrite hotspots with their top interacting pair
-  hex_sf$cell_pair_plot[top_pairs$hex_id] <- top_pairs$cell_pair_plot
+  # Overwrite hotspot bins with their dominant interacting pair
+  # top_pairs$hex_id are row positions in bin_sf (from get_cell_hex_mapping)
+  bin_sf$cell_pair_plot[top_pairs$hex_id] <- top_pairs$cell_pair_plot
 
   # Order levels for the legend
   legend_levels <- c(filtered_pairs, "rare pairs", "Non-Significant", "Empty")
-  hex_sf$cell_pair_plot <- factor(hex_sf$cell_pair_plot, levels = legend_levels)
+  bin_sf$cell_pair_plot <- factor(bin_sf$cell_pair_plot, levels = legend_levels)
 
   # 7. Visualization
-  p <- ggplot(hex_sf) +
+  p <- ggplot(bin_sf) +
     geom_sf(aes(fill = cell_pair_plot), color = NA) +
     scale_fill_manual(
       values = c(
         "Empty" = "#F0F0F0",
         "Non-Significant" = "#D3D3D3",
         "rare pairs" = "#818589",
-        setNames(cols[1:length(filtered_pairs)], filtered_pairs)
+        setNames(cols[seq_along(filtered_pairs)], filtered_pairs)
       )
     ) +
     theme_void() +

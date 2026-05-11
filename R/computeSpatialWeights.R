@@ -24,6 +24,8 @@
 #'   \item{isolate_idx_queen}{Integer indices of original queen-mode isolates.}
 #'   \item{isolate_idx_dist}{Integer indices of original diffuse-mode isolates.}
 #'   \item{low_cell_idx}{Integer indices of bins excluded for low cell counts.}
+#'   \item{queen_nb_full}{Full (unsubset) neighbour list for nearby mode, indexed over all bins.}
+#'   \item{dist_nb_full}{Full (unsubset) neighbour list for diffuse mode, indexed over all bins.}
 #' }
 #' @export
 computeSpatialWeights <- function(bin_sf,
@@ -107,6 +109,8 @@ computeSpatialWeights <- function(bin_sf,
     keep_idx_dist     = keep_idx_dist,
     isolate_idx_queen = isolate_idx_queen,
     isolate_idx_dist  = isolate_idx_dist,
-    low_cell_idx      = low_cell_idx
+    low_cell_idx      = low_cell_idx,
+    queen_nb_full     = queen_nb_full,
+    dist_nb_full      = dist_nb_full
   )
 }

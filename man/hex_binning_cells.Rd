@@ -2,7 +2,7 @@
 % Please edit documentation in R/hex_binning_cells.R
 \name{hex_binning_cells}
 \alias{hex_binning_cells}
-\title{Bin Single Cells into Hexagonal Tiles}
+\title{Bin Single Cells into Hexagonal Tiles (Deprecated)}
 \usage{
 hex_binning_cells(
   coords_df = NULL,
@@ -24,17 +24,13 @@ and \code{counts_matrix} are extracted automatically.}
 \item{hex_size}{Numeric. Side length of each hexagonal bin in coordinate units.}
 }
 \value{
-A list with:
-\describe{
-\item{hex_sf}{An \code{sf} object of hexagonal bin polygons with an
-\code{n_cells} column recording how many cells fall into each bin.}
-\item{hex_gene_counts}{Gene-by-bin sparse count matrix aligned to
-\code{hex_sf}.}
-\item{cell_to_hex}{Named integer vector mapping each cell ID to its
-hex bin ID.}
-}
+A list with \code{hex_sf}, \code{hex_gene_counts}, and
+\code{cell_to_hex}. Use \code{\link{hexBinCells}} for new code.
 }
 \description{
-Aggregates single-cell spatial transcriptomics data into hexagonal spatial
-bins and sums gene counts per bin.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+This function is superseded by \code{\link{hexBinCells}}, which has a
+cleaner interface, supports per-group binning via the \code{group} argument,
+and returns output compatible with \code{\link{runBLISA}}.
 }

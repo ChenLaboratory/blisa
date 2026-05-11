@@ -1,7 +1,11 @@
-#' Bin Single Cells into Hexagonal Tiles
+#' Bin Single Cells into Hexagonal Tiles (Deprecated)
 #'
-#' Aggregates single-cell spatial transcriptomics data into hexagonal spatial
-#' bins and sums gene counts per bin.
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
+#' This function is superseded by \code{\link{hexBinCells}}, which has a
+#' cleaner interface, supports per-group binning via the \code{group} argument,
+#' and returns output compatible with \code{\link{runBLISA}}.
 #'
 #' @param coords_df Data frame with columns \code{x_centroid}, \code{y_centroid},
 #'   and row names as cell IDs. Required when \code{spe} is \code{NULL}.
@@ -11,15 +15,8 @@
 #'   and \code{counts_matrix} are extracted automatically.
 #' @param hex_size Numeric. Side length of each hexagonal bin in coordinate units.
 #'
-#' @return A list with:
-#' \describe{
-#'   \item{hex_sf}{An \code{sf} object of hexagonal bin polygons with an
-#'     \code{n_cells} column recording how many cells fall into each bin.}
-#'   \item{hex_gene_counts}{Gene-by-bin sparse count matrix aligned to
-#'     \code{hex_sf}.}
-#'   \item{cell_to_hex}{Named integer vector mapping each cell ID to its
-#'     hex bin ID.}
-#' }
+#' @return A list with \code{hex_sf}, \code{hex_gene_counts}, and
+#'   \code{cell_to_hex}. Use \code{\link{hexBinCells}} for new code.
 #' @export
 hex_binning_cells <- function(
     coords_df = NULL,

@@ -2,13 +2,26 @@
 % Please edit documentation in R/CCIheatmap.R
 \name{CCIheatmap}
 \alias{CCIheatmap}
-\title{plot heatmap of cell-cell interaction scores for all LR pairs}
+\title{Heatmap of CCI scores across all ligand-receptor pairs}
 \usage{
-CCIheatmap(CCI_df, include_celltypes = NULL)
+CCIheatmap(CCI_df, include_celltypes = NULL, cell_type_colors)
 }
 \arguments{
-\item{CCI_df}{dataframe of cell-cell interaction scores from CCI anlaysis}
+\item{CCI_df}{Data frame returned by \code{runCCI}. Rows are
+\code{"Sender->Receiver"} cell-type pairs; columns are LR pairs.}
+
+\item{include_celltypes}{Character vector or \code{NULL}. If provided, only
+rows where the sender or receiver appears in this vector are kept.}
+
+\item{cell_type_colors}{Named character vector mapping cell-type names to
+colours, used for the sender/receiver row annotations.}
+}
+\value{
+Invisibly returns the \code{Heatmap} object.
 }
 \description{
-plot heatmap of cell-cell interaction scores for all LR pairs
+Draws a clustered heatmap (via \code{ComplexHeatmap}) with row annotations
+for sender and receiver cell types. Row annotations use \code{cell_type_colors},
+which must be a named character vector of colours defined in the calling
+environment or passed explicitly.
 }

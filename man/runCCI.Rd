@@ -2,12 +2,30 @@
 % Please edit documentation in R/runCCI.R
 \name{runCCI}
 \alias{runCCI}
-\title{run CCI analysis to get cell-cell interaction scores for all cell type pairs and ligand-receptor pairs
-...}
+\title{Score cell-cell interactions from BLISA hotspots}
 \usage{
-runCCI(spe, BLISA_output, ct_group = "cell_type", hex_size = 50, dmax = 250)
+runCCI(BLISA_output, counts_by_group)
+}
+\arguments{
+\item{BLISA_output}{Result list returned by \code{runBLISA}. Must contain
+\code{LR_out}, \code{bin_sf}, and \code{sw} (including
+\code{sw$queen_nb_full} and \code{sw$dist_nb_full}).}
+
+\item{counts_by_group}{Named list of gene-by-bin sparse count matrices, one
+per group level (e.g. cell type). Typically the \code{counts_by_group}
+element of the list returned by \code{\link{hexBinCells}} when \code{group}
+is supplied. Names must match the group levels.}
+}
+\value{
+A data frame with \code{"Sender->Receiver"} row names and one column
+per LR pair (only pairs with at least one hotspot) containing the
+interaction score.
 }
 \description{
-run CCI analysis to get cell-cell interaction scores for all cell type pairs and ligand-receptor pairs
-...
+For each significant ligand-receptor pair, aggregates ligand expression in
+sender bins (hotspot neighbourhood) and receptor expression in receiver bins
+(hotspot bins) by group (e.g. cell type), then computes an interaction score
+\code{0.5 * log2(receiver * sender + 1)} for every sender-receiver group
+combination. Returns a wide data frame: rows are \code{"Sender->Receiver"}
+group pairs, columns are LR pairs.
 }
