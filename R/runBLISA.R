@@ -54,6 +54,12 @@ runBLISA <- function(x, ...) UseMethod("runBLISA")
 #'   as diffuse signalling.
 #' @param species Character. Which CellChatDB to download when
 #'   \code{LR_df = NULL}. One of \code{"human"} (default) or \code{"mouse"}.
+#' @param genes Character vector of gene names to consider when matching
+#'   ligand-receptor pairs. Only LR pairs whose ligand and receptor genes are
+#'   all present in \code{genes} and pass the expression thresholds will be
+#'   tested. Defaults to \code{rownames(x)} (all genes in the count matrix).
+#'   Genes specified here but absent from \code{rownames(x)} are silently
+#'   ignored.
 #' @param counts_by_group Named list of gene-by-bin count matrices, one per
 #'   group level (e.g. cell type), as returned by \code{\link{hexBinCells}}
 #'   when \code{group} is supplied. When provided, \code{\link{runCCI}} is
@@ -89,6 +95,7 @@ runBLISA.default <- function(
     default_mode      = "diffuse",
     diffuse_category  = c("Secreted Signaling", "Non-protein Signaling"),
     species           = c("human", "mouse"),
+    genes             = NULL,
     counts_by_group   = NULL,
     ...
 ) {
@@ -98,8 +105,11 @@ runBLISA.default <- function(
   keep_idx_queen <- sw$keep_idx_queen
   keep_idx_dist  <- sw$keep_idx_dist
 
+  # Restrict gene panel for LR pair matching; default to all genes in x
+  genes <- if (is.null(genes)) rownames(x) else intersect(genes, rownames(x))
+
   LR_df_filtered <- filterLRpairs(
-    counts       = x,
+    counts       = x[genes, , drop = FALSE],
     min_ligand   = min_ligand,
     min_receptor = min_receptor,
     LR_df        = LR_df,
@@ -187,10 +197,14 @@ runBLISA.default <- function(
 #'   downstream CCI analysis via \code{\link{runCCI}}. If the column is not
 #'   found in \code{colData(x)}, a message is issued and CCI is skipped.
 #'   Default \code{"cell_type"}.
+#' @param genes Character vector of gene names to consider when matching
+#'   ligand-receptor pairs. Defaults to \code{rownames(x)} (all genes in the
+#'   \code{SpatialExperiment} object).
 #'
 #' @export
 runBLISA.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
-                                       group = "cell_type", ...) {
+                                       group = "cell_type",
+                                       genes = NULL, ...) {
   coords <- as.data.frame(SpatialExperiment::spatialCoords(x))
 
   # Resolve group vector from colData
@@ -203,6 +217,8 @@ runBLISA.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
     group_vec <- NULL
   }
 
+  if (is.null(genes)) genes <- rownames(x)
+
   binned <- hexBinCells(coords, counts(x), bin_size = bin_size, group = group_vec)
 
   runBLISA.default(
@@ -211,6 +227,7 @@ runBLISA.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
     LR_df           = LR_df,
     hex_size        = bin_size,
     n_cells_col     = "n_cells",
+    genes           = genes,
     counts_by_group = binned$counts_by_group,
     ...
   )

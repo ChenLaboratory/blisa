@@ -24,11 +24,19 @@ runBLISA(x, ...)
   default_mode = "diffuse",
   diffuse_category = c("Secreted Signaling", "Non-protein Signaling"),
   species = c("human", "mouse"),
+  genes = NULL,
   counts_by_group = NULL,
   ...
 )
 
-\method{runBLISA}{SpatialExperiment}(x, bin_size = 50, LR_df = NULL, group = "cell_type", ...)
+\method{runBLISA}{SpatialExperiment}(
+  x,
+  bin_size = 50,
+  LR_df = NULL,
+  group = "cell_type",
+  genes = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A gene-by-bin count matrix (for \code{runBLISA.default}) or a
@@ -82,6 +90,10 @@ as diffuse signalling.}
 
 \item{species}{Character. Which CellChatDB to download when
 \code{LR_df = NULL}. One of \code{"human"} (default) or \code{"mouse"}.}
+
+\item{genes}{Character vector of gene names to consider when matching
+ligand-receptor pairs. Defaults to \code{rownames(x)} (all genes in the
+\code{SpatialExperiment} object).}
 
 \item{counts_by_group}{Named list of gene-by-bin count matrices, one per
 group level (e.g. cell type), as returned by \code{\link{hexBinCells}}
