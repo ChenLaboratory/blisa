@@ -8,8 +8,8 @@ CCIheatmapOneLR(CCIres, lr_pair)
 }
 \arguments{
 \item{CCIres}{The \code{CCI_scores} slot of a \code{blisa} object (i.e.
-\code{res$CCI_scores}). Rows are \code{"Sender->Receiver"} cell-type
-pairs; columns are LR pairs.}
+\code{res$CCI_scores}). Must contain columns \code{Sender}, \code{Receiver},
+and one column per LR pair.}
 
 \item{lr_pair}{Character. Column name in \code{CCIres} corresponding to the
 ligand-receptor pair to visualise (e.g. \code{"CD80_CD274"}).}

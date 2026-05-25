@@ -179,7 +179,7 @@ blisa.default <- function(
   if (!is.null(counts_by_group)) {
     message("Running CCI analysis...")
     tmp <- new_blisa(LR_results, bins, sw)
-    CCI_scores <- runCCI(tmp, counts_by_group)
+    CCI_scores <- runCCI.default(tmp, counts_by_group)
   }
 
   new_blisa(LR_results, bins, sw, CCI_scores)

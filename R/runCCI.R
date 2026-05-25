@@ -16,28 +16,93 @@ get_cell_hex_mapping <- function(spe, bins) {
 
 #' Score cell-cell interactions from BLISA hotspots
 #'
-#' For each significant ligand-receptor pair, aggregates ligand expression in
-#' sender bins (hotspot neighbourhood) and receptor expression in receiver bins
-#' (hotspot bins) by group (e.g. cell type), then computes an interaction score
-#' \code{0.5 * log2(receiver * sender + 1)} for every sender-receiver group
-#' combination. Returns a wide data frame: rows are \code{"Sender->Receiver"}
-#' group pairs, columns are LR pairs.
+#' Generic function for scoring cell-cell interactions. Dispatches on the
+#' class of \code{x}:
+#' \itemize{
+#'   \item \code{runCCI.blisa} accepts a \code{blisa} object. If
+#'     \code{CCI_scores} are already present and \code{overwrite = FALSE}
+#'     (the default), the object is returned unchanged. Set
+#'     \code{overwrite = TRUE} with a \code{counts_by_group} to recompute and
+#'     replace existing scores. If no scores exist, \code{counts_by_group}
+#'     must be supplied and scores are computed and attached.
+#'   \item \code{runCCI.default} performs the raw computation given a
+#'     \code{blisa} object and a \code{counts_by_group} list, returning only
+#'     the scores data frame. Used internally by \code{runCCI.blisa} and
+#'     \code{\link{blisa.default}}.
+#' }
 #'
-#' @param BLISA_output An object of class \code{blisa} as returned by
-#'   \code{\link{blisa}}.
+#' @param x A \code{blisa} object.
+#' @param ... Additional arguments passed to the relevant method.
+#'
+#' @return See individual method documentation.
+#' @export
+runCCI <- function(x, ...) UseMethod("runCCI")
+
+
+#' @describeIn runCCI Method for a \code{blisa} object. If \code{CCI_scores}
+#'   are already present and \code{overwrite = FALSE} (the default), the object
+#'   is returned unchanged. Set \code{overwrite = TRUE} with a
+#'   \code{counts_by_group} to recompute and replace existing scores. If no
+#'   scores exist, \code{counts_by_group} must be supplied and scores are
+#'   computed and attached to \code{x$CCI_scores}.
+#'
 #' @param counts_by_group Named list of gene-by-bin sparse count matrices, one
 #'   per group level (e.g. cell type). Typically the \code{counts_by_group}
-#'   element of the list returned by \code{\link{hexBinCells}} when \code{group}
-#'   is supplied. Names must match the group levels.
+#'   element of the list returned by \code{\link{hexBinCells}} when
+#'   \code{group} is supplied. Names must match the group levels. Required
+#'   when \code{x$CCI_scores} is \code{NULL} or when \code{overwrite = TRUE}.
+#' @param overwrite Logical. If \code{FALSE} (default) and \code{x$CCI_scores}
+#'   is already populated, the object is returned unchanged. If \code{TRUE} and
+#'   \code{counts_by_group} is supplied, existing scores are recomputed and
+#'   replaced.
 #'
-#' @return A data frame with \code{"Sender->Receiver"} row names and one column
-#'   per LR pair (only pairs with at least one hotspot) containing the
-#'   interaction score.
+#' @return \code{runCCI.blisa}: the input \code{blisa} object with
+#'   \code{CCI_scores} populated (a wide data frame — rows are
+#'   \code{"Sender->Receiver"} group pairs, columns are LR pairs).
+#'
 #' @export
-runCCI <- function(BLISA_output, counts_by_group) {
+runCCI.blisa <- function(x, counts_by_group = NULL, overwrite = FALSE, ...) {
+  if (!is.null(x$CCI_scores)) {
+    if (!overwrite) {
+      message("CCI_scores already present — returning object unchanged. ",
+              "Set overwrite = TRUE to recompute.")
+      return(x)
+    }
+    if (is.null(counts_by_group))
+      stop(
+        "counts_by_group is required to recompute CCI_scores. ",
+        "Supply counts_by_group explicitly or set overwrite = FALSE to keep existing scores."
+      )
+    message("Recomputing CCI_scores (overwrite = TRUE)...")
+    x$CCI_scores <- runCCI.default(x, counts_by_group)
+    message("CCI_scores replaced.")
+    return(x)
+  }
+  if (is.null(counts_by_group))
+    stop(
+      "counts_by_group is required when CCI_scores have not been computed. ",
+      "Re-run blisa() with a 'group' argument, or supply counts_by_group explicitly."
+    )
+  message("Computing CCI_scores...")
+  x$CCI_scores <- runCCI.default(x, counts_by_group)
+  message("CCI_scores added.")
+  x
+}
 
-  LRI_sum         <- BLISA_output$LR_results
-  sw            <- BLISA_output$spatial_weights
+
+#' @describeIn runCCI Default method. Performs the raw CCI computation and
+#'   returns only the scores data frame. Typically called internally; use
+#'   \code{runCCI.blisa} to compute and attach scores to a \code{blisa} object
+#'   in one step.
+#'
+#' @return \code{runCCI.default}: a data frame with \code{"Sender->Receiver"}
+#'   row names and one column per significant LR pair containing the
+#'   interaction score \code{0.5 * log2(receiver * sender + 1)}.
+#'
+#' @export
+runCCI.default <- function(x, counts_by_group, ...) {
+  LRI_sum       <- x$LR_results
+  sw            <- x$spatial_weights
   queen_nb_full <- sw$queen_nb_full
   dist_nb_full  <- sw$dist_nb_full
   ct_names      <- names(counts_by_group)
@@ -74,5 +139,14 @@ runCCI <- function(BLISA_output, counts_by_group) {
   scores_list <- Filter(Negate(is.null), scores_list)
   if (length(scores_list) == 0) return(data.frame())
 
-  as.data.frame(do.call(cbind, scores_list))
+  score_df <- as.data.frame(do.call(cbind, scores_list))
+  # Split "Sender->Receiver" row names into explicit columns
+  sr_pairs <- strsplit(rownames(score_df), "->")
+  data.frame(
+    Sender   = sapply(sr_pairs, `[`, 1),
+    Receiver = sapply(sr_pairs, `[`, 2),
+    score_df,
+    row.names = NULL,
+    check.names = FALSE
+  )
 }

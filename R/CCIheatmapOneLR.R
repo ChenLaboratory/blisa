@@ -4,8 +4,8 @@
 #' and draws a clustered heatmap.
 #'
 #' @param CCIres The \code{CCI_scores} slot of a \code{blisa} object (i.e.
-#'   \code{res$CCI_scores}). Rows are \code{"Sender->Receiver"} cell-type
-#'   pairs; columns are LR pairs.
+#'   \code{res$CCI_scores}). Must contain columns \code{Sender}, \code{Receiver},
+#'   and one column per LR pair.
 #' @param lr_pair Character. Column name in \code{CCIres} corresponding to the
 #'   ligand-receptor pair to visualise (e.g. \code{"CD80_CD274"}).
 #'
@@ -23,10 +23,8 @@ CCIheatmapOneLR <- function(CCIres, lr_pair) {
   # Extract interaction scores for the selected LR pair
   interaction_scores <- CCIres[[lr_pair]]
 
-  # Parse receiver and sender names from rownames (e.g., "B_Cells->T_Cells")
-  pairs <- strsplit(rownames(CCIres), "->")
-  receiver <- sapply(pairs, `[`, 2)
-  sender <- sapply(pairs, `[`, 1)
+  sender   <- CCIres$Sender
+  receiver <- CCIres$Receiver
 
   # Create matrix (receiver as rows, sender as columns)
   all_receivers <- unique(receiver)

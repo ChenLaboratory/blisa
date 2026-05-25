@@ -118,11 +118,19 @@ dev.off()
 
 # Run Cell–Cell Interaction Analysis
 
+When `blisa()` is called with a `group` argument (e.g. `group = "cell_type"`),
+CCI scores are computed automatically and stored in `BLISAres$CCI_scores`.
+To compute or recompute them after the fact, call `runCCI()` on the
+`blisa` object and supply `counts_by_group` from `hexBinCells()`:
+
 ```{r}
-CCIres <- runCCI(
-  spe,
-  BLISAres
-)
+# CCI already computed inside blisa() — retrieve directly
+CCIres <- BLISAres$CCI_scores
+
+# Alternatively, compute on an existing blisa object that lacks CCI_scores:
+# binned  <- hexBinCells(coords, counts_matrix, bin_size = 50, group = cell_type_vec)
+# BLISAres <- runCCI(BLISAres, counts_by_group = binned$counts_by_group)
+# CCIres  <- BLISAres$CCI_scores
 
 head(CCIres)
 ```

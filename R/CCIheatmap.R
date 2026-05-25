@@ -8,8 +8,8 @@
 #' environment or passed explicitly.
 #'
 #' @param CCI_df The \code{CCI_scores} slot of a \code{blisa} object (i.e.
-#'   \code{res$CCI_scores}). Rows are \code{"Sender->Receiver"} cell-type
-#'   pairs; columns are LR pairs.
+#'   \code{res$CCI_scores}). Must contain columns \code{Sender}, \code{Receiver},
+#'   and one column per LR pair.
 #' @param include_celltypes Character vector or \code{NULL}. If provided, only
 #'   rows where the sender or receiver appears in this vector are kept.
 #' @param cell_type_colors Named character vector mapping cell-type names to
@@ -19,26 +19,16 @@
 #' @return Invisibly returns the \code{Heatmap} object.
 #' @export
 CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors = NULL) {
-  # Optional subsetting
+  # Optional subsetting by cell type
   if (!is.null(include_celltypes)) {
-    # Parse sender and receiver from rownames
-    pairs <- strsplit(rownames(CCI_df), "->")
-    senders <- sapply(pairs, `[`, 1)
-    receivers <- sapply(pairs, `[`, 2)
-
-    # Keep rows where either sender or receiver is in include_celltypes
-    keep_idx <- senders %in% include_celltypes | receivers %in% include_celltypes
+    keep_idx <- CCI_df$Sender %in% include_celltypes | CCI_df$Receiver %in% include_celltypes
     CCI_df <- CCI_df[keep_idx, , drop = FALSE]
-
-    if (nrow(CCI_df) == 0) {
+    if (nrow(CCI_df) == 0)
       stop("No matching cell type pairs found for the specified include_celltypes.")
-    }
   }
 
-  # Row annotations for sender and receiver
-  pairs <- strsplit(rownames(CCI_df), "->")
-  senders <- sapply(pairs, `[`, 1)
-  receivers <- sapply(pairs, `[`, 2)
+  senders   <- CCI_df$Sender
+  receivers <- CCI_df$Receiver
 
   if (is.null(cell_type_colors)) {
     all_cts <- sort(unique(c(senders, receivers)))
@@ -58,12 +48,17 @@ CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors = NULL
     annotation_name_side = "top"
   )
 
+  # Score matrix: exclude the Sender / Receiver identifier columns
+  lr_cols   <- setdiff(colnames(CCI_df), c("Sender", "Receiver"))
+  row_labels <- paste(senders, receivers, sep = " -> ")
+
   f1 = viridisLite::viridis(10)
-  ht <- ComplexHeatmap::Heatmap(as.matrix(CCI_df),
+  ht <- ComplexHeatmap::Heatmap(as.matrix(CCI_df[, lr_cols, drop = FALSE]),
                 name = "Interaction\nScore",
                 col = f1,
                 cluster_rows = TRUE,
                 cluster_columns = TRUE,
+                row_labels = row_labels,
                 row_names_gp = gpar(fontsize = 10, fontface = "bold"),
                 column_names_gp = gpar(fontsize = 10, fontface = "bold"),
                 column_names_rot = 45,

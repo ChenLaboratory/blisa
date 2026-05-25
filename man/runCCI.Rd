@@ -2,29 +2,71 @@
 % Please edit documentation in R/runCCI.R
 \name{runCCI}
 \alias{runCCI}
+\alias{runCCI.blisa}
+\alias{runCCI.default}
 \title{Score cell-cell interactions from BLISA hotspots}
 \usage{
-runCCI(BLISA_output, counts_by_group)
+runCCI(x, ...)
+
+\method{runCCI}{blisa}(x, counts_by_group = NULL, overwrite = FALSE, ...)
+
+\method{runCCI}{default}(x, counts_by_group, ...)
 }
 \arguments{
-\item{BLISA_output}{An object of class \code{blisa} as returned by
-\code{\link{blisa}}.}
+\item{x}{A \code{blisa} object.}
+
+\item{...}{Additional arguments passed to the relevant method.}
 
 \item{counts_by_group}{Named list of gene-by-bin sparse count matrices, one
 per group level (e.g. cell type). Typically the \code{counts_by_group}
-element of the list returned by \code{\link{hexBinCells}} when \code{group}
-is supplied. Names must match the group levels.}
+element of the list returned by \code{\link{hexBinCells}} when
+\code{group} is supplied. Names must match the group levels. Required
+when \code{x$CCI_scores} is \code{NULL} or when \code{overwrite = TRUE}.}
+
+\item{overwrite}{Logical. If \code{FALSE} (default) and \code{x$CCI_scores}
+is already populated, the object is returned unchanged. If \code{TRUE} and
+\code{counts_by_group} is supplied, existing scores are recomputed and
+replaced.}
 }
 \value{
-A data frame with \code{"Sender->Receiver"} row names and one column
-per LR pair (only pairs with at least one hotspot) containing the
-interaction score.
+\code{runCCI.blisa}: the input \code{blisa} object with \code{CCI_scores}
+  populated. See below for the structure of \code{CCI_scores}.
+
+\code{runCCI.default}: a data frame with integer row names and columns
+  \code{Sender} (sending cell type), \code{Receiver} (receiving cell type),
+  followed by one numeric column per significant LR pair containing the
+  interaction score \code{0.5 * log2(receiver * sender + 1)}.
 }
 \description{
-For each significant ligand-receptor pair, aggregates ligand expression in
-sender bins (hotspot neighbourhood) and receptor expression in receiver bins
-(hotspot bins) by group (e.g. cell type), then computes an interaction score
-\code{0.5 * log2(receiver * sender + 1)} for every sender-receiver group
-combination. Returns a wide data frame: rows are \code{"Sender->Receiver"}
-group pairs, columns are LR pairs.
+Generic function for scoring cell-cell interactions. Dispatches on the
+class of \code{x}:
+\itemize{
+  \item \code{runCCI.blisa} accepts a \code{blisa} object. If
+    \code{CCI_scores} are already present and \code{overwrite = FALSE}
+    (the default), the object is returned unchanged. Set
+    \code{overwrite = TRUE} with a \code{counts_by_group} to recompute and
+    replace existing scores. If no scores exist, \code{counts_by_group}
+    must be supplied and scores are computed and attached.
+  \item \code{runCCI.default} performs the raw computation given a
+    \code{blisa} object and a \code{counts_by_group} list, returning only
+    the scores data frame. Used internally by \code{runCCI.blisa} and
+    \code{\link{blisa.default}}.
+}
+}
+\section{Methods (by class)}{
+\subsection{\code{runCCI(blisa)}}{
+
+If \code{CCI_scores} are already present and \code{overwrite = FALSE} (the
+default), the object is returned unchanged with a message. If
+\code{overwrite = TRUE} and \code{counts_by_group} is supplied, existing
+scores are recomputed and replaced. If \code{CCI_scores} are absent,
+\code{counts_by_group} must be supplied and scores are computed and attached.
+}
+
+\subsection{\code{runCCI(default)}}{
+
+Performs the raw CCI computation and returns only the scores data frame.
+Typically called internally; use \code{runCCI.blisa} to compute and attach
+scores to a \code{blisa} object in one step.
+}
 }
