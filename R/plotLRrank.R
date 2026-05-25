@@ -23,7 +23,10 @@ plotLRrank <- function(LR_out, top = 30, pt.size = 4, flip = FALSE) {
 
   LR_out$LR_pair <- rownames(LR_out)
   LR_out <- LR_out[order(-LR_out$sig_numbers), ]
-  LR_out$LR_pair <- factor(LR_out$LR_pair, levels = rev(LR_out$LR_pair))
+  # flip=FALSE: levels low→high so highest appears at top of y-axis
+  # flip=TRUE:  levels high→low so highest appears at left of x-axis
+  LR_out$LR_pair <- factor(LR_out$LR_pair,
+                            levels = if (flip) LR_out$LR_pair else rev(LR_out$LR_pair))
 
   color_scale <- scale_color_manual(
     values = c(
@@ -47,8 +50,8 @@ plotLRrank <- function(LR_out, top = 30, pt.size = 4, flip = FALSE) {
         legend.title    = element_text(size = 12, face = "bold"),
         legend.text     = element_text(size = 10),
         panel.border    = element_rect(colour = "black", fill = NA, linewidth = 0.8),
-        axis.text.x     = element_text(face = "bold", size = 12, angle = 45, hjust = 1),
-        axis.text.y     = element_text(angle = 45, hjust = 1)
+        axis.text.x     = element_text(size = 12, angle = 45, hjust = 1),
+        axis.text.y     = element_text(angle = 0, hjust = 1)
       ) +
       coord_cartesian(clip = "off")
   } else {
@@ -64,7 +67,7 @@ plotLRrank <- function(LR_out, top = 30, pt.size = 4, flip = FALSE) {
         legend.title    = element_text(size = 12, face = "bold"),
         legend.text     = element_text(size = 10),
         panel.border    = element_rect(colour = "black", fill = NA, linewidth = 0.8),
-        axis.text.y     = element_text(face = "bold", size = 12),
+        axis.text.y     = element_text(size = 12),
         axis.text.x     = element_text(angle = 45, hjust = 1)
       ) +
       coord_cartesian(clip = "off")

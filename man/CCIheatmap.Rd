@@ -4,7 +4,7 @@
 \alias{CCIheatmap}
 \title{Heatmap of CCI scores across all ligand-receptor pairs}
 \usage{
-CCIheatmap(CCI_df, include_celltypes = NULL, cell_type_colors)
+CCIheatmap(CCI_df, include_celltypes = NULL, cell_type_colors = NULL)
 }
 \arguments{
 \item{CCI_df}{Data frame returned by \code{runCCI}. Rows are
@@ -14,7 +14,8 @@ CCIheatmap(CCI_df, include_celltypes = NULL, cell_type_colors)
 rows where the sender or receiver appears in this vector are kept.}
 
 \item{cell_type_colors}{Named character vector mapping cell-type names to
-colours, used for the sender/receiver row annotations.}
+colours, used for the sender/receiver row annotations. When \code{NULL}
+(default), colours are assigned automatically from the package palette.}
 }
 \value{
 Invisibly returns the \code{Heatmap} object.
