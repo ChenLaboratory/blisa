@@ -2,14 +2,21 @@
 % Please edit documentation in R/plotLRrank.R
 \name{plotLRrank}
 \alias{plotLRrank}
+\alias{plotLRrank.blisa}
+\alias{plotLRrank.data.frame}
 \title{Dot plot ranking LR pairs by number of significant hotspot bins}
 \usage{
-plotLRrank(LR_results, top = 30, pt.size = 4, flip = FALSE)
+plotLRrank(x, ...)
+
+\method{plotLRrank}{blisa}(x, top = 30, pt.size = 4, flip = FALSE, ...)
+
+\method{plotLRrank}{data.frame}(x, top = 30, pt.size = 4, flip = FALSE, ...)
 }
 \arguments{
-\item{LR_results}{The \code{LR_results} slot of a \code{blisa} object (i.e.
-\code{res$LR_results}). Rows are ligand-receptor pairs; must contain
-columns \code{sig_numbers} and \code{annotation}.}
+\item{x}{A \code{blisa} object or a data frame of LR results. The data frame
+must contain columns \code{sig_numbers} and \code{annotation}.}
+
+\item{...}{Additional arguments passed to the relevant method.}
 
 \item{top}{Integer or \code{NULL}. Number of top LR pairs (by
 \code{sig_numbers}) to display. Default \code{30}.}
@@ -24,5 +31,24 @@ and the hotspot count on the y-axis (vertical orientation). Default
 A \code{ggplot} object.
 }
 \description{
-Dot plot ranking LR pairs by number of significant hotspot bins
+Generic function for ranking LR pairs. Dispatches on the class of \code{x}:
+\itemize{
+  \item \code{plotLRrank.blisa} accepts a \code{blisa} object and uses its
+    \code{LR_results} slot directly.
+  \item \code{plotLRrank.data.frame} accepts the \code{LR_results} data
+    frame directly.
+}
+}
+\section{Methods (by class)}{
+\subsection{\code{plotLRrank(blisa)}}{
+
+Method for a \code{blisa} object. Extracts \code{LR_results} and delegates
+to \code{plotLRrank.data.frame}.
+}
+
+\subsection{\code{plotLRrank(data.frame)}}{
+
+Method for a data frame of LR results (e.g. the \code{LR_results} slot of
+a \code{blisa} object).
+}
 }

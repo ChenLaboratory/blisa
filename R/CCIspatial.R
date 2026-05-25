@@ -41,8 +41,8 @@ CCIspatial <- function(
   cell_data <- data.table::data.table(
     hex_id = as.integer(cell_to_hex),
     ct = as.character(SummarizedExperiment::colData(spe)[[ct_group]]),
-    ligand_expr = as.numeric(SummarizedExperiment::counts(spe)[interaction[1], ]),
-    receptor_expr = as.numeric(SummarizedExperiment::counts(spe)[interaction[2], ])
+    ligand_expr = as.numeric(SummarizedExperiment::assay(spe, "counts")[interaction[1], ]),
+    receptor_expr = as.numeric(SummarizedExperiment::assay(spe, "counts")[interaction[2], ])
   )
 
   # 4. Interaction Scoring (Receiver in HH bins, Sender in neighbours)

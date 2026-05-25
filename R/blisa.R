@@ -220,7 +220,7 @@ blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
 
   if (is.null(genes)) genes <- rownames(x)
 
-  binned <- hexBinCells(coords, SummarizedExperiment::counts(x), bin_size = bin_size, group = group_vec)
+  binned <- hexBinCells(coords, SummarizedExperiment::assay(x, "counts"), bin_size = bin_size, group = group_vec)
 
   blisa.default(
     x               = binned$counts_matrix,

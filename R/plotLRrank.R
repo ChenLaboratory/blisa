@@ -1,8 +1,25 @@
 #' Dot plot ranking LR pairs by number of significant hotspot bins
 #'
-#' @param LR_results The \code{LR_results} slot of a \code{blisa} object (i.e.
-#'   \code{res$LR_results}). Rows are ligand-receptor pairs; must contain
-#'   columns \code{sig_numbers} and \code{annotation}.
+#' Generic function for ranking LR pairs. Dispatches on the class of \code{x}:
+#' \itemize{
+#'   \item \code{plotLRrank.blisa} accepts a \code{blisa} object and uses its
+#'     \code{LR_results} slot directly.
+#'   \item \code{plotLRrank.data.frame} accepts the \code{LR_results} data
+#'     frame directly.
+#' }
+#'
+#' @param x A \code{blisa} object or a data frame of LR results. The data frame
+#'   must contain columns \code{sig_numbers} and \code{annotation}.
+#' @param ... Additional arguments passed to the relevant method.
+#'
+#' @return A \code{ggplot} object.
+#' @export
+plotLRrank <- function(x, ...) UseMethod("plotLRrank")
+
+
+#' @describeIn plotLRrank Method for a \code{blisa} object. Extracts
+#'   \code{LR_results} and delegates to \code{plotLRrank.data.frame}.
+#'
 #' @param top Integer or \code{NULL}. Number of top LR pairs (by
 #'   \code{sig_numbers}) to display. Default \code{30}.
 #' @param pt.size Numeric. Point size passed to \code{geom_point}. Default 4.
@@ -10,9 +27,18 @@
 #'   and the hotspot count on the y-axis (vertical orientation). Default
 #'   \code{FALSE} (LR pairs on y-axis, horizontal orientation).
 #'
-#' @return A \code{ggplot} object.
 #' @export
-plotLRrank <- function(LR_results, top = 30, pt.size = 4, flip = FALSE) {
+plotLRrank.blisa <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
+  plotLRrank.data.frame(x$LR_results, top = top, pt.size = pt.size, flip = flip)
+}
+
+
+#' @describeIn plotLRrank Method for a data frame of LR results (e.g. the
+#'   \code{LR_results} slot of a \code{blisa} object).
+#'
+#' @export
+plotLRrank.data.frame <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
+  LR_results <- x
 
   if (!is.null(top)) {
     LR_results <- LR_results[seq_len(min(top, nrow(LR_results))), ]

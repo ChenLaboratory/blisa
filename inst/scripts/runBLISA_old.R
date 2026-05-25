@@ -92,9 +92,9 @@ runBLISA.old <- function(
   ## ---------------------------
   ## Hex binning
   ## ---------------------------
-  binning_res <- hex_binning_cells(coords_df, counts_matrix, spe, hex_size)
-  hex_gene_counts <- binning_res$hex_gene_counts
-  hex_sf <- binning_res$hex_sf
+  binning_res <- hexBinCells(coords_df, counts_matrix, bin_size = hex_size)
+  hex_gene_counts <- binning_res$counts_matrix
+  hex_sf <- binning_res$bins
 
   ## ---------------------------
   ## Spatial weights
