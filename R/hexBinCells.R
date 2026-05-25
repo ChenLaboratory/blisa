@@ -23,8 +23,8 @@
 #' @return A list with:
 #' \describe{
 #'   \item{counts_matrix}{Gene-by-bin sparse count matrix (all cells combined).
-#'     Column \emph{i} corresponds to row \emph{i} of \code{bin_sf}.}
-#'   \item{bin_sf}{An \code{sf} object of hexagonal bin polygons with an
+#'     Column \emph{i} corresponds to row \emph{i} of \code{bins}.}
+#'   \item{bins}{An \code{sf} object of hexagonal bin polygons with an
 #'     \code{n_cells} column recording how many cells fall in each bin. Row
 #'     order matches the columns of \code{counts_matrix}.}
 #'   \item{counts_by_group}{(Only when \code{group} is supplied.) A named list
@@ -60,26 +60,26 @@ hexBinCells <- function(coords_df, counts_matrix, bin_size = 50, min_cells = 1,
     what     = "polygons",
     square   = FALSE
   )
-  bin_sf <- sf::st_sf(bin_id = seq_along(hex_geom), geometry = hex_geom)
+  bins <- sf::st_sf(bin_id = seq_along(hex_geom), geometry = hex_geom)
 
   # Point-in-polygon: assign each cell to its bin (same row order as cell_sf)
-  cell_bin_sf <- sf::st_join(cell_sf, bin_sf, join = sf::st_intersects)
-  cell_to_bin <- sf::st_drop_geometry(cell_bin_sf)$bin_id
+  cell_bins <- sf::st_join(cell_sf, bins, join = sf::st_intersects)
+  cell_to_bin <- sf::st_drop_geometry(cell_bins)$bin_id
 
   # Aggregate counts: genes x bins  (H is cells x bins)
-  n_bins     <- nrow(bin_sf)
+  n_bins     <- nrow(bins)
   bin_factor <- factor(cell_to_bin, levels = seq_len(n_bins))
   H          <- Matrix::sparse.model.matrix(~ bin_factor - 1)
   bin_counts <- counts_matrix %*% H
 
-  bin_sf$n_cells <- as.numeric(Matrix::colSums(H))
+  bins$n_cells <- as.numeric(Matrix::colSums(H))
 
   # Drop bins below min_cells
-  keep       <- bin_sf$n_cells >= min_cells
-  bin_sf     <- bin_sf[keep, , drop = FALSE]
+  keep       <- bins$n_cells >= min_cells
+  bins     <- bins[keep, , drop = FALSE]
   bin_counts <- bin_counts[, keep, drop = FALSE]
 
-  result <- list(counts_matrix = bin_counts, bin_sf = bin_sf)
+  result <- list(counts_matrix = bin_counts, bins = bins)
 
   # Per-cell-type bin matrices (reuse H, subset rows by cell type)
   if (!is.null(group)) {

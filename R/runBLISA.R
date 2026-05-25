@@ -4,7 +4,7 @@
 #' Association). Dispatches on the class of \code{x}:
 #' \itemize{
 #'   \item \code{runBLISA.default} accepts a pre-binned gene-by-bin count
-#'     matrix and a matching \code{bin_sf} polygon object.
+#'     matrix and a matching \code{bins} polygon object.
 #'   \item \code{runBLISA.SpatialExperiment} accepts a cell-level
 #'     \code{SpatialExperiment} object and bins cells into hexagonal tiles
 #'     internally via \code{\link{hexBinCells}} before running the analysis.
@@ -22,7 +22,7 @@ runBLISA <- function(x, ...) UseMethod("runBLISA")
 
 #' @describeIn runBLISA Method for a gene-by-bin count matrix.
 #'
-#' @param bin_sf An \code{sf} object of bin polygons. Row order must match the
+#' @param bins An \code{sf} object of bin polygons. Row order must match the
 #'   column order of \code{x}.
 #' @param LR_df Data frame of ligand-receptor pairs with columns
 #'   \code{ligand.symbol} and \code{receptor.symbol}. When \code{NULL},
@@ -41,7 +41,7 @@ runBLISA <- function(x, ...) UseMethod("runBLISA")
 #' @param min_cells_per_bin Integer. Bins with fewer cells are excluded from
 #'   Moran's I and assigned neutral statistics (\emph{p} = 1, LISA = 0).
 #'   Ignored when \code{n_cells_col = NA}. Default \code{1}.
-#' @param n_cells_col Character or \code{NA}. Column in \code{bin_sf} holding
+#' @param n_cells_col Character or \code{NA}. Column in \code{bins} holding
 #'   per-bin cell counts used for \code{min_cells_per_bin} filtering.
 #'   Set to \code{NA} to skip (default).
 #' @param col Character. Column in \code{LR_df} specifying interaction
@@ -64,24 +64,24 @@ runBLISA <- function(x, ...) UseMethod("runBLISA")
 #'   group level (e.g. cell type), as returned by \code{\link{hexBinCells}}
 #'   when \code{group} is supplied. When provided, \code{\link{runCCI}} is
 #'   called automatically after the BLISA loop and its output is included in
-#'   the result as \code{CCI_out}. Default \code{NULL}.
+#'   the result as \code{CCI_scores}. Default \code{NULL}.
 #'
 #' @return A list with:
 #' \describe{
-#'   \item{LR_out}{Data frame of BLISA results for each LR pair, including
+#'   \item{LR_results}{Data frame of BLISA results for each LR pair, including
 #'     \code{ccc_mode}, \code{sig_numbers}, \code{sig_index}, \code{sig_pval},
 #'     \code{all_pval}, \code{all_lisa}, and original columns from
 #'     \code{LR_df}.}
-#'   \item{bin_sf}{Input bin-level \code{sf} object.}
-#'   \item{sw}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
-#'   \item{CCI_out}{(Only when \code{counts_by_group} is supplied.) Wide data
+#'   \item{bins}{Bin-level \code{sf} object of hexagonal polygons.}
+#'   \item{spatial_weights}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
+#'   \item{CCI_scores}{(Only when \code{counts_by_group} is supplied.) Wide data
 #'     frame of interaction scores from \code{\link{runCCI}}: rows are
 #'     \code{"Sender->Receiver"} group pairs, columns are LR pairs.}
 #' }
 #' @export
 runBLISA.default <- function(
     x,
-    bin_sf,
+    bins,
     LR_df             = NULL,
     hex_size          = 50,
     dmax              = 250,
@@ -99,7 +99,7 @@ runBLISA.default <- function(
     counts_by_group   = NULL,
     ...
 ) {
-  sw             <- computeSpatialWeights(bin_sf, hex_size, dmax, min_cells_per_bin, n_cells_col)
+  sw             <- computeSpatialWeights(bins, hex_size, dmax, min_cells_per_bin, n_cells_col)
   queen_wt       <- sw$queen_wt
   dist_wt        <- sw$dist_wt
   keep_idx_queen <- sw$keep_idx_queen
@@ -116,20 +116,20 @@ runBLISA.default <- function(
     species      = species
   )
 
-  LR_out <- LR_df_add_mode(LR_df_filtered, col, default_mode, diffuse_category)
+  LR_results <- LR_df_add_mode(LR_df_filtered, col, default_mode, diffuse_category)
 
-  LR_out$sig_numbers <- integer(nrow(LR_out))
-  LR_out$sig_index   <- vector("list", nrow(LR_out))
-  LR_out$sig_pval    <- vector("list", nrow(LR_out))
-  LR_out$all_pval    <- vector("list", nrow(LR_out))
-  LR_out$all_lisa    <- vector("list", nrow(LR_out))
+  LR_results$sig_numbers <- integer(nrow(LR_results))
+  LR_results$sig_index   <- vector("list", nrow(LR_results))
+  LR_results$sig_pval    <- vector("list", nrow(LR_results))
+  LR_results$all_pval    <- vector("list", nrow(LR_results))
+  LR_results$all_lisa    <- vector("list", nrow(LR_results))
 
-  for (i in seq_len(nrow(LR_out))) {
-    message(rownames(LR_out)[i])
+  for (i in seq_len(nrow(LR_results))) {
+    message(rownames(LR_results)[i])
 
-    ligand   <- LR_out$ligand.symbol[i]
-    receptor <- LR_out$receptor.symbol[i]
-    mode     <- LR_out$ccc_mode[i]
+    ligand   <- LR_results$ligand.symbol[i]
+    receptor <- LR_results$receptor.symbol[i]
+    mode     <- LR_results$ccc_mode[i]
 
     if (mode == "nearby") {
       wt       <- queen_wt
@@ -162,23 +162,23 @@ runBLISA.default <- function(
     HH_idx    <- keep_idx[which(hs_idx_hh)]
     HH_pval   <- full_pval[HH_idx]
 
-    LR_out$sig_numbers[i] <- length(HH_idx)
-    LR_out$sig_index[[i]] <- HH_idx
-    LR_out$sig_pval[[i]]  <- HH_pval
-    LR_out$all_pval[[i]]  <- full_pval
-    LR_out$all_lisa[[i]]  <- full_lisa
-    LR_out$ccc_mode[i]    <- mode
+    LR_results$sig_numbers[i] <- length(HH_idx)
+    LR_results$sig_index[[i]] <- HH_idx
+    LR_results$sig_pval[[i]]  <- HH_pval
+    LR_results$all_pval[[i]]  <- full_pval
+    LR_results$all_lisa[[i]]  <- full_lisa
+    LR_results$ccc_mode[i]    <- mode
   }
 
-  LR_out <- LR_out[order(-LR_out$sig_numbers), , drop = FALSE]
+  LR_results <- LR_results[order(-LR_results$sig_numbers), , drop = FALSE]
   front_cols <- c("ccc_mode", "sig_numbers", "sig_index", "sig_pval")
-  LR_out <- LR_out[, c(front_cols, setdiff(colnames(LR_out), front_cols))]
+  LR_results <- LR_results[, c(front_cols, setdiff(colnames(LR_results), front_cols))]
 
-  result <- list(LR_out = LR_out, bin_sf = bin_sf, sw = sw)
+  result <- list(LR_results = LR_results, bins = bins, spatial_weights = sw)
 
   if (!is.null(counts_by_group)) {
     message("Running CCI analysis...")
-    result$CCI_out <- runCCI(result, counts_by_group)
+    result$CCI_scores <- runCCI(result, counts_by_group)
   }
 
   result
@@ -223,7 +223,7 @@ runBLISA.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
 
   runBLISA.default(
     x               = binned$counts_matrix,
-    bin_sf          = binned$bin_sf,
+    bins          = binned$bins,
     LR_df           = LR_df,
     hex_size        = bin_size,
     n_cells_col     = "n_cells",

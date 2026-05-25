@@ -5,13 +5,13 @@
 #' excluding low-cell bins. A second-pass isolation check further removes bins
 #' that become isolated after the initial subset.
 #'
-#' @param bin_sf An \code{sf} object of spatial bins.
+#' @param bins An \code{sf} object of spatial bins.
 #' @param hex_size Numeric. Bin spacing used to define queen adjacency
 #'   (\code{1.2 * hex_size} radius).
 #' @param dmax Numeric. Maximum distance for diffuse-mode neighbours.
 #' @param min_cells_per_bin Integer. Minimum cell count for a bin to be
 #'   included. Ignored when \code{n_cells_col = NA}.
-#' @param n_cells_col Character or \code{NA}. Column name in \code{bin_sf}
+#' @param n_cells_col Character or \code{NA}. Column name in \code{bins}
 #'   holding per-bin cell counts. Set to \code{NA} to skip cell-count
 #'   filtering (default).
 #'
@@ -28,22 +28,22 @@
 #'   \item{dist_nb_full}{Full (unsubset) neighbour list for diffuse mode, indexed over all bins.}
 #' }
 #' @export
-computeSpatialWeights <- function(bin_sf,
+computeSpatialWeights <- function(bins,
                                   hex_size          = 50,
                                   dmax              = 250,
                                   min_cells_per_bin = 1,
                                   n_cells_col       = NA) {
-  centroids <- sf::st_centroid(bin_sf)
+  centroids <- sf::st_centroid(bins)
   coords    <- sf::st_coordinates(centroids)
-  n_bins    <- nrow(bin_sf)
+  n_bins    <- nrow(bins)
 
   ## ---------------------------
   ## Filter low-cell bins
   ## ---------------------------
   if (!is.na(n_cells_col)) {
-    if (!n_cells_col %in% colnames(bin_sf))
-      stop("Column '", n_cells_col, "' not found in bin_sf.")
-    low_cell_idx <- which(bin_sf[[n_cells_col]] < min_cells_per_bin)
+    if (!n_cells_col %in% colnames(bins))
+      stop("Column '", n_cells_col, "' not found in bins.")
+    low_cell_idx <- which(bins[[n_cells_col]] < min_cells_per_bin)
     message(length(low_cell_idx), " bins removed: < ", min_cells_per_bin,
             " cells (column: '", n_cells_col, "').")
   } else {
@@ -98,7 +98,7 @@ computeSpatialWeights <- function(bin_sf,
   dist_nb       <- r$nb;  keep_idx_dist <- r$keep_idx
 
   weight_at_dmax <- 0.01
-  dist_wt <- spdep::nb2listwdist(dist_nb, bin_sf[keep_idx_dist, ],
+  dist_wt <- spdep::nb2listwdist(dist_nb, bins[keep_idx_dist, ],
                                  type = "exp", style = "W", zero.policy = TRUE,
                                  alpha = -log(weight_at_dmax) / dmax)
 

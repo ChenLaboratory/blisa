@@ -4,10 +4,10 @@
 \alias{plotLRrank}
 \title{Dot plot ranking LR pairs by number of significant hotspot bins}
 \usage{
-plotLRrank(LR_out, top = 30, pt.size = 4, flip = FALSE)
+plotLRrank(LR_results, top = 30, pt.size = 4, flip = FALSE)
 }
 \arguments{
-\item{LR_out}{Data frame returned in the \code{LR_out} slot of a BLISA
+\item{LR_results}{Data frame returned in the \code{LR_results} slot of a BLISA
 result list. Rows are ligand-receptor pairs; must contain columns
 \code{sig_numbers} and \code{annotation}.}
 

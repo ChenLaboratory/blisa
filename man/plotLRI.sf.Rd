@@ -4,16 +4,16 @@
 \alias{plotLRI.sf}
 \title{Spatial significance map for one ligand-receptor pair}
 \usage{
-plotLRI.sf(hex_sf, LR_out, index, log_pval = TRUE)
+plotLRI.sf(bins, LR_results, index, log_pval = TRUE)
 }
 \arguments{
-\item{hex_sf}{An \code{sf} object of hex bin polygons. Must contain an
+\item{bins}{An \code{sf} object of hex bin polygons. Must contain an
 \code{n_cells} column (number of cells per bin).}
 
-\item{LR_out}{Data frame from the \code{LR_out} slot of a BLISA result.
+\item{LR_results}{Data frame from the \code{LR_results} slot of a BLISA result.
 Must contain \code{sig_index} and \code{sig_pval} list columns.}
 
-\item{index}{Integer. Row index into \code{LR_out} selecting the
+\item{index}{Integer. Row index into \code{LR_results} selecting the
 ligand-receptor pair to visualise.}
 
 \item{log_pval}{Logical. If \code{TRUE} (default), colour significant bins
@@ -23,6 +23,6 @@ by -log10(p-value). If \code{FALSE}, use 1 - p-value.}
 A \code{ggplot} object.
 }
 \description{
-Plots each hex bin coloured by significance status: empty, non-significant,
+Plots each bin coloured by significance status: empty, non-significant,
 or significant (continuous gradient of -log10 p-value or 1-p-value).
 }

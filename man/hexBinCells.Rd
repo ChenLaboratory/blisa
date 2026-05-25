@@ -37,8 +37,8 @@ per-cell-type gene-by-bin matrices is included in the output as
 A list with:
 \describe{
 \item{counts_matrix}{Gene-by-bin sparse count matrix (all cells combined).
-Column \emph{i} corresponds to row \emph{i} of \code{bin_sf}.}
-\item{bin_sf}{An \code{sf} object of hexagonal bin polygons with an
+Column \emph{i} corresponds to row \emph{i} of \code{bins}.}
+\item{bins}{An \code{sf} object of hexagonal bin polygons with an
 \code{n_cells} column recording how many cells fall in each bin. Row
 order matches the columns of \code{counts_matrix}.}
 \item{counts_by_group}{(Only when \code{group} is supplied.) A named list

@@ -10,7 +10,7 @@ runBLISA(x, ...)
 
 \method{runBLISA}{default}(
   x,
-  bin_sf,
+  bins,
   LR_df = NULL,
   hex_size = 50,
   dmax = 250,
@@ -45,7 +45,7 @@ cell-level \code{SpatialExperiment} object (for
 
 \item{...}{Additional arguments passed to the relevant method.}
 
-\item{bin_sf}{An \code{sf} object of bin polygons. Row order must match the
+\item{bins}{An \code{sf} object of bin polygons. Row order must match the
 column order of \code{x}.}
 
 \item{LR_df}{Data frame of ligand-receptor pairs with columns
@@ -73,7 +73,7 @@ Default \code{10}.}
 Moran's I and assigned neutral statistics (\emph{p} = 1, LISA = 0).
 Ignored when \code{n_cells_col = NA}. Default \code{1}.}
 
-\item{n_cells_col}{Character or \code{NA}. Column in \code{bin_sf} holding
+\item{n_cells_col}{Character or \code{NA}. Column in \code{bins} holding
 per-bin cell counts used for \code{min_cells_per_bin} filtering.
 Set to \code{NA} to skip (default).}
 
@@ -99,7 +99,7 @@ ligand-receptor pairs. Defaults to \code{rownames(x)} (all genes in the
 group level (e.g. cell type), as returned by \code{\link{hexBinCells}}
 when \code{group} is supplied. When provided, \code{\link{runCCI}} is
 called automatically after the BLISA loop and its output is included in
-the result as \code{CCI_out}. Default \code{NULL}.}
+the result as \code{CCI_scores}. Default \code{NULL}.}
 
 \item{bin_size}{Numeric. Width of each hexagonal bin in coordinate units
 (e.g. microns). Passed to \code{\link{hexBinCells}} and also used as
@@ -116,13 +116,13 @@ A list; see individual method documentation for details.
 
 A list with:
 \describe{
-\item{LR_out}{Data frame of BLISA results for each LR pair, including
+\item{LR_results}{Data frame of BLISA results for each LR pair, including
 \code{ccc_mode}, \code{sig_numbers}, \code{sig_index}, \code{sig_pval},
 \code{all_pval}, \code{all_lisa}, and original columns from
 \code{LR_df}.}
-\item{bin_sf}{Input bin-level \code{sf} object.}
-\item{sw}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
-\item{CCI_out}{(Only when \code{counts_by_group} is supplied.) Wide data
+\item{bins}{Bin-level \code{sf} object of hexagonal polygons.}
+\item{spatial_weights}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
+\item{CCI_scores}{(Only when \code{counts_by_group} is supplied.) Wide data
 frame of interaction scores from \code{\link{runCCI}}: rows are
 \code{"Sender->Receiver"} group pairs, columns are LR pairs.}
 }
@@ -132,7 +132,7 @@ Generic function for running BLISA (Bivariate Local Indicator of Spatial
 Association). Dispatches on the class of \code{x}:
 \itemize{
 \item \code{runBLISA.default} accepts a pre-binned gene-by-bin count
-matrix and a matching \code{bin_sf} polygon object.
+matrix and a matching \code{bins} polygon object.
 \item \code{runBLISA.SpatialExperiment} accepts a cell-level
 \code{SpatialExperiment} object and bins cells into hexagonal tiles
 internally via \code{\link{hexBinCells}} before running the analysis.

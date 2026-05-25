@@ -1,6 +1,6 @@
 #' Dot plot ranking LR pairs by number of significant hotspot bins
 #'
-#' @param LR_out Data frame returned in the \code{LR_out} slot of a BLISA
+#' @param LR_results Data frame returned in the \code{LR_results} slot of a BLISA
 #'   result list. Rows are ligand-receptor pairs; must contain columns
 #'   \code{sig_numbers} and \code{annotation}.
 #' @param top Integer or \code{NULL}. Number of top LR pairs (by
@@ -12,21 +12,21 @@
 #'
 #' @return A \code{ggplot} object.
 #' @export
-plotLRrank <- function(LR_out, top = 30, pt.size = 4, flip = FALSE) {
+plotLRrank <- function(LR_results, top = 30, pt.size = 4, flip = FALSE) {
 
   if (!is.null(top)) {
-    LR_out <- LR_out[seq_len(min(top, nrow(LR_out))), ]
+    LR_results <- LR_results[seq_len(min(top, nrow(LR_results))), ]
   }
 
-  n_shown <- nrow(LR_out)
+  n_shown <- nrow(LR_results)
   title   <- paste0("Top ", n_shown, " LR pairs by hotspot count")
 
-  LR_out$LR_pair <- rownames(LR_out)
-  LR_out <- LR_out[order(-LR_out$sig_numbers), ]
+  LR_results$LR_pair <- rownames(LR_results)
+  LR_results <- LR_results[order(-LR_results$sig_numbers), ]
   # flip=FALSE: levels low→high so highest appears at top of y-axis
   # flip=TRUE:  levels high→low so highest appears at left of x-axis
-  LR_out$LR_pair <- factor(LR_out$LR_pair,
-                            levels = if (flip) LR_out$LR_pair else rev(LR_out$LR_pair))
+  LR_results$LR_pair <- factor(LR_results$LR_pair,
+                            levels = if (flip) LR_results$LR_pair else rev(LR_results$LR_pair))
 
   color_scale <- scale_color_manual(
     values = c(
@@ -38,7 +38,7 @@ plotLRrank <- function(LR_out, top = 30, pt.size = 4, flip = FALSE) {
   )
 
   if (flip) {
-    p <- ggplot(LR_out, aes(x = LR_pair, y = sig_numbers, color = annotation)) +
+    p <- ggplot(LR_results, aes(x = LR_pair, y = sig_numbers, color = annotation)) +
       geom_point(size = pt.size) +
       color_scale +
       scale_y_continuous(expand = expansion(add = 100)) +
@@ -55,7 +55,7 @@ plotLRrank <- function(LR_out, top = 30, pt.size = 4, flip = FALSE) {
       ) +
       coord_cartesian(clip = "off")
   } else {
-    p <- ggplot(LR_out, aes(x = sig_numbers, y = LR_pair, color = annotation)) +
+    p <- ggplot(LR_results, aes(x = sig_numbers, y = LR_pair, color = annotation)) +
       geom_point(size = pt.size) +
       color_scale +
       scale_x_continuous(expand = expansion(add = 100)) +

@@ -10,9 +10,9 @@ CCIspatial(spe, BLISA_output, index, ct_group = "cell_type", top = 30)
 \item{spe}{A cell-level \code{SpatialExperiment} object.}
 
 \item{BLISA_output}{Result list returned by \code{\link{runBLISA}}. Must
-contain \code{LR_out}, \code{bin_sf}, and \code{sw}.}
+contain \code{LR_results}, \code{bins}, and \code{spatial_weights}.}
 
-\item{index}{Integer. Row index into \code{BLISA_output$LR_out} selecting
+\item{index}{Integer. Row index into \code{BLISA_output$LR_results} selecting
 the ligand-receptor pair to visualise.}
 
 \item{ct_group}{Character. Column name in \code{colData(spe)} containing

@@ -6,8 +6,8 @@
 #'
 #' @param spe A cell-level \code{SpatialExperiment} object.
 #' @param BLISA_output Result list returned by \code{\link{runBLISA}}. Must
-#'   contain \code{LR_out}, \code{bin_sf}, and \code{sw}.
-#' @param index Integer. Row index into \code{BLISA_output$LR_out} selecting
+#'   contain \code{LR_results}, \code{bins}, and \code{spatial_weights}.
+#' @param index Integer. Row index into \code{BLISA_output$LR_results} selecting
 #'   the ligand-receptor pair to visualise.
 #' @param ct_group Character. Column name in \code{colData(spe)} containing
 #'   cell-type labels. Default \code{"cell_type"}.
@@ -24,9 +24,9 @@ CCIspatial <- function(
     top = 30
 ) {
   # 1. Setup Data
-  LRI_sum <- BLISA_output$LR_out
-  bin_sf  <- BLISA_output$bin_sf
-  sw      <- BLISA_output$sw
+  LRI_sum         <- BLISA_output$LR_results
+  bins          <- BLISA_output$bins
+  sw <- BLISA_output$spatial_weights
 
   interaction <- unname(unlist(LRI_sum[index, c("ligand.symbol", "receptor.symbol")]))
   sigHH <- LRI_sum$sig_index[[index]]
@@ -36,7 +36,7 @@ CCIspatial <- function(
   nb_list <- if (mode == "nearby") sw$queen_nb_full else sw$dist_nb_full
 
   # 3. Map cells to bin row positions
-  cell_to_hex <- get_cell_hex_mapping(spe, bin_sf)
+  cell_to_hex <- get_cell_hex_mapping(spe, bins)
 
   cell_data <- data.table::data.table(
     hex_id = as.integer(cell_to_hex),
@@ -73,18 +73,18 @@ CCIspatial <- function(
   top_pairs[, cell_pair_plot := ifelse(cell_pair %in% filtered_pairs, cell_pair, "rare pairs")]
 
   # 6. Categorize ALL bins
-  bin_sf$cell_pair_plot <- ifelse(bin_sf$n_cells > 0, "Non-Significant", "Empty")
+  bins$cell_pair_plot <- ifelse(bins$n_cells > 0, "Non-Significant", "Empty")
 
   # Overwrite hotspot bins with their dominant interacting pair
-  # top_pairs$hex_id are row positions in bin_sf (from get_cell_hex_mapping)
-  bin_sf$cell_pair_plot[top_pairs$hex_id] <- top_pairs$cell_pair_plot
+  # top_pairs$hex_id are row positions in bins (from get_cell_hex_mapping)
+  bins$cell_pair_plot[top_pairs$hex_id] <- top_pairs$cell_pair_plot
 
   # Order levels for the legend
   legend_levels <- c(filtered_pairs, "rare pairs", "Non-Significant", "Empty")
-  bin_sf$cell_pair_plot <- factor(bin_sf$cell_pair_plot, levels = legend_levels)
+  bins$cell_pair_plot <- factor(bins$cell_pair_plot, levels = legend_levels)
 
   # 7. Visualization
-  p <- ggplot(bin_sf) +
+  p <- ggplot(bins) +
     geom_sf(aes(fill = cell_pair_plot), color = NA) +
     scale_fill_manual(
       values = c(

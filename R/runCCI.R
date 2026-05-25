@@ -1,14 +1,14 @@
-get_cell_hex_mapping <- function(spe, bin_sf) {
+get_cell_hex_mapping <- function(spe, bins) {
   # Convert spe coordinates to sf
   coords <- as.data.frame(SpatialExperiment::spatialCoords(spe))
-  cell_sf <- sf::st_as_sf(coords, coords = c("x_centroid", "y_centroid"), crs = sf::st_crs(bin_sf))
+  cell_sf <- sf::st_as_sf(coords, coords = c("x_centroid", "y_centroid"), crs = sf::st_crs(bins))
 
   # Spatial join to find which bin each cell falls into
-  mapped <- sf::st_join(cell_sf, bin_sf, join = sf::st_intersects)
+  mapped <- sf::st_join(cell_sf, bins, join = sf::st_intersects)
 
-  # Return row positions in bin_sf (not bin_id values) so they align with
-  # the sigHH indices stored in BLISA_output$LR_out$sig_index
-  res <- match(mapped$bin_id, bin_sf$bin_id)
+  # Return row positions in bins (not bin_id values) so they align with
+  # the sigHH indices stored in BLISA_output$LR_results$sig_index
+  res <- match(mapped$bin_id, bins$bin_id)
   names(res) <- rownames(coords)
   return(res)
 }
@@ -24,8 +24,8 @@ get_cell_hex_mapping <- function(spe, bin_sf) {
 #' group pairs, columns are LR pairs.
 #'
 #' @param BLISA_output Result list returned by \code{runBLISA}. Must contain
-#'   \code{LR_out}, \code{bin_sf}, and \code{sw} (including
-#'   \code{sw$queen_nb_full} and \code{sw$dist_nb_full}).
+#'   \code{LR_results}, \code{bins}, and \code{spatial_weights} (including
+#'   \code{spatial_weights$queen_nb_full} and \code{spatial_weights$dist_nb_full}).
 #' @param counts_by_group Named list of gene-by-bin sparse count matrices, one
 #'   per group level (e.g. cell type). Typically the \code{counts_by_group}
 #'   element of the list returned by \code{\link{hexBinCells}} when \code{group}
@@ -37,8 +37,8 @@ get_cell_hex_mapping <- function(spe, bin_sf) {
 #' @export
 runCCI <- function(BLISA_output, counts_by_group) {
 
-  LRI_sum       <- BLISA_output$LR_out
-  sw            <- BLISA_output$sw
+  LRI_sum         <- BLISA_output$LR_results
+  sw            <- BLISA_output$spatial_weights
   queen_nb_full <- sw$queen_nb_full
   dist_nb_full  <- sw$dist_nb_full
   ct_names      <- names(counts_by_group)
