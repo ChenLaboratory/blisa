@@ -70,8 +70,10 @@ blisa <- function(x, ...) UseMethod("blisa")
 #' \describe{
 #'   \item{LR_results}{Data frame of BLISA results for each LR pair, including
 #'     \code{ccc_mode}, \code{sig_numbers}, \code{sig_index}, \code{sig_pval},
-#'     \code{all_pval}, \code{all_lisa}, and original columns from
-#'     \code{LR_df}.}
+#'     \code{all_pval}, \code{all_lisa}, \code{all_quadrant}, and original
+#'     columns from \code{LR_df}. \code{all_quadrant} is a character vector
+#'     of \code{spdep::hotspot} quadrant labels (\code{"High-High"},
+#'     \code{"Low-Low"}, etc.) for every bin; non-tested bins are \code{NA}.}
 #'   \item{bins}{Bin-level \code{sf} object of hexagonal polygons.}
 #'   \item{spatial_weights}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
 #'   \item{CCI_scores}{\code{NULL} unless \code{counts_by_group} is supplied,
@@ -119,11 +121,12 @@ blisa.default <- function(
 
   LR_results <- LR_df_add_mode(LR_df_filtered, col, default_mode, diffuse_category)
 
-  LR_results$sig_numbers <- integer(nrow(LR_results))
-  LR_results$sig_index   <- vector("list", nrow(LR_results))
-  LR_results$sig_pval    <- vector("list", nrow(LR_results))
-  LR_results$all_pval    <- vector("list", nrow(LR_results))
-  LR_results$all_lisa    <- vector("list", nrow(LR_results))
+  LR_results$sig_numbers   <- integer(nrow(LR_results))
+  LR_results$sig_index     <- vector("list", nrow(LR_results))
+  LR_results$sig_pval      <- vector("list", nrow(LR_results))
+  LR_results$all_pval      <- vector("list", nrow(LR_results))
+  LR_results$all_lisa      <- vector("list", nrow(LR_results))
+  LR_results$all_quadrant  <- vector("list", nrow(LR_results))
 
   for (i in seq_len(nrow(LR_results))) {
     message(rownames(LR_results)[i])
@@ -163,12 +166,16 @@ blisa.default <- function(
     HH_idx    <- keep_idx[which(hs_idx_hh)]
     HH_pval   <- full_pval[HH_idx]
 
-    LR_results$sig_numbers[i] <- length(HH_idx)
-    LR_results$sig_index[[i]] <- HH_idx
-    LR_results$sig_pval[[i]]  <- HH_pval
-    LR_results$all_pval[[i]]  <- full_pval
-    LR_results$all_lisa[[i]]  <- full_lisa
-    LR_results$ccc_mode[i]    <- mode
+    full_quadrant <- rep(NA_character_, ncol(x))
+    full_quadrant[keep_idx] <- as.character(hs)
+
+    LR_results$sig_numbers[i]   <- length(HH_idx)
+    LR_results$sig_index[[i]]   <- HH_idx
+    LR_results$sig_pval[[i]]    <- HH_pval
+    LR_results$all_pval[[i]]    <- full_pval
+    LR_results$all_lisa[[i]]    <- full_lisa
+    LR_results$all_quadrant[[i]] <- full_quadrant
+    LR_results$ccc_mode[i]      <- mode
   }
 
   LR_results <- LR_results[order(-LR_results$sig_numbers), , drop = FALSE]
