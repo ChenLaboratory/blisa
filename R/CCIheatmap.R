@@ -12,11 +12,12 @@
 #' @param include_celltypes Character vector or \code{NULL}. If provided, only
 #'   rows where the sender or receiver appears in this vector are kept.
 #' @param cell_type_colors Named character vector mapping cell-type names to
-#'   colours, used for the sender/receiver row annotations.
+#'   colours, used for the sender/receiver row annotations. When \code{NULL}
+#'   (default), colours are assigned automatically from the package palette.
 #'
 #' @return Invisibly returns the \code{Heatmap} object.
 #' @export
-CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors) {
+CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors = NULL) {
   # Optional subsetting
   if (!is.null(include_celltypes)) {
     # Parse sender and receiver from rownames
@@ -37,6 +38,11 @@ CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors) {
   pairs <- strsplit(rownames(CCI_df), "->")
   senders <- sapply(pairs, `[`, 1)
   receivers <- sapply(pairs, `[`, 2)
+
+  if (is.null(cell_type_colors)) {
+    all_cts <- sort(unique(c(senders, receivers)))
+    cell_type_colors <- setNames(cols[seq_along(all_cts)], all_cts)
+  }
 
   row_ha <- rowAnnotation(
     Sender = senders,
