@@ -99,12 +99,8 @@ plotLRIsum(BLISAres$LR_out)
 # Visualize Spatial Distribution of Top LR Pairs
 
 ```{r, fig.width=15, fig.height=12}
-plots <- lapply(seq_len(nrow(BLISAres$LR_out)), function(i) {
-  plotLRI.sf(
-    BLISAres$bin_sf,
-    BLISAres$LR_out,
-    index = i
-  )
+plots <- lapply(seq_len(nrow(BLISAres$LR_results)), function(i) {
+  plotHotspots(BLISAres, index = i)
 })
 
 combined_plot <- patchwork::wrap_plots(plots, ncol = 3)
