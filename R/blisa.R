@@ -3,24 +3,24 @@
 #' Generic function for running BLISA (Bivariate Local Indicator of Spatial
 #' Association). Dispatches on the class of \code{x}:
 #' \itemize{
-#'   \item \code{runBLISA.default} accepts a pre-binned gene-by-bin count
+#'   \item \code{blisa.default} accepts a pre-binned gene-by-bin count
 #'     matrix and a matching \code{bins} polygon object.
-#'   \item \code{runBLISA.SpatialExperiment} accepts a cell-level
+#'   \item \code{blisa.SpatialExperiment} accepts a cell-level
 #'     \code{SpatialExperiment} object and bins cells into hexagonal tiles
 #'     internally via \code{\link{hexBinCells}} before running the analysis.
 #' }
 #'
-#' @param x A gene-by-bin count matrix (for \code{runBLISA.default}) or a
+#' @param x A gene-by-bin count matrix (for \code{blisa.default}) or a
 #'   cell-level \code{SpatialExperiment} object (for
-#'   \code{runBLISA.SpatialExperiment}).
+#'   \code{blisa.SpatialExperiment}).
 #' @param ... Additional arguments passed to the relevant method.
 #'
 #' @return A list; see individual method documentation for details.
 #' @export
-runBLISA <- function(x, ...) UseMethod("runBLISA")
+blisa <- function(x, ...) UseMethod("blisa")
 
 
-#' @describeIn runBLISA Method for a gene-by-bin count matrix.
+#' @describeIn blisa Method for a gene-by-bin count matrix.
 #'
 #' @param bins An \code{sf} object of bin polygons. Row order must match the
 #'   column order of \code{x}.
@@ -66,7 +66,7 @@ runBLISA <- function(x, ...) UseMethod("runBLISA")
 #'   called automatically after the BLISA loop and its output is included in
 #'   the result as \code{CCI_scores}. Default \code{NULL}.
 #'
-#' @return A list with:
+#' @return An object of class \code{blisa} with four components:
 #' \describe{
 #'   \item{LR_results}{Data frame of BLISA results for each LR pair, including
 #'     \code{ccc_mode}, \code{sig_numbers}, \code{sig_index}, \code{sig_pval},
@@ -74,12 +74,13 @@ runBLISA <- function(x, ...) UseMethod("runBLISA")
 #'     \code{LR_df}.}
 #'   \item{bins}{Bin-level \code{sf} object of hexagonal polygons.}
 #'   \item{spatial_weights}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
-#'   \item{CCI_scores}{(Only when \code{counts_by_group} is supplied.) Wide data
-#'     frame of interaction scores from \code{\link{runCCI}}: rows are
-#'     \code{"Sender->Receiver"} group pairs, columns are LR pairs.}
+#'   \item{CCI_scores}{\code{NULL} unless \code{counts_by_group} is supplied,
+#'     in which case a wide data frame of interaction scores from
+#'     \code{\link{runCCI}}: rows are \code{"Sender->Receiver"} group pairs,
+#'     columns are LR pairs.}
 #' }
 #' @export
-runBLISA.default <- function(
+blisa.default <- function(
     x,
     bins,
     LR_df             = NULL,
@@ -174,20 +175,20 @@ runBLISA.default <- function(
   front_cols <- c("ccc_mode", "sig_numbers", "sig_index", "sig_pval")
   LR_results <- LR_results[, c(front_cols, setdiff(colnames(LR_results), front_cols))]
 
-  result <- list(LR_results = LR_results, bins = bins, spatial_weights = sw)
-
+  CCI_scores <- NULL
   if (!is.null(counts_by_group)) {
     message("Running CCI analysis...")
-    result$CCI_scores <- runCCI(result, counts_by_group)
+    tmp <- new_blisa(LR_results, bins, sw)
+    CCI_scores <- runCCI(tmp, counts_by_group)
   }
 
-  result
+  new_blisa(LR_results, bins, sw, CCI_scores)
 }
 
 
-#' @describeIn runBLISA Method for a cell-level SpatialExperiment object.
+#' @describeIn blisa Method for a cell-level SpatialExperiment object.
 #'   Bins cells into hexagonal tiles via \code{\link{hexBinCells}} then
-#'   delegates to \code{runBLISA.default}.
+#'   delegates to \code{blisa.default}.
 #'
 #' @param bin_size Numeric. Width of each hexagonal bin in coordinate units
 #'   (e.g. microns). Passed to \code{\link{hexBinCells}} and also used as
@@ -202,7 +203,7 @@ runBLISA.default <- function(
 #'   \code{SpatialExperiment} object).
 #'
 #' @export
-runBLISA.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
+blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
                                        group = "cell_type",
                                        genes = NULL, ...) {
   coords <- as.data.frame(SpatialExperiment::spatialCoords(x))
@@ -219,9 +220,9 @@ runBLISA.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
 
   if (is.null(genes)) genes <- rownames(x)
 
-  binned <- hexBinCells(coords, counts(x), bin_size = bin_size, group = group_vec)
+  binned <- hexBinCells(coords, SummarizedExperiment::counts(x), bin_size = bin_size, group = group_vec)
 
-  runBLISA.default(
+  blisa.default(
     x               = binned$counts_matrix,
     bins          = binned$bins,
     LR_df           = LR_df,

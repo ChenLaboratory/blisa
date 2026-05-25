@@ -1,8 +1,8 @@
 #' Dot plot ranking LR pairs by number of significant hotspot bins
 #'
-#' @param LR_results Data frame returned in the \code{LR_results} slot of a BLISA
-#'   result list. Rows are ligand-receptor pairs; must contain columns
-#'   \code{sig_numbers} and \code{annotation}.
+#' @param LR_results The \code{LR_results} slot of a \code{blisa} object (i.e.
+#'   \code{res$LR_results}). Rows are ligand-receptor pairs; must contain
+#'   columns \code{sig_numbers} and \code{annotation}.
 #' @param top Integer or \code{NULL}. Number of top LR pairs (by
 #'   \code{sig_numbers}) to display. Default \code{30}.
 #' @param pt.size Numeric. Point size passed to \code{geom_point}. Default 4.

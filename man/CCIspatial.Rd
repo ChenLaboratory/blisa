@@ -9,8 +9,8 @@ CCIspatial(spe, BLISA_output, index, ct_group = "cell_type", top = 30)
 \arguments{
 \item{spe}{A cell-level \code{SpatialExperiment} object.}
 
-\item{BLISA_output}{Result list returned by \code{\link{runBLISA}}. Must
-contain \code{LR_results}, \code{bins}, and \code{spatial_weights}.}
+\item{BLISA_output}{An object of class \code{blisa} as returned by
+\code{\link{blisa}}.}
 
 \item{index}{Integer. Row index into \code{BLISA_output$LR_results} selecting
 the ligand-receptor pair to visualise.}

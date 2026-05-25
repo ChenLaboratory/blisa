@@ -3,10 +3,10 @@
 #' Plots each bin coloured by significance status: empty, non-significant,
 #' or significant (continuous gradient of -log10 p-value or 1-p-value).
 #'
-#' @param bins An \code{sf} object of hex bin polygons. Must contain an
-#'   \code{n_cells} column (number of cells per bin).
-#' @param LR_results Data frame from the \code{LR_results} slot of a BLISA result.
-#'   Must contain \code{sig_index} and \code{sig_pval} list columns.
+#' @param bins The \code{bins} slot of a \code{blisa} object (i.e.
+#'   \code{res$bins}).
+#' @param LR_results The \code{LR_results} slot of a \code{blisa} object (i.e.
+#'   \code{res$LR_results}).
 #' @param index Integer. Row index into \code{LR_results} selecting the
 #'   ligand-receptor pair to visualise.
 #' @param log_pval Logical. If \code{TRUE} (default), colour significant bins

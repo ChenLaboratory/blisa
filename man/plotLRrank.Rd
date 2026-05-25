@@ -7,9 +7,9 @@
 plotLRrank(LR_results, top = 30, pt.size = 4, flip = FALSE)
 }
 \arguments{
-\item{LR_results}{Data frame returned in the \code{LR_results} slot of a BLISA
-result list. Rows are ligand-receptor pairs; must contain columns
-\code{sig_numbers} and \code{annotation}.}
+\item{LR_results}{The \code{LR_results} slot of a \code{blisa} object (i.e.
+\code{res$LR_results}). Rows are ligand-receptor pairs; must contain
+columns \code{sig_numbers} and \code{annotation}.}
 
 \item{top}{Integer or \code{NULL}. Number of top LR pairs (by
 \code{sig_numbers}) to display. Default \code{30}.}

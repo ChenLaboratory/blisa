@@ -2,7 +2,6 @@
 % Please edit documentation in R/imports.R
 \docType{package}
 \name{blisa-package}
-\alias{blisa}
 \alias{blisa-package}
 \title{blisa: Bivariate Local Indicator of Spatial Association for spatial transcriptomics}
 \description{

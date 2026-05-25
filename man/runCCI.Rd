@@ -7,9 +7,8 @@
 runCCI(BLISA_output, counts_by_group)
 }
 \arguments{
-\item{BLISA_output}{Result list returned by \code{runBLISA}. Must contain
-\code{LR_results}, \code{bins}, and \code{spatial_weights} (including
-\code{spatial_weights$queen_nb_full} and \code{spatial_weights$dist_nb_full}).}
+\item{BLISA_output}{An object of class \code{blisa} as returned by
+\code{\link{blisa}}.}
 
 \item{counts_by_group}{Named list of gene-by-bin sparse count matrices, one
 per group level (e.g. cell type). Typically the \code{counts_by_group}

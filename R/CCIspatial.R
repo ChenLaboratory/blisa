@@ -5,8 +5,8 @@
 #' bins; sender cells are in the immediate neighbourhood.
 #'
 #' @param spe A cell-level \code{SpatialExperiment} object.
-#' @param BLISA_output Result list returned by \code{\link{runBLISA}}. Must
-#'   contain \code{LR_results}, \code{bins}, and \code{spatial_weights}.
+#' @param BLISA_output An object of class \code{blisa} as returned by
+#'   \code{\link{blisa}}.
 #' @param index Integer. Row index into \code{BLISA_output$LR_results} selecting
 #'   the ligand-receptor pair to visualise.
 #' @param ct_group Character. Column name in \code{colData(spe)} containing
@@ -32,7 +32,7 @@ CCIspatial <- function(
   sigHH <- LRI_sum$sig_index[[index]]
   mode  <- LRI_sum$ccc_mode[index]
 
-  # 2. Neighbour lookup (reuse pre-computed lists from runBLISA)
+  # 2. Neighbour lookup (reuse pre-computed lists from blisa)
   nb_list <- if (mode == "nearby") sw$queen_nb_full else sw$dist_nb_full
 
   # 3. Map cells to bin row positions
@@ -41,8 +41,8 @@ CCIspatial <- function(
   cell_data <- data.table::data.table(
     hex_id = as.integer(cell_to_hex),
     ct = as.character(SummarizedExperiment::colData(spe)[[ct_group]]),
-    ligand_expr = as.numeric(counts(spe)[interaction[1], ]),
-    receptor_expr = as.numeric(counts(spe)[interaction[2], ])
+    ligand_expr = as.numeric(SummarizedExperiment::counts(spe)[interaction[1], ]),
+    receptor_expr = as.numeric(SummarizedExperiment::counts(spe)[interaction[2], ])
   )
 
   # 4. Interaction Scoring (Receiver in HH bins, Sender in neighbours)

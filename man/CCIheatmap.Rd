@@ -7,8 +7,9 @@
 CCIheatmap(CCI_df, include_celltypes = NULL, cell_type_colors = NULL)
 }
 \arguments{
-\item{CCI_df}{Data frame returned by \code{runCCI}. Rows are
-\code{"Sender->Receiver"} cell-type pairs; columns are LR pairs.}
+\item{CCI_df}{The \code{CCI_scores} slot of a \code{blisa} object (i.e.
+\code{res$CCI_scores}). Rows are \code{"Sender->Receiver"} cell-type
+pairs; columns are LR pairs.}
 
 \item{include_celltypes}{Character vector or \code{NULL}. If provided, only
 rows where the sender or receiver appears in this vector are kept.}

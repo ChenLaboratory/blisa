@@ -49,5 +49,5 @@ bin order as \code{counts_matrix}.}
 \description{
 Aggregates single-cell spatial data into hexagonal bins and returns a
 bin-level count matrix together with a matching \code{sf} polygon object,
-ready to pass directly to \code{\link{runBLISA.default}}.
+ready to pass directly to \code{\link{blisa.default}}.
 }

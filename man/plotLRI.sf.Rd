@@ -7,11 +7,11 @@
 plotLRI.sf(bins, LR_results, index, log_pval = TRUE)
 }
 \arguments{
-\item{bins}{An \code{sf} object of hex bin polygons. Must contain an
-\code{n_cells} column (number of cells per bin).}
+\item{bins}{The \code{bins} slot of a \code{blisa} object (i.e.
+\code{res$bins}).}
 
-\item{LR_results}{Data frame from the \code{LR_results} slot of a BLISA result.
-Must contain \code{sig_index} and \code{sig_pval} list columns.}
+\item{LR_results}{The \code{LR_results} slot of a \code{blisa} object (i.e.
+\code{res$LR_results}).}
 
 \item{index}{Integer. Row index into \code{LR_results} selecting the
 ligand-receptor pair to visualise.}

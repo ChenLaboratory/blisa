@@ -23,9 +23,8 @@ get_cell_hex_mapping <- function(spe, bins) {
 #' combination. Returns a wide data frame: rows are \code{"Sender->Receiver"}
 #' group pairs, columns are LR pairs.
 #'
-#' @param BLISA_output Result list returned by \code{runBLISA}. Must contain
-#'   \code{LR_results}, \code{bins}, and \code{spatial_weights} (including
-#'   \code{spatial_weights$queen_nb_full} and \code{spatial_weights$dist_nb_full}).
+#' @param BLISA_output An object of class \code{blisa} as returned by
+#'   \code{\link{blisa}}.
 #' @param counts_by_group Named list of gene-by-bin sparse count matrices, one
 #'   per group level (e.g. cell type). Typically the \code{counts_by_group}
 #'   element of the list returned by \code{\link{hexBinCells}} when \code{group}
