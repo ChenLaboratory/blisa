@@ -111,8 +111,10 @@ An object of class \code{blisa} with four components:
 \describe{
 \item{LR_results}{Data frame of BLISA results for each LR pair, including
 \code{ccc_mode}, \code{sig_numbers}, \code{sig_index}, \code{sig_pval},
-\code{all_pval}, \code{all_lisa}, and original columns from
-\code{LR_df}.}
+\code{all_pval}, \code{all_lisa}, \code{all_quadrant}, and original
+columns from \code{LR_df}. \code{all_quadrant} is a character vector
+of \code{spdep::hotspot} quadrant labels (\code{"High-High"},
+\code{"Low-Low"}, etc.) for every bin; non-tested bins are \code{NA}.}
 \item{bins}{Bin-level \code{sf} object of hexagonal polygons.}
 \item{spatial_weights}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
 \item{CCI_scores}{\code{NULL} unless \code{counts_by_group} is supplied,

@@ -29,44 +29,44 @@ is already populated, the object is returned unchanged. If \code{TRUE} and
 replaced.}
 }
 \value{
-\code{runCCI.blisa}: the input \code{blisa} object with \code{CCI_scores}
-  populated. See below for the structure of \code{CCI_scores}.
+See individual method documentation.
 
-\code{runCCI.default}: a data frame with integer row names and columns
-  \code{Sender} (sending cell type), \code{Receiver} (receiving cell type),
-  followed by one numeric column per significant LR pair containing the
-  interaction score \code{0.5 * log2(receiver * sender + 1)}.
+\code{runCCI.blisa}: the input \code{blisa} object with
+\code{CCI_scores} populated (a wide data frame — rows are
+\code{"Sender->Receiver"} group pairs, columns are LR pairs).
+
+\code{runCCI.default}: a data frame with \code{"Sender->Receiver"}
+row names and one column per significant LR pair containing the
+interaction score \code{0.5 * log2(receiver * sender + 1)}.
 }
 \description{
 Generic function for scoring cell-cell interactions. Dispatches on the
 class of \code{x}:
 \itemize{
-  \item \code{runCCI.blisa} accepts a \code{blisa} object. If
-    \code{CCI_scores} are already present and \code{overwrite = FALSE}
-    (the default), the object is returned unchanged. Set
-    \code{overwrite = TRUE} with a \code{counts_by_group} to recompute and
-    replace existing scores. If no scores exist, \code{counts_by_group}
-    must be supplied and scores are computed and attached.
-  \item \code{runCCI.default} performs the raw computation given a
-    \code{blisa} object and a \code{counts_by_group} list, returning only
-    the scores data frame. Used internally by \code{runCCI.blisa} and
-    \code{\link{blisa.default}}.
+\item \code{runCCI.blisa} accepts a \code{blisa} object. If
+\code{CCI_scores} are already present and \code{overwrite = FALSE}
+(the default), the object is returned unchanged. Set
+\code{overwrite = TRUE} with a \code{counts_by_group} to recompute and
+replace existing scores. If no scores exist, \code{counts_by_group}
+must be supplied and scores are computed and attached.
+\item \code{runCCI.default} performs the raw computation given a
+\code{blisa} object and a \code{counts_by_group} list, returning only
+the scores data frame. Used internally by \code{runCCI.blisa} and
+\code{\link{blisa.default}}.
 }
 }
 \section{Methods (by class)}{
-\subsection{\code{runCCI(blisa)}}{
+\itemize{
+\item \code{runCCI(blisa)}: Method for a \code{blisa} object. If \code{CCI_scores}
+are already present and \code{overwrite = FALSE} (the default), the object
+is returned unchanged. Set \code{overwrite = TRUE} with a
+\code{counts_by_group} to recompute and replace existing scores. If no
+scores exist, \code{counts_by_group} must be supplied and scores are
+computed and attached to \code{x$CCI_scores}.
 
-If \code{CCI_scores} are already present and \code{overwrite = FALSE} (the
-default), the object is returned unchanged with a message. If
-\code{overwrite = TRUE} and \code{counts_by_group} is supplied, existing
-scores are recomputed and replaced. If \code{CCI_scores} are absent,
-\code{counts_by_group} must be supplied and scores are computed and attached.
-}
+\item \code{runCCI(default)}: Default method. Performs the raw CCI computation and
+returns only the scores data frame. Typically called internally; use
+\code{runCCI.blisa} to compute and attach scores to a \code{blisa} object
+in one step.
 
-\subsection{\code{runCCI(default)}}{
-
-Performs the raw CCI computation and returns only the scores data frame.
-Typically called internally; use \code{runCCI.blisa} to compute and attach
-scores to a \code{blisa} object in one step.
-}
-}
+}}

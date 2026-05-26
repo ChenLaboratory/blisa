@@ -33,22 +33,18 @@ A \code{ggplot} object.
 \description{
 Generic function for ranking LR pairs. Dispatches on the class of \code{x}:
 \itemize{
-  \item \code{plotLRrank.blisa} accepts a \code{blisa} object and uses its
-    \code{LR_results} slot directly.
-  \item \code{plotLRrank.data.frame} accepts the \code{LR_results} data
-    frame directly.
+\item \code{plotLRrank.blisa} accepts a \code{blisa} object and uses its
+\code{LR_results} slot directly.
+\item \code{plotLRrank.data.frame} accepts the \code{LR_results} data
+frame directly.
 }
 }
 \section{Methods (by class)}{
-\subsection{\code{plotLRrank(blisa)}}{
+\itemize{
+\item \code{plotLRrank(blisa)}: Method for a \code{blisa} object. Extracts
+\code{LR_results} and delegates to \code{plotLRrank.data.frame}.
 
-Method for a \code{blisa} object. Extracts \code{LR_results} and delegates
-to \code{plotLRrank.data.frame}.
-}
+\item \code{plotLRrank(data.frame)}: Method for a data frame of LR results (e.g. the
+\code{LR_results} slot of a \code{blisa} object).
 
-\subsection{\code{plotLRrank(data.frame)}}{
-
-Method for a data frame of LR results (e.g. the \code{LR_results} slot of
-a \code{blisa} object).
-}
-}
+}}

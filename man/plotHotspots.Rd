@@ -55,26 +55,7 @@ non-significant, or significant hotspot (continuous gradient of
 -log10 p-value or 1 - p-value).
 }
 \section{Methods (by class)}{
-\subsection{\code{plotHotspots(blisa)}}{
+\itemize{
+\item \code{plotHotspots(blisa)}: Method for a \code{blisa} object.
 
-Extracts \code{bins} and \code{LR_results} from the \code{blisa} object.
-The LR pair is selected by \code{index} (default 1, the top-ranked pair)
-unless both \code{ligand} and \code{receptor} are supplied, in which case
-the matching row is located automatically and \code{index} is ignored. When
-\code{p_cutoff} is provided, hotspot bins are recomputed on the fly from
-the stored \code{all_pval} and \code{all_lisa} vectors.
-}
-}
-\examples{
-\dontrun{
-# By index (default: top-ranked pair)
-plotHotspots(res)
-plotHotspots(res, index = 3)
-
-# By gene name
-plotHotspots(res, ligand = "CXCL12", receptor = "CXCR4")
-
-# Custom p-value cutoff
-plotHotspots(res, ligand = "CXCL12", receptor = "CXCR4", p_cutoff = 0.01)
-}
-}
+}}
