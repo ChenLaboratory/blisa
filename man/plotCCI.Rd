@@ -8,9 +8,25 @@
 \usage{
 plotCCI(x, ...)
 
-\method{plotCCI}{blisa}(x, include_celltypes = NULL, cell_type_colors = NULL, ...)
+\method{plotCCI}{blisa}(
+  x,
+  top_lr = 20,
+  top_pairs = 30,
+  sender = NULL,
+  receiver = NULL,
+  cell_type_colors = NULL,
+  ...
+)
 
-\method{plotCCI}{default}(x, include_celltypes = NULL, cell_type_colors = NULL, ...)
+\method{plotCCI}{default}(
+  x,
+  top_lr = 20,
+  top_pairs = 30,
+  sender = NULL,
+  receiver = NULL,
+  cell_type_colors = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{blisa} object or a CCI scores data frame (the
@@ -19,8 +35,25 @@ contain columns \code{Sender}, \code{Receiver}, and one column per LR pair.}
 
 \item{...}{Additional arguments passed to the relevant method.}
 
-\item{include_celltypes}{Character vector or \code{NULL}. If provided, only
-rows where the sender or receiver appears in this vector are kept.}
+\item{top_lr}{Integer or \code{NULL}. Number of top-ranked LR pairs (by
+\code{sig_numbers}) to display as columns. LR pairs in \code{CCI_scores}
+are already ordered by rank, so this simply takes the first \code{top_lr}
+columns. Default \code{20}.}
+
+\item{top_pairs}{Integer or \code{NULL}. Number of top sender-receiver pairs
+to display as rows, ranked by their maximum interaction score across the
+displayed LR pairs (after \code{top_lr} is applied). When \code{NULL} all
+rows are shown. Default \code{30}.}
+
+\item{sender}{Character vector or \code{NULL}. If provided, only rows where
+\code{Sender} is in this vector are kept. Applied independently of
+\code{receiver} (AND logic when both are supplied). Default \code{NULL}
+(all senders).}
+
+\item{receiver}{Character vector or \code{NULL}. If provided, only rows
+where \code{Receiver} is in this vector are kept. Applied independently of
+\code{sender} (AND logic when both are supplied). Default \code{NULL}
+(all receivers).}
 
 \item{cell_type_colors}{Named character vector mapping cell-type names to
 colours, used for the sender/receiver row annotations. When \code{NULL}

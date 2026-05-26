@@ -20,18 +20,34 @@ plotCCI <- function(x, ...) UseMethod("plotCCI")
 #'   \code{CCI_scores} and delegates to \code{plotCCI.default}. Stops with an
 #'   informative error if \code{CCI_scores} is \code{NULL}.
 #'
-#' @param include_celltypes Character vector or \code{NULL}. If provided, only
-#'   rows where the sender or receiver appears in this vector are kept.
+#' @param top_lr Integer or \code{NULL}. Number of top-ranked LR pairs (by
+#'   \code{sig_numbers}) to display as columns. LR pairs in \code{CCI_scores}
+#'   are already ordered by rank, so this simply takes the first \code{top_lr}
+#'   columns. Default \code{20}.
+#' @param top_pairs Integer or \code{NULL}. Number of top sender-receiver pairs
+#'   to display as rows, ranked by their maximum interaction score across the
+#'   displayed LR pairs (after \code{top_lr} is applied). When \code{NULL} all
+#'   rows are shown. Default \code{30}.
+#' @param sender Character vector or \code{NULL}. If provided, only rows where
+#'   \code{Sender} is in this vector are kept. Applied independently of
+#'   \code{receiver} (AND logic when both are supplied). Default \code{NULL}
+#'   (all senders).
+#' @param receiver Character vector or \code{NULL}. If provided, only rows
+#'   where \code{Receiver} is in this vector are kept. Applied independently of
+#'   \code{sender} (AND logic when both are supplied). Default \code{NULL}
+#'   (all receivers).
 #' @param cell_type_colors Named character vector mapping cell-type names to
 #'   colours, used for the sender/receiver row annotations. When \code{NULL}
 #'   (default), colours are assigned automatically from the package palette.
 #'
 #' @export
-plotCCI.blisa <- function(x, include_celltypes = NULL,
+plotCCI.blisa <- function(x, top_lr = 20, top_pairs = 30,
+                          sender = NULL, receiver = NULL,
                           cell_type_colors = NULL, ...) {
   if (is.null(x$CCI_scores))
     stop("CCI_scores is NULL. Run runCCI() first to compute CCI scores.")
-  plotCCI.default(x$CCI_scores, include_celltypes = include_celltypes,
+  plotCCI.default(x$CCI_scores, top_lr = top_lr, top_pairs = top_pairs,
+                  sender = sender, receiver = receiver,
                   cell_type_colors = cell_type_colors)
 }
 
@@ -40,17 +56,36 @@ plotCCI.blisa <- function(x, include_celltypes = NULL,
 #'   \code{CCI_scores} slot of a \code{blisa} object).
 #'
 #' @export
-plotCCI.default <- function(x, include_celltypes = NULL,
+plotCCI.default <- function(x, top_lr = 20, top_pairs = 30,
+                            sender = NULL, receiver = NULL,
                             cell_type_colors = NULL, ...) {
   CCI_df <- x
 
-  # Optional subsetting by cell type
-  if (!is.null(include_celltypes)) {
-    keep_idx <- CCI_df$Sender %in% include_celltypes |
-                CCI_df$Receiver %in% include_celltypes
-    CCI_df <- CCI_df[keep_idx, , drop = FALSE]
+  # Filter rows by sender (AND logic with receiver)
+  if (!is.null(sender)) {
+    CCI_df <- CCI_df[CCI_df$Sender %in% sender, , drop = FALSE]
     if (nrow(CCI_df) == 0)
-      stop("No matching cell type pairs found for the specified include_celltypes.")
+      stop("No rows remaining after filtering by sender.")
+  }
+
+  # Filter rows by receiver (AND logic with sender)
+  if (!is.null(receiver)) {
+    CCI_df <- CCI_df[CCI_df$Receiver %in% receiver, , drop = FALSE]
+    if (nrow(CCI_df) == 0)
+      stop("No rows remaining after filtering by receiver.")
+  }
+
+  # Subset to top_lr LR pair columns (already ranked by sig_numbers)
+  lr_cols <- setdiff(colnames(CCI_df), c("Sender", "Receiver"))
+  if (!is.null(top_lr))
+    lr_cols <- lr_cols[seq_len(min(top_lr, length(lr_cols)))]
+
+  # Subset to top_pairs rows by max score across the displayed LR columns
+  if (!is.null(top_pairs) && nrow(CCI_df) > top_pairs) {
+    score_mat <- as.matrix(CCI_df[, lr_cols, drop = FALSE])
+    row_max   <- apply(score_mat, 1, max, na.rm = TRUE)
+    keep      <- order(row_max, decreasing = TRUE)[seq_len(top_pairs)]
+    CCI_df    <- CCI_df[keep, , drop = FALSE]
   }
 
   senders   <- CCI_df$Sender
@@ -74,8 +109,6 @@ plotCCI.default <- function(x, include_celltypes = NULL,
     annotation_name_side = "top"
   )
 
-  # Score matrix: exclude the Sender / Receiver identifier columns
-  lr_cols    <- setdiff(colnames(CCI_df), c("Sender", "Receiver"))
   row_labels <- paste(senders, receivers, sep = " -> ")
 
   f1 <- viridisLite::viridis(10)
