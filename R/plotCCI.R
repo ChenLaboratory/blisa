@@ -1,27 +1,53 @@
-#library(ComplexHeatmap)
-
 #' Heatmap of CCI scores across all ligand-receptor pairs
 #'
-#' Draws a clustered heatmap (via \code{ComplexHeatmap}) with row annotations
-#' for sender and receiver cell types. Row annotations use \code{cell_type_colors},
-#' which must be a named character vector of colours defined in the calling
-#' environment or passed explicitly.
+#' Generic function. Draws a clustered heatmap (via \code{ComplexHeatmap})
+#' with rows as Sender \eqn{\rightarrow} Receiver cell-type pairs and columns
+#' as LR pairs. Row annotations colour-code the sender and receiver cell types.
 #'
-#' @param CCI_df The \code{CCI_scores} slot of a \code{blisa} object (i.e.
-#'   \code{res$CCI_scores}). Must contain columns \code{Sender}, \code{Receiver},
-#'   and one column per LR pair.
+#' @param x A \code{blisa} object or a CCI scores data frame (the
+#'   \code{CCI_scores} slot of a \code{blisa} object). The data frame must
+#'   contain columns \code{Sender}, \code{Receiver}, and one column per LR pair.
+#' @param ... Additional arguments passed to the relevant method.
+#'
+#' @return Invisibly returns the \code{Heatmap} object.
+#' @seealso \code{\link{plotCCIpair}} for a sender-by-receiver heatmap of a
+#'   single LR pair.
+#' @export
+plotCCI <- function(x, ...) UseMethod("plotCCI")
+
+
+#' @describeIn plotCCI Method for a \code{blisa} object. Extracts
+#'   \code{CCI_scores} and delegates to \code{plotCCI.default}. Stops with an
+#'   informative error if \code{CCI_scores} is \code{NULL}.
+#'
 #' @param include_celltypes Character vector or \code{NULL}. If provided, only
 #'   rows where the sender or receiver appears in this vector are kept.
 #' @param cell_type_colors Named character vector mapping cell-type names to
 #'   colours, used for the sender/receiver row annotations. When \code{NULL}
 #'   (default), colours are assigned automatically from the package palette.
 #'
-#' @return Invisibly returns the \code{Heatmap} object.
 #' @export
-CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors = NULL) {
+plotCCI.blisa <- function(x, include_celltypes = NULL,
+                          cell_type_colors = NULL, ...) {
+  if (is.null(x$CCI_scores))
+    stop("CCI_scores is NULL. Run runCCI() first to compute CCI scores.")
+  plotCCI.default(x$CCI_scores, include_celltypes = include_celltypes,
+                  cell_type_colors = cell_type_colors)
+}
+
+
+#' @describeIn plotCCI Method for a CCI scores data frame (e.g. the
+#'   \code{CCI_scores} slot of a \code{blisa} object).
+#'
+#' @export
+plotCCI.default <- function(x, include_celltypes = NULL,
+                            cell_type_colors = NULL, ...) {
+  CCI_df <- x
+
   # Optional subsetting by cell type
   if (!is.null(include_celltypes)) {
-    keep_idx <- CCI_df$Sender %in% include_celltypes | CCI_df$Receiver %in% include_celltypes
+    keep_idx <- CCI_df$Sender %in% include_celltypes |
+                CCI_df$Receiver %in% include_celltypes
     CCI_df <- CCI_df[keep_idx, , drop = FALSE]
     if (nrow(CCI_df) == 0)
       stop("No matching cell type pairs found for the specified include_celltypes.")
@@ -49,10 +75,10 @@ CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors = NULL
   )
 
   # Score matrix: exclude the Sender / Receiver identifier columns
-  lr_cols   <- setdiff(colnames(CCI_df), c("Sender", "Receiver"))
+  lr_cols    <- setdiff(colnames(CCI_df), c("Sender", "Receiver"))
   row_labels <- paste(senders, receivers, sep = " -> ")
 
-  f1 = viridisLite::viridis(10)
+  f1 <- viridisLite::viridis(10)
   ht <- ComplexHeatmap::Heatmap(as.matrix(CCI_df[, lr_cols, drop = FALSE]),
                 name = "Interaction\nScore",
                 col = f1,
@@ -65,11 +91,9 @@ CCIheatmap <- function(CCI_df, include_celltypes = NULL, cell_type_colors = NULL
                 heatmap_legend_param = list(title_position = "topcenter"),
                 left_annotation = row_ha)
 
-  # Draw the heatmap with adjusted layout to avoid truncation
   draw(ht,
        heatmap_legend_side = "right",
        padding = unit(c(5, 15, 5, 10), "mm"))
 
-  # Optionally return the heatmap object (useful if chaining)
   invisible(ht)
 }

@@ -134,20 +134,17 @@ head(CCIres)
 # Visualize CCI Heatmap
 
 ```{r fig.height=8, fig.width=8}
-CCIheatmap(CCIres)
+plotCCI(BLISAres)
 ```
 
 ```{r, fig.height=10, fig.width=9}
-CCIheatmap(CCIres, include_celltypes = c("Invasive_Tumor"))
+plotCCI(BLISAres, include_celltypes = c("Invasive_Tumor"))
 ```
 
 # Visualize One Ligand–Receptor Pair
 
 ```{r fig.height=5, fig.width=6}
-p <- CCIheatmapOneLR(
-  CCIres,
-  "CXCL12_CXCR4"
-)
+p <- plotCCIpair(BLISAres, ligand = "CXCL12", receptor = "CXCR4")
 
 draw(
   p,
