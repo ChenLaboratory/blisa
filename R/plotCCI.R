@@ -10,7 +10,7 @@
 #' @param ... Additional arguments passed to the relevant method.
 #'
 #' @return Invisibly returns the \code{Heatmap} object.
-#' @seealso \code{\link{plotCCIpair}} for a sender-by-receiver heatmap of a
+#' @seealso \code{\link{plotCCILR}} for a sender-by-receiver heatmap of a
 #'   single LR pair; \code{\link{plotCCIsummary}} for an aggregated
 #'   sender-by-receiver heatmap across all LR pairs.
 #' @export

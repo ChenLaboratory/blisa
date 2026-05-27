@@ -1,42 +1,21 @@
 LRI_spatial_colors <- c("#FFFFCC", "#FFD700", "#FF7F00", "#D7301F")
 
-cols <- c(
-  # Highly distinct / saturated first
-  "#E69F00", # orange
-  "#56B4E9", # light blue
-  "#009E73", # green
-  "#D55E00", # vermillion
-  "#CC79A7", # magenta
-  "#117a77", # blue
-  "#F0E442", # yellow
-  "#0b2b5e", # strong blue
-  "#33A02C", # strong green
-  "#E31A1C", # red
-  "#6A3D9A", # purple
-  "#B15928", # brown
-
-  # Softer but still distinct
-  "#FB8072", # coral
-  "#80B1D3", # sky blue
-  "#FDB462", # orange pastel
-  "#B3DE69", # lime pastel
-  "#CAB2D6", # lavender
-  "#FB9A99", # salmon
-  "#a18e6a", # gold pastel
-  "#FF7F00", # bright orange
-
-  # Pastel / similar shades pushed later
-  "#8DD3C7", # teal pastel
-  "#FFFFB3", # pale yellow
-  "#BEBADA", # pale lavender
-  "#FCCDE5", # pink pastel
-  "#BC80BD", # violet pastel
-  "#CCEBC5", # mint
-  "#FFED6F", # soft yellow
-  "#A6CEE3", # pale blue
-  "#B2DF8A", # pale green
-  "#FFB3BA"  # baby pink
+col.pDark <- c(
+  "#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD",
+  "#8C564B", "#E377C2", "#7F7F7F", "#BCBD22", "#17BECF"
 )
+
+col.pLight <- c(
+  "#AEC7E8", "#FFBB78", "#98DF8A", "#FF9896", "#C5B0D5",
+  "#C49C94", "#F7B6D2", "#C7C7C7", "#DBDB8D", "#9EDAE5"
+)
+
+col.pMedium <- c(
+  "#729ECE", "#FF9E4A", "#67BF5C", "#ED665D", "#AD8BC9",
+  "#A8786E", "#ED97CA", "#A2A2A2", "#CDCC5D", "#6DCCDA"
+)
+
+cols <- c(col.pDark, col.pLight, col.pMedium)
 
 # Session-level cache so CellChatDB is only downloaded once per R session
 .blisa_cache <- new.env(parent = emptyenv())

@@ -9,7 +9,7 @@
 #' @param ... Additional arguments passed to the relevant method.
 #'
 #' @return A \code{Heatmap} object.
-#' @seealso \code{\link{plotCCIpair}} for a per-LR-pair version of this plot;
+#' @seealso \code{\link{plotCCILR}} for a per-LR-pair version of this plot;
 #'   \code{\link{plotCCI}} for a heatmap with LR pairs as columns.
 #' @export
 plotCCIsummary <- function(x, ...) UseMethod("plotCCIsummary")

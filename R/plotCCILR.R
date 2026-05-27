@@ -11,10 +11,10 @@
 #' @seealso \code{\link{plotCCI}} for an overview heatmap across all LR pairs;
 #'   \code{\link{plotCCIsummary}} for an aggregated sender-by-receiver heatmap.
 #' @export
-plotCCIpair <- function(x, ...) UseMethod("plotCCIpair")
+plotCCILR <- function(x, ...) UseMethod("plotCCILR")
 
 
-#' @describeIn plotCCIpair Method for a \code{blisa} object. The LR pair is
+#' @describeIn plotCCILR Method for a \code{blisa} object. The LR pair is
 #'   selected by \code{index} (default 1, the top-ranked pair) unless both
 #'   \code{ligand} and \code{receptor} are supplied, in which case the matching
 #'   row is located automatically and \code{index} is ignored. Stops with an
@@ -32,7 +32,7 @@ plotCCIpair <- function(x, ...) UseMethod("plotCCIpair")
 #'   with \code{ligand}.
 #'
 #' @export
-plotCCIpair.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
+plotCCILR.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
                                ...) {
   if (is.null(x$CCI_scores))
     stop("CCI_scores is NULL. Run runCCI() first to compute CCI scores.")
@@ -50,11 +50,11 @@ plotCCIpair.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
   if (!lr_pair %in% colnames(x$CCI_scores))
     stop("LR pair '", lr_pair, "' not found in CCI_scores.")
 
-  plotCCIpair.default(x$CCI_scores, lr_pair)
+  plotCCILR.default(x$CCI_scores, lr_pair)
 }
 
 
-#' @describeIn plotCCIpair Method for a CCI scores data frame (e.g. the
+#' @describeIn plotCCILR Method for a CCI scores data frame (e.g. the
 #'   \code{CCI_scores} slot of a \code{blisa} object). The LR pair is selected
 #'   by column name via \code{lr_pair}.
 #'
@@ -63,7 +63,7 @@ plotCCIpair.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
 #'   (e.g. \code{"CXCL12_CXCR4"}).
 #'
 #' @export
-plotCCIpair.default <- function(x, lr_pair, ...) {
+plotCCILR.default <- function(x, lr_pair, ...) {
   CCI_df <- x
 
   if (!lr_pair %in% colnames(CCI_df))
