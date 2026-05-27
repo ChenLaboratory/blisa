@@ -67,6 +67,6 @@ informative error if \code{CCI_scores} is \code{NULL}.
 
 }}
 \seealso{
-\code{\link{plotCCIpair}} for a per-LR-pair version of this plot;
+\code{\link{plotCCILR}} for a per-LR-pair version of this plot;
 \code{\link{plotCCI}} for a heatmap with LR pairs as columns.
 }
