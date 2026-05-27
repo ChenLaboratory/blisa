@@ -56,5 +56,6 @@ by column name via \code{lr_pair}.
 
 }}
 \seealso{
-\code{\link{plotCCI}} for an overview heatmap across all LR pairs.
+\code{\link{plotCCI}} for an overview heatmap across all LR pairs;
+\code{\link{plotCCIsummary}} for an aggregated sender-by-receiver heatmap.
 }

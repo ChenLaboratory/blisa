@@ -79,5 +79,6 @@ informative error if \code{CCI_scores} is \code{NULL}.
 }}
 \seealso{
 \code{\link{plotCCIpair}} for a sender-by-receiver heatmap of a
-single LR pair.
+single LR pair; \code{\link{plotCCIsummary}} for an aggregated
+sender-by-receiver heatmap across all LR pairs.
 }
