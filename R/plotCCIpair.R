@@ -8,7 +8,8 @@
 #' @param ... Additional arguments passed to the relevant method.
 #'
 #' @return A \code{Heatmap} object.
-#' @seealso \code{\link{plotCCI}} for an overview heatmap across all LR pairs.
+#' @seealso \code{\link{plotCCI}} for an overview heatmap across all LR pairs;
+#'   \code{\link{plotCCIsummary}} for an aggregated sender-by-receiver heatmap.
 #' @export
 plotCCIpair <- function(x, ...) UseMethod("plotCCIpair")
 
