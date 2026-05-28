@@ -4,28 +4,50 @@
 \alias{plotCCIspatial}
 \title{Spatial map of dominant sender-receiver cell-type pairs at BLISA hotspots}
 \usage{
-plotCCIspatial(spe, BLISA_output, index, ct_group = "cell_type", top = 30)
+plotCCIspatial(
+  x,
+  spe,
+  index = 1,
+  ligand = NULL,
+  receptor = NULL,
+  ct_group = "cell_type",
+  top = 30
+)
 }
 \arguments{
+\item{x}{A \code{blisa} object as returned by \code{\link{blisa}}.}
+
 \item{spe}{A cell-level \code{SpatialExperiment} object.}
 
-\item{BLISA_output}{An object of class \code{blisa} as returned by
-\code{\link{blisa}}.}
+\item{index}{Integer. Row index into \code{x$LR_results} selecting the
+ligand-receptor pair to visualise. Ignored when both \code{ligand} and
+\code{receptor} are supplied. Default \code{1} (top-ranked pair).}
 
-\item{index}{Integer. Row index into \code{BLISA_output$LR_results} selecting
-the ligand-receptor pair to visualise.}
+\item{ligand}{Character. Ligand gene symbol. When both \code{ligand} and
+\code{receptor} are provided the matching LR pair is located automatically
+and \code{index} is ignored. Must be supplied together with
+\code{receptor}.}
+
+\item{receptor}{Character. Receptor gene symbol. Must be supplied together
+with \code{ligand}.}
 
 \item{ct_group}{Character. Column name in \code{colData(spe)} containing
 cell-type labels. Default \code{"cell_type"}.}
 
 \item{top}{Integer. Maximum number of distinct cell-type pairs to show in
-the legend; remaining pairs are grouped as \code{"rare pairs"}. Default 30.}
+the legend; remaining pairs are grouped as \code{"rare pairs"}. Default
+\code{30}.}
 }
 \value{
 A \code{ggplot} object.
 }
 \description{
-Plots the dominant interacting cell-type pair at each hotspot bin for a
-selected ligand-receptor interaction. Receiver cells are those inside hotspot
-bins; sender cells are in the immediate neighbourhood.
+For a selected ligand-receptor pair, identifies the dominant interacting
+cell-type pair at each significant hotspot bin and draws a spatial map of
+the tissue coloured by those pairs. Receiver cells are those inside hotspot
+bins; sender cells are drawn from the immediate neighbourhood.
+}
+\seealso{
+\code{\link{plotHotspots}} for a significance-based spatial map of
+hotspot bins.
 }

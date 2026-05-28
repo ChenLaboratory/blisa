@@ -32,7 +32,7 @@ replaced.}
 See individual method documentation.
 
 \code{runCCI.blisa}: the input \code{blisa} object with
-\code{CCI_scores} populated (a wide data frame — rows are
+\code{CCI_scores} populated (a wide data frame -- rows are
 \code{"Sender->Receiver"} group pairs, columns are LR pairs).
 
 \code{runCCI.default}: a data frame with \code{"Sender->Receiver"}
