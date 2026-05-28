@@ -62,4 +62,3 @@ filterLRpairs <- function(counts, min_ligand = 10, min_receptor = 10,
 
 }
 
-# LR_pairs_filtered <- filterLRpairs(counts = hex_gene_counts, min_ligand = 10, min_receptor = 10, LR_df = CellChatDB.human$interaction)
