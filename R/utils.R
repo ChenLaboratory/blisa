@@ -4,7 +4,7 @@ if (getRversion() >= "2.15.1") {
     # ggplot2 aes (plotCCIspatial)
     "cell_pair_plot",
     # ggplot2 aes (plotHotspots)
-    "fill_col", "val",
+    "fill_col", "val", "y",
     # ggplot2 aes (plotLRrank)
     "LR_pair", "sig_numbers", "annotation"
   ))
