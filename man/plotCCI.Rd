@@ -14,7 +14,8 @@ plotCCI(x, ...)
   top_pairs = 30,
   sender = NULL,
   receiver = NULL,
-  cell_type_colors = NULL,
+  colors = NULL,
+  colours = NULL,
   ...
 )
 
@@ -24,7 +25,8 @@ plotCCI(x, ...)
   top_pairs = 30,
   sender = NULL,
   receiver = NULL,
-  cell_type_colors = NULL,
+  colors = NULL,
+  colours = NULL,
   ...
 )
 }
@@ -55,9 +57,13 @@ where \code{Receiver} is in this vector are kept. Applied independently of
 \code{sender} (AND logic when both are supplied). Default \code{NULL}
 (all receivers).}
 
-\item{cell_type_colors}{Named character vector mapping cell-type names to
-colours, used for the sender/receiver row annotations. When \code{NULL}
-(default), colours are assigned automatically from the package palette.}
+\item{colors}{Named character vector mapping cell-type names to colours,
+used for the sender/receiver row annotations. When \code{NULL} (default),
+colours are assigned automatically from the package palette. The British
+spelling \code{colours} is accepted as an alias.}
+
+\item{colours}{Alias for \code{colors} (British spelling). Ignored when
+\code{colors} is supplied.}
 }
 \value{
 Invisibly returns the \code{Heatmap} object.
