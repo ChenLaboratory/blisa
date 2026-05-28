@@ -1,18 +1,3 @@
-get_cell_hex_mapping <- function(spe, bins) {
-  # Convert spe coordinates to sf
-  coords <- as.data.frame(SpatialExperiment::spatialCoords(spe))
-  cell_sf <- sf::st_as_sf(coords, coords = c("x_centroid", "y_centroid"), crs = sf::st_crs(bins))
-
-  # Spatial join to find which bin each cell falls into
-  mapped <- sf::st_join(cell_sf, bins, join = sf::st_intersects)
-
-  # Return row positions in bins (not bin_id values) so they align with
-  # the sigHH indices stored in BLISA_output$LR_results$sig_index
-  res <- match(mapped$bin_id, bins$bin_id)
-  names(res) <- rownames(coords)
-  return(res)
-}
-
 
 #' Score cell-cell interactions from BLISA hotspots
 #'

@@ -6,7 +6,9 @@
 #' bins; sender cells are drawn from the immediate neighbourhood.
 #'
 #' @param x A \code{blisa} object as returned by \code{\link{blisa}}.
-#' @param spe A cell-level \code{SpatialExperiment} object.
+#' @param counts_by_group Named list of gene-by-bin count matrices, one per
+#'   cell type. Typically the \code{counts_by_group} element returned by
+#'   \code{\link{hexBinCells}}. Names must match the cell-type levels.
 #' @param index Integer. Row index into \code{x$LR_results} selecting the
 #'   ligand-receptor pair to visualise. Ignored when both \code{ligand} and
 #'   \code{receptor} are supplied. Default \code{1} (top-ranked pair).
@@ -16,88 +18,74 @@
 #'   \code{receptor}.
 #' @param receptor Character. Receptor gene symbol. Must be supplied together
 #'   with \code{ligand}.
-#' @param ct_group Character. Column name in \code{colData(spe)} containing
-#'   cell-type labels. Default \code{"cell_type"}.
-#' @param top Integer. Maximum number of distinct cell-type pairs to show in
-#'   the legend; remaining pairs are grouped as \code{"rare pairs"}. Default
+#' @param top_pairs Integer. Maximum number of distinct cell-type pairs to show
+#'   in the legend; remaining pairs are grouped as \code{"rare pairs"}. Default
 #'   \code{30}.
 #'
 #' @return A \code{ggplot} object.
 #' @seealso \code{\link{plotHotspots}} for a significance-based spatial map of
 #'   hotspot bins.
 #' @export
-plotCCIspatial <- function(x, spe, index = 1, ligand = NULL, receptor = NULL,
-                            ct_group = "cell_type", top = 30) {
+plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
+                            receptor = NULL, top_pairs = 30) {
 
   LR_results <- x$LR_results
   bins       <- x$bins
   sw         <- x$spatial_weights
+  ct_names   <- names(counts_by_group)
 
   index   <- .resolve_lr_index(LR_results, index, ligand, receptor)
   lr_pair <- rownames(LR_results)[index]
 
-  genes <- unname(unlist(LR_results[index, c("ligand.symbol", "receptor.symbol")]))
-  sigHH <- LR_results$sig_index[[index]]
-  mode  <- LR_results$ccc_mode[index]
+  gene_l <- LR_results$ligand.symbol[index]
+  gene_r <- LR_results$receptor.symbol[index]
+  sigHH  <- LR_results$sig_index[[index]]
+  mode   <- LR_results$ccc_mode[index]
 
   if (length(sigHH) == 0)
     stop("LR pair '", lr_pair, "' has no significant hotspots.")
 
   nb_list <- if (mode == "nearby") sw$queen_nb_full else sw$dist_nb_full
 
-  # Map each cell to its bin row position
-  cell_to_hex <- get_cell_hex_mapping(spe, bins)
+  # For each hotspot bin, score all sender-receiver cell-type combinations
+  # and retain the dominant (highest-scoring) pair
+  dominant_pairs <- do.call(rbind, lapply(sigHH, function(h) {
+    nb_h <- unique(c(h, nb_list[[h]]))
 
-  cell_data <- data.frame(
-    hex_id        = as.integer(cell_to_hex),
-    ct            = as.character(SummarizedExperiment::colData(spe)[[ct_group]]),
-    ligand_expr   = as.numeric(SummarizedExperiment::assay(spe, "counts")[genes[1], ]),
-    receptor_expr = as.numeric(SummarizedExperiment::assay(spe, "counts")[genes[2], ])
-  )
+    # Receptor expression in bin h per cell type (receivers)
+    r_scores <- sapply(ct_names, function(ct)
+      sum(counts_by_group[[ct]][gene_r, h]))
 
-  # Receiver: sum receptor expression per (hotspot bin, cell type)
-  rcpt_data    <- cell_data[cell_data$hex_id %in% sigHH, ]
-  rcpt_summary <- aggregate(receptor_expr ~ hex_id + ct,
-                            data = rcpt_data, FUN = sum)
-  colnames(rcpt_summary)[colnames(rcpt_summary) == "ct"]            <- "ct_r"
-  colnames(rcpt_summary)[colnames(rcpt_summary) == "receptor_expr"] <- "r_sum"
+    # Ligand expression in neighbourhood of h per cell type (senders)
+    l_scores <- sapply(ct_names, function(ct)
+      sum(counts_by_group[[ct]][gene_l, nb_h]))
 
-  # Sender: sum ligand expression per (hotspot + neighbour bin, cell type)
-  sigHH_ng    <- unique(c(sigHH, unlist(nb_list[sigHH])))
-  lig_data    <- cell_data[cell_data$hex_id %in% sigHH_ng, ]
-  lig_summary <- aggregate(ligand_expr ~ hex_id + ct,
-                           data = lig_data, FUN = sum)
-  colnames(lig_summary)[colnames(lig_summary) == "ct"]           <- "ct_l"
-  colnames(lig_summary)[colnames(lig_summary) == "hex_id"]       <- "hh_hex"
-  colnames(lig_summary)[colnames(lig_summary) == "ligand_expr"]  <- "l_sum"
+    score_mat <- 0.5 * log2(outer(r_scores, l_scores) + 1)
+    best      <- which(score_mat == max(score_mat), arr.ind = TRUE)[1L, ]
 
-  # Cartesian merge: all (receiver ct x sender ct) combinations per hotspot bin
-  merged           <- merge(rcpt_summary, lig_summary,
-                            by.x = "hex_id", by.y = "hh_hex")
-  merged$product   <- 0.5 * log2(merged$r_sum * merged$l_sum + 1)
-  merged$cell_pair <- paste(merged$ct_l, merged$ct_r, sep = " -> ")
-
-  # Keep the top-scoring sender-receiver pair per hotspot bin
-  best_idx  <- tapply(seq_len(nrow(merged)), merged$hex_id,
-                      function(i) i[which.max(merged$product[i])])
-  top_pairs <- merged[unlist(best_idx), ]
+    data.frame(
+      hex_id    = h,
+      cell_pair = paste(ct_names[best[2L]], ct_names[best[1L]], sep = " -> "),
+      product   = score_mat[best[1L], best[2L]]
+    )
+  }))
 
   # Legend: show top N pairs by frequency; group remainder as "rare pairs"
-  tbl <- sort(table(top_pairs$cell_pair), decreasing = TRUE)
-  if (length(tbl) <= top) {
+  tbl <- sort(table(dominant_pairs$cell_pair), decreasing = TRUE)
+  if (length(tbl) <= top_pairs) {
     shown_pairs  <- names(tbl)
     legend_title <- "All pairs"
   } else {
-    shown_pairs  <- names(tbl[seq_len(top)])
-    legend_title <- paste0("Top ", top, " pairs")
+    shown_pairs  <- names(tbl[seq_len(top_pairs)])
+    legend_title <- paste0("Top ", top_pairs, " pairs")
   }
-  top_pairs$cell_pair_plot <- ifelse(top_pairs$cell_pair %in% shown_pairs,
-                                     top_pairs$cell_pair, "rare pairs")
+  dominant_pairs$cell_pair_plot <- ifelse(dominant_pairs$cell_pair %in% shown_pairs,
+                                     dominant_pairs$cell_pair, "rare pairs")
 
   # Label every bin: Empty / Non-Significant / dominant interacting pair
-  bins$cell_pair_plot                    <- ifelse(bins$n_cells > 0,
-                                                    "Non-Significant", "Empty")
-  bins$cell_pair_plot[top_pairs$hex_id] <- top_pairs$cell_pair_plot
+  bins$cell_pair_plot                   <- ifelse(bins$n_cells > 0,
+                                                   "Non-Significant", "Empty")
+  bins$cell_pair_plot[dominant_pairs$hex_id] <- dominant_pairs$cell_pair_plot
   legend_levels       <- c(shown_pairs, "rare pairs", "Non-Significant", "Empty")
   bins$cell_pair_plot <- factor(bins$cell_pair_plot, levels = legend_levels)
 

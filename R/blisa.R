@@ -27,7 +27,7 @@ blisa <- function(x, ...) UseMethod("blisa")
 #' @param LR_df Data frame of ligand-receptor pairs with columns
 #'   \code{ligand.symbol} and \code{receptor.symbol}. When \code{NULL},
 #'   CellChatDB for the chosen \code{species} is downloaded automatically.
-#' @param hex_size Numeric. Bin spacing used to define queen adjacency for
+#' @param bin_size Numeric. Bin spacing used to define queen adjacency for
 #'   nearby-mode interactions. Default \code{50}.
 #' @param dmax Numeric. Maximum distance for diffuse-mode neighbours.
 #'   Default \code{250}.
@@ -38,14 +38,14 @@ blisa <- function(x, ...) UseMethod("blisa")
 #' @param min_ligand Numeric. Minimum ligand count threshold. Default \code{10}.
 #' @param min_receptor Numeric. Minimum receptor count threshold.
 #'   Default \code{10}.
-#' @param min_cells_per_bin Integer. Bins with fewer cells are excluded from
+#' @param min_cells Integer. Bins with fewer cells are excluded from
 #'   Moran's I and assigned neutral statistics (\emph{p} = 1, LISA = 0).
 #'   Ignored when \code{n_cells_col = NA}. Default \code{1}.
 #' @param n_cells_col Character or \code{NA}. Column in \code{bins} holding
-#'   per-bin cell counts used for \code{min_cells_per_bin} filtering.
+#'   per-bin cell counts used for \code{min_cells} filtering.
 #'   Set to \code{NA} to skip (default).
-#' @param col Character. Column in \code{LR_df} specifying interaction
-#'   category used for communication-mode assignment. Default
+#' @param annotation_col Character. Column in \code{LR_df} specifying
+#'   interaction category used for communication-mode assignment. Default
 #'   \code{"annotation"}.
 #' @param default_mode Character. CCC mode assigned to LR pairs whose
 #'   annotation does not match \code{diffuse_category}. Default
@@ -86,15 +86,15 @@ blisa.default <- function(
     x,
     bins,
     LR_df             = NULL,
-    hex_size          = 50,
-    dmax              = 250,
-    nsim              = 999,
-    p_cutoff          = 0.05,
-    min_ligand        = 10,
-    min_receptor      = 10,
-    min_cells_per_bin = 1,
-    n_cells_col       = NA,
-    col               = "annotation",
+    bin_size         = 50,
+    dmax             = 250,
+    nsim             = 999,
+    p_cutoff         = 0.05,
+    min_ligand       = 10,
+    min_receptor     = 10,
+    min_cells        = 1,
+    n_cells_col      = NA,
+    annotation_col   = "annotation",
     default_mode      = "diffuse",
     diffuse_category  = c("Secreted Signaling", "Non-protein Signaling"),
     species           = c("human", "mouse"),
@@ -102,7 +102,7 @@ blisa.default <- function(
     counts_by_group   = NULL,
     ...
 ) {
-  sw             <- computeSpatialWeights(bins, hex_size, dmax, min_cells_per_bin, n_cells_col)
+  sw             <- computeSpatialWeights(bins, bin_size, dmax, min_cells, n_cells_col)
   queen_wt       <- sw$queen_wt
   dist_wt        <- sw$dist_wt
   keep_idx_queen <- sw$keep_idx_queen
@@ -119,7 +119,7 @@ blisa.default <- function(
     species      = species
   )
 
-  LR_results <- LR_df_add_mode(LR_df_filtered, col, default_mode, diffuse_category)
+  LR_results <- LR_df_add_mode(LR_df_filtered, annotation_col, default_mode, diffuse_category)
 
   LR_results$sig_numbers   <- integer(nrow(LR_results))
   LR_results$sig_index     <- vector("list", nrow(LR_results))
@@ -198,8 +198,8 @@ blisa.default <- function(
 #'   delegates to \code{blisa.default}.
 #'
 #' @param bin_size Numeric. Width of each hexagonal bin in coordinate units
-#'   (e.g. microns). Passed to \code{\link{hexBinCells}} and also used as
-#'   \code{hex_size} for queen-adjacency computation. Default \code{50}.
+#'   (e.g. microns). Passed to \code{\link{hexBinCells}} and
+#'   \code{\link{computeSpatialWeights}}. Default \code{50}.
 #' @param group Character. Column name in \code{colData(x)} to use as the
 #'   grouping variable (e.g. cell type) for per-group bin aggregation and
 #'   downstream CCI analysis via \code{\link{runCCI}}. If the column is not
@@ -233,7 +233,7 @@ blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
     x               = binned$counts_matrix,
     bins          = binned$bins,
     LR_df           = LR_df,
-    hex_size        = bin_size,
+    bin_size        = bin_size,
     n_cells_col     = "n_cells",
     genes           = genes,
     counts_by_group = binned$counts_by_group,

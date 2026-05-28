@@ -6,10 +6,10 @@
 #' that become isolated after the initial subset.
 #'
 #' @param bins An \code{sf} object of spatial bins.
-#' @param hex_size Numeric. Bin spacing used to define queen adjacency
-#'   (\code{1.2 * hex_size} radius).
+#' @param bin_size Numeric. Bin spacing used to define queen adjacency
+#'   (\code{1.2 * bin_size} radius).
 #' @param dmax Numeric. Maximum distance for diffuse-mode neighbours.
-#' @param min_cells_per_bin Integer. Minimum cell count for a bin to be
+#' @param min_cells Integer. Minimum cell count for a bin to be
 #'   included. Ignored when \code{n_cells_col = NA}.
 #' @param n_cells_col Character or \code{NA}. Column name in \code{bins}
 #'   holding per-bin cell counts. Set to \code{NA} to skip cell-count
@@ -29,10 +29,10 @@
 #' }
 #' @export
 computeSpatialWeights <- function(bins,
-                                  hex_size          = 50,
-                                  dmax              = 250,
-                                  min_cells_per_bin = 1,
-                                  n_cells_col       = NA) {
+                                  bin_size    = 50,
+                                  dmax        = 250,
+                                  min_cells   = 1,
+                                  n_cells_col = NA) {
   centroids <- sf::st_centroid(bins)
   coords    <- sf::st_coordinates(centroids)
   n_bins    <- nrow(bins)
@@ -43,8 +43,8 @@ computeSpatialWeights <- function(bins,
   if (!is.na(n_cells_col)) {
     if (!n_cells_col %in% colnames(bins))
       stop("Column '", n_cells_col, "' not found in bins.")
-    low_cell_idx <- which(bins[[n_cells_col]] < min_cells_per_bin)
-    message(length(low_cell_idx), " bins removed: < ", min_cells_per_bin,
+    low_cell_idx <- which(bins[[n_cells_col]] < min_cells)
+    message(length(low_cell_idx), " bins removed: < ", min_cells,
             " cells (column: '", n_cells_col, "').")
   } else {
     low_cell_idx <- integer(0)
@@ -69,7 +69,7 @@ computeSpatialWeights <- function(bins,
   ## ---------------------------
   ## Queen spatial weights  (for "nearby" mode)
   ## ---------------------------
-  queen_nb_full     <- spdep::dnearneigh(coords, 0, 1.2 * hex_size)
+  queen_nb_full     <- spdep::dnearneigh(coords, 0, 1.2 * bin_size)
   isolate_idx_queen <- which(spdep::card(queen_nb_full) == 0)
   message(length(isolate_idx_queen), " isolated bins with no nearby neighbours: ",
           paste(isolate_idx_queen, collapse = ","))

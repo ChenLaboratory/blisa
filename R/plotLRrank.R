@@ -22,14 +22,14 @@ plotLRrank <- function(x, ...) UseMethod("plotLRrank")
 #'
 #' @param top Integer or \code{NULL}. Number of top LR pairs (by
 #'   \code{sig_numbers}) to display. Default \code{30}.
-#' @param pt.size Numeric. Point size passed to \code{geom_point}. Default 4.
+#' @param pt_size Numeric. Point size passed to \code{geom_point}. Default 4.
 #' @param flip Logical. When \code{TRUE}, LR pairs are placed on the x-axis
 #'   and the hotspot count on the y-axis (vertical orientation). Default
 #'   \code{FALSE} (LR pairs on y-axis, horizontal orientation).
 #'
 #' @export
-plotLRrank.blisa <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
-  plotLRrank.data.frame(x$LR_results, top = top, pt.size = pt.size, flip = flip)
+plotLRrank.blisa <- function(x, top = 30, pt_size = 4, flip = FALSE, ...) {
+  plotLRrank.data.frame(x$LR_results, top = top, pt_size = pt_size, flip = flip)
 }
 
 
@@ -37,7 +37,7 @@ plotLRrank.blisa <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
 #'   \code{LR_results} slot of a \code{blisa} object).
 #'
 #' @export
-plotLRrank.data.frame <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
+plotLRrank.data.frame <- function(x, top = 30, pt_size = 4, flip = FALSE, ...) {
   LR_results <- x
 
   if (!is.null(top)) {
@@ -65,7 +65,7 @@ plotLRrank.data.frame <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
 
   if (flip) {
     p <- ggplot(LR_results, aes(x = LR_pair, y = sig_numbers, color = annotation)) +
-      geom_point(size = pt.size) +
+      geom_point(size = pt_size) +
       color_scale +
       scale_y_continuous(expand = expansion(add = 100)) +
       labs(x = "Ligand\u2013Receptor Pair", y = "Sig Spot Numbers",
@@ -82,7 +82,7 @@ plotLRrank.data.frame <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
       coord_cartesian(clip = "off")
   } else {
     p <- ggplot(LR_results, aes(x = sig_numbers, y = LR_pair, color = annotation)) +
-      geom_point(size = pt.size) +
+      geom_point(size = pt_size) +
       color_scale +
       scale_x_continuous(expand = expansion(add = 100)) +
       labs(x = "Sig Spot Numbers", y = "Ligand\u2013Receptor Pair",
