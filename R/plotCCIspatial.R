@@ -91,19 +91,16 @@ plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
 
   fill_values <- c(
     setNames(cols[seq_along(shown_pairs)], shown_pairs),
-    "rare pairs"      = "#818589",
+    "rare pairs"      = "#404040",
     "Non-Significant" = "#D3D3D3",
-    "Empty"           = "#F0F0F0"
+    "Empty"           = "#F5F5F5"
   )
 
   p <- ggplot(bins) +
     geom_sf(aes(fill = cell_pair_plot), color = NA) +
     scale_fill_manual(values = fill_values, drop = FALSE) +
     guides(fill = guide_legend(title = legend_title)) +
-    labs(
-      title    = paste0(lr_pair, ": Interacting Hotspots"),
-      subtitle = "Grey: light = empty bins, medium = non-significant bins"
-    ) +
+    labs(title = paste0(lr_pair, ": Interacting Hotspots")) +
     theme_void()
 
   return(p)

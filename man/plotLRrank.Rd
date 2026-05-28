@@ -8,9 +8,9 @@
 \usage{
 plotLRrank(x, ...)
 
-\method{plotLRrank}{blisa}(x, top = 30, pt.size = 4, flip = FALSE, ...)
+\method{plotLRrank}{blisa}(x, top = 30, pt_size = 4, flip = FALSE, ...)
 
-\method{plotLRrank}{data.frame}(x, top = 30, pt.size = 4, flip = FALSE, ...)
+\method{plotLRrank}{data.frame}(x, top = 30, pt_size = 4, flip = FALSE, ...)
 }
 \arguments{
 \item{x}{A \code{blisa} object or a data frame of LR results. The data frame
@@ -21,7 +21,7 @@ must contain columns \code{sig_numbers} and \code{annotation}.}
 \item{top}{Integer or \code{NULL}. Number of top LR pairs (by
 \code{sig_numbers}) to display. Default \code{30}.}
 
-\item{pt.size}{Numeric. Point size passed to \code{geom_point}. Default 4.}
+\item{pt_size}{Numeric. Point size passed to \code{geom_point}. Default 4.}
 
 \item{flip}{Logical. When \code{TRUE}, LR pairs are placed on the x-axis
 and the hotspot count on the y-axis (vertical orientation). Default

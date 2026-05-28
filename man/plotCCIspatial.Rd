@@ -6,18 +6,19 @@
 \usage{
 plotCCIspatial(
   x,
-  spe,
+  counts_by_group,
   index = 1,
   ligand = NULL,
   receptor = NULL,
-  ct_group = "cell_type",
-  top = 30
+  top_pairs = 30
 )
 }
 \arguments{
 \item{x}{A \code{blisa} object as returned by \code{\link{blisa}}.}
 
-\item{spe}{A cell-level \code{SpatialExperiment} object.}
+\item{counts_by_group}{Named list of gene-by-bin count matrices, one per
+cell type. Typically the \code{counts_by_group} element returned by
+\code{\link{hexBinCells}}. Names must match the cell-type levels.}
 
 \item{index}{Integer. Row index into \code{x$LR_results} selecting the
 ligand-receptor pair to visualise. Ignored when both \code{ligand} and
@@ -31,11 +32,8 @@ and \code{index} is ignored. Must be supplied together with
 \item{receptor}{Character. Receptor gene symbol. Must be supplied together
 with \code{ligand}.}
 
-\item{ct_group}{Character. Column name in \code{colData(spe)} containing
-cell-type labels. Default \code{"cell_type"}.}
-
-\item{top}{Integer. Maximum number of distinct cell-type pairs to show in
-the legend; remaining pairs are grouped as \code{"rare pairs"}. Default
+\item{top_pairs}{Integer. Maximum number of distinct cell-type pairs to show
+in the legend; remaining pairs are grouped as \code{"rare pairs"}. Default
 \code{30}.}
 }
 \value{

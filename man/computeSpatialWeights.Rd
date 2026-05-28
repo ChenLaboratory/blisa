@@ -6,21 +6,21 @@
 \usage{
 computeSpatialWeights(
   bins,
-  hex_size = 50,
+  bin_size = 50,
   dmax = 250,
-  min_cells_per_bin = 1,
+  min_cells = 1,
   n_cells_col = NA
 )
 }
 \arguments{
 \item{bins}{An \code{sf} object of spatial bins.}
 
-\item{hex_size}{Numeric. Bin spacing used to define queen adjacency
-(\code{1.2 * hex_size} radius).}
+\item{bin_size}{Numeric. Bin spacing used to define queen adjacency
+(\code{1.2 * bin_size} radius).}
 
 \item{dmax}{Numeric. Maximum distance for diffuse-mode neighbours.}
 
-\item{min_cells_per_bin}{Integer. Minimum cell count for a bin to be
+\item{min_cells}{Integer. Minimum cell count for a bin to be
 included. Ignored when \code{n_cells_col = NA}.}
 
 \item{n_cells_col}{Character or \code{NA}. Column name in \code{bins}

@@ -12,15 +12,15 @@ blisa(x, ...)
   x,
   bins,
   LR_df = NULL,
-  hex_size = 50,
+  bin_size = 50,
   dmax = 250,
   nsim = 999,
   p_cutoff = 0.05,
   min_ligand = 10,
   min_receptor = 10,
-  min_cells_per_bin = 1,
+  min_cells = 1,
   n_cells_col = NA,
-  col = "annotation",
+  annotation_col = "annotation",
   default_mode = "diffuse",
   diffuse_category = c("Secreted Signaling", "Non-protein Signaling"),
   species = c("human", "mouse"),
@@ -45,8 +45,9 @@ column order of \code{x}.}
 \code{ligand.symbol} and \code{receptor.symbol}. When \code{NULL},
 CellChatDB for the chosen \code{species} is downloaded automatically.}
 
-\item{hex_size}{Numeric. Bin spacing used to define queen adjacency for
-nearby-mode interactions. Default \code{50}.}
+\item{bin_size}{Numeric. Width of each hexagonal bin in coordinate units
+(e.g. microns). Passed to \code{\link{hexBinCells}} and
+\code{\link{computeSpatialWeights}}. Default \code{50}.}
 
 \item{dmax}{Numeric. Maximum distance for diffuse-mode neighbours.
 Default \code{250}.}
@@ -62,16 +63,16 @@ Default \code{0.05}.}
 \item{min_receptor}{Numeric. Minimum receptor count threshold.
 Default \code{10}.}
 
-\item{min_cells_per_bin}{Integer. Bins with fewer cells are excluded from
+\item{min_cells}{Integer. Bins with fewer cells are excluded from
 Moran's I and assigned neutral statistics (\emph{p} = 1, LISA = 0).
 Ignored when \code{n_cells_col = NA}. Default \code{1}.}
 
 \item{n_cells_col}{Character or \code{NA}. Column in \code{bins} holding
-per-bin cell counts used for \code{min_cells_per_bin} filtering.
+per-bin cell counts used for \code{min_cells} filtering.
 Set to \code{NA} to skip (default).}
 
-\item{col}{Character. Column in \code{LR_df} specifying interaction
-category used for communication-mode assignment. Default
+\item{annotation_col}{Character. Column in \code{LR_df} specifying
+interaction category used for communication-mode assignment. Default
 \code{"annotation"}.}
 
 \item{default_mode}{Character. CCC mode assigned to LR pairs whose
@@ -93,10 +94,6 @@ group level (e.g. cell type), as returned by \code{\link{hexBinCells}}
 when \code{group} is supplied. When provided, \code{\link{runCCI}} is
 called automatically after the BLISA loop and its output is included in
 the result as \code{CCI_scores}. Default \code{NULL}.}
-
-\item{bin_size}{Numeric. Width of each hexagonal bin in coordinate units
-(e.g. microns). Passed to \code{\link{hexBinCells}} and also used as
-\code{hex_size} for queen-adjacency computation. Default \code{50}.}
 
 \item{group}{Character. Column name in \code{colData(x)} to use as the
 grouping variable (e.g. cell type) for per-group bin aggregation and
