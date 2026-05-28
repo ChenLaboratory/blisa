@@ -114,7 +114,7 @@ plotHotspots.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
     val = seq(val_range[1], val_range[2], length.out = 100)
   )
 
-  title_suffix <- if (!is.null(p_cutoff)) paste0(" (p ≤ ", p_cutoff, ")") else ""
+  title_suffix <- if (!is.null(p_cutoff)) paste0(" (p \u2264 ", p_cutoff, ")") else ""
 
   p <- ggplot(bins) +
     geom_sf(aes(fill = fill_col), color = NA) +

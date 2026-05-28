@@ -49,8 +49,8 @@ plotLRrank.data.frame <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
 
   LR_results$LR_pair <- rownames(LR_results)
   LR_results <- LR_results[order(-LR_results$sig_numbers), ]
-  # flip=FALSE: levels low→high so highest appears at top of y-axis
-  # flip=TRUE:  levels high→low so highest appears at left of x-axis
+  # flip=FALSE: levels low->high so highest appears at top of y-axis
+  # flip=TRUE:  levels high->low so highest appears at left of x-axis
   LR_results$LR_pair <- factor(LR_results$LR_pair,
                             levels = if (flip) LR_results$LR_pair else rev(LR_results$LR_pair))
 
@@ -68,7 +68,7 @@ plotLRrank.data.frame <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
       geom_point(size = pt.size) +
       color_scale +
       scale_y_continuous(expand = expansion(add = 100)) +
-      labs(x = "Ligand–Receptor Pair", y = "Sig Spot Numbers",
+      labs(x = "Ligand\u2013Receptor Pair", y = "Sig Spot Numbers",
            color = "Annotation", title = title) +
       theme_minimal() +
       theme(
@@ -85,7 +85,7 @@ plotLRrank.data.frame <- function(x, top = 30, pt.size = 4, flip = FALSE, ...) {
       geom_point(size = pt.size) +
       color_scale +
       scale_x_continuous(expand = expansion(add = 100)) +
-      labs(x = "Sig Spot Numbers", y = "Ligand–Receptor Pair",
+      labs(x = "Sig Spot Numbers", y = "Ligand\u2013Receptor Pair",
            color = "Annotation", title = title) +
       theme_minimal() +
       theme(

@@ -2,6 +2,9 @@
 #'
 #' @importFrom ComplexHeatmap Heatmap rowAnnotation draw
 #' @importFrom grid gpar unit
+#' @importFrom grDevices colorRampPalette
+#' @importFrom stats setNames
+#' @importFrom utils download.file
 #' @importFrom ggplot2 ggplot aes geom_sf geom_point scale_fill_manual
 #'   scale_fill_identity scale_color_gradientn scale_color_manual
 #'   scale_x_continuous scale_y_continuous expansion guides guide_legend guide_colorbar

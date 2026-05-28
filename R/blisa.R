@@ -221,7 +221,7 @@ blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
     group_vec <- SummarizedExperiment::colData(x)[[group]]
   } else {
     if (!is.null(group))
-      message("Column '", group, "' not found in colData(x) — CCI analysis will be skipped.")
+      message("Column '", group, "' not found in colData(x) \u2014 CCI analysis will be skipped.")
     group_vec <- NULL
   }
 

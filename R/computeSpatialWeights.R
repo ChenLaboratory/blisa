@@ -48,7 +48,7 @@ computeSpatialWeights <- function(bins,
             " cells (column: '", n_cells_col, "').")
   } else {
     low_cell_idx <- integer(0)
-    message("n_cells_col = NA — cell-count filtering skipped.")
+    message("n_cells_col = NA \u2014 cell-count filtering skipped.")
   }
 
   ## ---------------------------
@@ -60,7 +60,7 @@ computeSpatialWeights <- function(bins,
     new_iso_sub <- which(spdep::card(nb) == 0) # positions in subset space
     if (length(new_iso_sub) == 0) return(list(nb = nb, keep_idx = keep_idx))
     new_iso_full <- keep_idx[new_iso_sub] # back to full-space indices
-    message(length(new_iso_full), " bins became isolated after subset — excluded.")
+    message(length(new_iso_full), " bins became isolated after subset \u2014 excluded.")
     keep_idx <- setdiff(keep_idx, new_iso_full)
     nb       <- spdep::subset.nb(nb_full, subset = seq_len(n_bins) %in% keep_idx)
     list(nb = nb, keep_idx = keep_idx)

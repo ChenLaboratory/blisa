@@ -1,3 +1,15 @@
+# Suppress R CMD check notes for ggplot2 aes() variables
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c(
+    # ggplot2 aes (plotCCIspatial)
+    "cell_pair_plot",
+    # ggplot2 aes (plotHotspots)
+    "fill_col", "val",
+    # ggplot2 aes (plotLRrank)
+    "LR_pair", "sig_numbers", "annotation"
+  ))
+}
+
 LRI_spatial_colors <- c("#FFFFCC", "#FFD700", "#FF7F00", "#D7301F")
 
 col.pDark <- c(

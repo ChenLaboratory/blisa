@@ -57,14 +57,14 @@ runCCI <- function(x, ...) UseMethod("runCCI")
 #'   replaced.
 #'
 #' @return \code{runCCI.blisa}: the input \code{blisa} object with
-#'   \code{CCI_scores} populated (a wide data frame — rows are
+#'   \code{CCI_scores} populated (a wide data frame -- rows are
 #'   \code{"Sender->Receiver"} group pairs, columns are LR pairs).
 #'
 #' @export
 runCCI.blisa <- function(x, counts_by_group = NULL, overwrite = FALSE, ...) {
   if (!is.null(x$CCI_scores)) {
     if (!overwrite) {
-      message("CCI_scores already present — returning object unchanged. ",
+      message("CCI_scores already present \u2014 returning object unchanged. ",
               "Set overwrite = TRUE to recompute.")
       return(x)
     }
