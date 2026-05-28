@@ -37,19 +37,22 @@ plotCCI <- function(x, ...) UseMethod("plotCCI")
 #'   where \code{Receiver} is in this vector are kept. Applied independently of
 #'   \code{sender} (AND logic when both are supplied). Default \code{NULL}
 #'   (all receivers).
-#' @param cell_type_colors Named character vector mapping cell-type names to
-#'   colours, used for the sender/receiver row annotations. When \code{NULL}
-#'   (default), colours are assigned automatically from the package palette.
+#' @param colors Named character vector mapping cell-type names to colours,
+#'   used for the sender/receiver row annotations. When \code{NULL} (default),
+#'   colours are assigned automatically from the package palette. The British
+#'   spelling \code{colours} is accepted as an alias.
+#' @param colours Alias for \code{colors} (British spelling). Ignored when
+#'   \code{colors} is supplied.
 #'
 #' @export
 plotCCI.blisa <- function(x, top_lr = 20, top_pairs = 30,
                           sender = NULL, receiver = NULL,
-                          cell_type_colors = NULL, ...) {
+                          colors = NULL, colours = NULL, ...) {
   if (is.null(x$CCI_scores))
     stop("CCI_scores is NULL. Run runCCI() first to compute CCI scores.")
+  if (is.null(colors)) colors <- colours
   plotCCI.default(x$CCI_scores, top_lr = top_lr, top_pairs = top_pairs,
-                  sender = sender, receiver = receiver,
-                  cell_type_colors = cell_type_colors)
+                  sender = sender, receiver = receiver, colors = colors)
 }
 
 
@@ -59,7 +62,8 @@ plotCCI.blisa <- function(x, top_lr = 20, top_pairs = 30,
 #' @export
 plotCCI.default <- function(x, top_lr = 20, top_pairs = 30,
                             sender = NULL, receiver = NULL,
-                            cell_type_colors = NULL, ...) {
+                            colors = NULL, colours = NULL, ...) {
+  if (is.null(colors)) colors <- colours
   CCI_df <- x
 
   # Filter rows by sender (AND logic with receiver)
@@ -92,17 +96,17 @@ plotCCI.default <- function(x, top_lr = 20, top_pairs = 30,
   senders   <- CCI_df$Sender
   receivers <- CCI_df$Receiver
 
-  if (is.null(cell_type_colors)) {
+  if (is.null(colors)) {
     all_cts <- sort(unique(c(senders, receivers)))
-    cell_type_colors <- setNames(cols[seq_along(all_cts)], all_cts)
+    colors  <- setNames(cols[seq_along(all_cts)], all_cts)
   }
 
   row_ha <- rowAnnotation(
     Sender = senders,
     Receiver = receivers,
     col = list(
-      Sender = cell_type_colors,
-      Receiver = cell_type_colors
+      Sender = colors,
+      Receiver = colors
     ),
     annotation_legend_param = list(Sender = list(show = FALSE),
                                    Receiver = list(show = FALSE)),
