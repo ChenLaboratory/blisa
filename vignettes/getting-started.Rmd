@@ -10,8 +10,8 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig.width = 6,
+  comment  = "#>",
+  fig.width  = 6,
   fig.height = 4,
   eval = FALSE
 )
@@ -19,150 +19,157 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-BLISA identifies spatially enriched ligand–receptor interactions from spatial transcriptomics data using local bivariate Moran’s I statistics.
+`blisa` identifies spatially enriched ligand-receptor (LR) interactions from
+spatial transcriptomics data using bivariate Local Moran's I (LISA) statistics.
+The core idea is to bin cells into a hexagonal grid, compute spatial co-enrichment
+of every ligand-receptor pair across bins, and flag "High-High" hotspot bins
+where both partners are spatially co-expressed beyond chance.
 
-This vignette demonstrates a typical BLISA workflow using Xenium data.
+This vignette walks through a typical workflow on a Xenium breast cancer dataset.
 
 # Load Package
 
 ```{r}
 library(blisa)
-library(scider)
-library(CellChat)
-library(patchwork)
+library(SpatialExperiment)
 ```
 
 # Load Example Data
 
-Example Xenium dataset distributed with the package:
+The example dataset is a small `SpatialExperiment` object (one Xenium breast
+cancer section) hosted as a GitHub Release asset. Download it once and cache
+locally:
 
 ```{r}
-spe <- readRDS(
-  system.file("extdata", "xenium380Cell_spe.rds", package = "blisa")
-)
+data_url   <- "https://github.com/ChenLaboratory/example_data/releases/download/v1.0.0/spe_xenium_bc_s1rep1.rds"
+cache_dir  <- tools::R_user_dir("blisa", "cache")
+data_file  <- file.path(cache_dir, "spe_xenium_bc_s1rep1.rds")
 
-dim(spe)
+if (!file.exists(data_file)) {
+  dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+  download.file(data_url, data_file, mode = "wb")
+}
+
+spe <- readRDS(data_file)
+spe
 ```
 
-# Visualize Spatial Cell Types
+# Bin Cells into Hexagons
+
+`hexBinCells()` aggregates cells into hexagonal bins. When a `group` argument
+is supplied (here, cell type), it also returns per-cell-type bin matrices in
+`counts_by_group`, which are needed downstream for CCI scoring and spatial
+visualisation.
 
 ```{r}
-cell_type_colors <- c(
-  RColorBrewer::brewer.pal(7, "Set1"),
-  RColorBrewer::brewer.pal(6, "Set2")
+coords <- as.data.frame(SpatialExperiment::spatialCoords(spe))
+counts <- SummarizedExperiment::assay(spe, "counts")
+
+binned <- hexBinCells(
+  coords_df     = coords,
+  counts_matrix = counts,
+  bin_size      = 50,
+  group         = spe$cell_type
 )
 
-names(cell_type_colors) <- unique(spe$cell_type)
-
-scider::plotSpatial(
-  spe,
-  group.by = "cell_type",
-  pt.size = 0.2,
-  pt.alpha = 0.9,
-  cols = cell_type_colors
-)
-```
-
-# Filter Ligand–Receptor Pairs
-
-Restrict CellChat ligand–receptor database to genes present in the panel:
-
-```{r}
-counts_matrix <- SummarizedExperiment::assay(spe, "counts")
-
-LR_pairs_filtered <- filterLRpairs(
-  counts = counts_matrix,
-  min_ligand = 1,
-  min_receptor = 1,
-  LR_df = CellChatDB.human$interaction
-)
-
-head(LR_pairs_filtered)
+# Components:
+#   binned$counts_matrix   - gene x bin sparse matrix (all cells)
+#   binned$bins            - sf polygons (with n_cells column)
+#   binned$counts_by_group - named list of gene x bin matrices, one per cell type
 ```
 
 # Run BLISA
 
-```{r}
-system.time(BLISAres<- runBLISA.spe.isolates.removed(
-    spe, 
-    LR_df = LR_pairs_filtered))
-
-BLISAres$LR_out
-```
-
-# Summarize Ligand–Receptor Interaction Enrichment
+`blisa()` does everything in one call: spatial weights, LR pair filtering against
+CellChatDB, bivariate Moran's I per LR pair, hotspot identification, and (when
+`counts_by_group` is supplied) cell-cell interaction scoring.
 
 ```{r}
-plotLRIsum(BLISAres$LR_out)
+BLISAres <- blisa(
+  binned$counts_matrix,
+  bins            = binned$bins,
+  n_cells_col     = "n_cells",
+  counts_by_group = binned$counts_by_group
+)
+
+BLISAres
 ```
 
-# Visualize Spatial Distribution of Top LR Pairs
+The result is a `blisa` object with four slots:
 
-```{r, fig.width=15, fig.height=12}
-plots <- lapply(seq_len(nrow(BLISAres$LR_results)), function(i) {
-  plotHotspots(BLISAres, index = i)
-})
+- `LR_results` — one row per LR pair, sorted by number of hotspot bins
+- `bins` — the hexagonal grid as an `sf` object
+- `spatial_weights` — queen and distance-decay weights from `computeSpatialWeights()`
+- `CCI_scores` — wide data frame of sender-receiver interaction scores per LR pair
 
-combined_plot <- patchwork::wrap_plots(plots, ncol = 3)
+# Rank LR Pairs by Hotspot Count
 
-combined_plot
-
-pdf("xenium_LRI_spatial_plots.pdf", width = 15, height = 12)
-print(combined_plot)
-dev.off()
+```{r fig.width=8, fig.height=6}
+plotLRrank(BLISAres, top = 30)
 ```
 
-# Run Cell–Cell Interaction Analysis
+# Spatial Map of Hotspot Bins
 
-When `blisa()` is called with a `group` argument (e.g. `group = "cell_type"`),
-CCI scores are computed automatically and stored in `BLISAres$CCI_scores`.
-To compute or recompute them after the fact, call `runCCI()` on the
-`blisa` object and supply `counts_by_group` from `hexBinCells()`:
+For a chosen LR pair (here, the top-ranked pair by default), shows which bins
+are significant hotspots, coloured by p-value or LISA score.
 
-```{r}
-# CCI already computed inside blisa() — retrieve directly
-CCIres <- BLISAres$CCI_scores
+```{r fig.width=6, fig.height=5}
+plotHotspots(BLISAres, index = 1)
 
-# Alternatively, compute on an existing blisa object that lacks CCI_scores:
-# binned  <- hexBinCells(coords, counts_matrix, bin_size = 50, group = cell_type_vec)
-# BLISAres <- runCCI(BLISAres, counts_by_group = binned$counts_by_group)
-# CCIres  <- BLISAres$CCI_scores
-
-head(CCIres)
+# Or by gene names:
+# plotHotspots(BLISAres, ligand = "CXCL12", receptor = "CXCR4")
 ```
 
-# Visualize CCI Heatmap
+# Cell-Cell Interaction (CCI) Heatmaps
 
-```{r fig.height=8, fig.width=8}
-plotCCI(BLISAres)
+## Across all LR pairs
+
+Rows are sender→receiver cell-type pairs; columns are LR pairs.
+
+```{r fig.width=8, fig.height=8}
+plotCCI(BLISAres, top_lr = 20, top_pairs = 30)
 ```
 
-```{r, fig.height=10, fig.width=9}
+Filter by specific senders or receivers:
+
+```{r fig.width=8, fig.height=6}
 plotCCI(BLISAres, sender = "Invasive_Tumor", receiver = "Invasive_Tumor")
 ```
 
-# Visualize One Ligand–Receptor Pair
+## For a single LR pair
 
-```{r fig.height=5, fig.width=6}
-p <- plotCCIpair(BLISAres, ligand = "CXCL12", receptor = "CXCR4")
-
-draw(
-  p,
-  heatmap_legend_side = "right",
-  padding = unit(c(5, 5, 10, 10), "mm")
-)
+```{r fig.width=6, fig.height=5}
+plotCCILR(BLISAres, ligand = "CXCL12", receptor = "CXCR4")
 ```
 
-```{r fig.height=7, fig.width=10}
-CCIspatial(
-  spe,
+## Aggregated across LR pairs
+
+Sender × receiver heatmap with scores summed (or any user-supplied function)
+across all LR pairs:
+
+```{r fig.width=6, fig.height=5}
+plotCCIsummary(BLISAres)
+
+# With a different aggregation:
+# plotCCIsummary(BLISAres, agg_fun = mean)
+```
+
+# Spatial Map of Dominant Cell-Type Pairs
+
+For each hotspot bin of a chosen LR pair, identifies the dominant sender→receiver
+cell-type combination based on ligand expression in the neighbourhood and
+receptor expression inside the bin.
+
+```{r fig.width=8, fig.height=6}
+plotCCIspatial(
   BLISAres,
-  index = 2
+  counts_by_group = binned$counts_by_group,
+  index = 1
 )
 ```
 
 # Session Information
 
-```{r}
+```{r eval=TRUE}
 sessionInfo()
 ```
