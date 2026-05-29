@@ -5,5 +5,15 @@
 \alias{blisa-package}
 \title{blisa: Bivariate Local Indicator of Spatial Association for spatial transcriptomics}
 \description{
-Tools for spatial cell-cell communication analysis of spatial transcriptomics data.
+Identifies cell-cell communication hotspots in spatial transcriptomics data using bivariate Local Moran's I statistics on hexagonally binned cells. Provides functions for spatial weighting, ligand-receptor pair filtering, hotspot detection, and visualisation of sender-receiver cell-type interactions.
+}
+\author{
+\strong{Maintainer}: Yunshun Chen \email{yuchen@wehi.edu.au}
+
+Authors:
+\itemize{
+  \item Lei Qin \email{qin.l@wehi.edu.au}
+  \item Lizhong Chen
+}
+
 }
