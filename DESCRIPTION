@@ -1,10 +1,21 @@
 Package: blisa
 Type: Package
-Title: Infer cell-cell communication from spatial transcriptomics
+Title: Infer Cell-Cell Communication from Spatial Transcriptomics
 Version: 0.2.0
-Author: Lei Qin, Lizhong Chen, Yunshun Chen
-Maintainer: Lei Qin <qin.l@wehi.edu.au>, Yunshun Chen <yuchen@wehi.edu.au>
-Description: Tools for spatial cell-cell communication analysis of spatial transcriptomics data.
+Authors@R: c(
+    person(given = "Yunshun", family = "Chen",
+           role = c("aut", "cre"),
+           email = "yuchen@wehi.edu.au"),
+    person(given = "Lei", family = "Qin",
+           role = "aut",
+           email = "qin.l@wehi.edu.au"),
+    person(given = "Lizhong", family = "Chen",
+           role = "aut"))
+Description: Identifies cell-cell communication hotspots in spatial
+    transcriptomics data using bivariate Local Moran's I statistics
+    on hexagonally binned cells. Provides functions for spatial
+    weighting, ligand-receptor pair filtering, hotspot detection,
+    and visualisation of sender-receiver cell-type interactions.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: false
