@@ -1,21 +1,13 @@
 ---
-title: "BLISA Workflow"
+title: "Exploring cell-cell interaction with blisa"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{BLISA Workflow}
+  %\VignetteIndexEntry{Exploring cell-cell interaction with blisa}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment  = "#>",
-  fig.width  = 6,
-  fig.height = 4,
-  eval = FALSE
-)
-```
+
 
 # Introduction
 
@@ -29,7 +21,8 @@ This vignette walks through a typical workflow on a Xenium breast cancer dataset
 
 # Load Package
 
-```{r}
+
+``` r
 library(blisa)
 library(SpatialExperiment)
 ```
@@ -40,7 +33,8 @@ The example dataset is a small `SpatialExperiment` object (one Xenium breast
 cancer section) hosted as a GitHub Release asset. Download it once and cache
 locally:
 
-```{r}
+
+``` r
 data_url   <- "https://github.com/ChenLaboratory/example_data/releases/download/v1.0.0/spe_xenium_bc_s1rep1.rds"
 cache_dir  <- tools::R_user_dir("blisa", "cache")
 data_file  <- file.path(cache_dir, "spe_xenium_bc_s1rep1.rds")
@@ -52,6 +46,19 @@ if (!file.exists(data_file)) {
 
 spe <- readRDS(data_file)
 spe
+#> class: SpatialExperiment 
+#> dim: 313 163797 
+#> metadata(0):
+#> assays(1): counts
+#> rownames(313): ABCC11 ACTA2 ... ZEB2 ZNF562
+#> rowData names(3): ID Symbol Type
+#> colnames(163797): cell_1 cell_2 ... cell_167779 cell_167780
+#> colData names(12): cell_id transcript_counts ... gene_counts cell_type
+#> reducedDimNames(0):
+#> mainExpName: NULL
+#> altExpNames(0):
+#> spatialCoords names(2) : x_centroid y_centroid
+#> imgData names(1): sample_id
 ```
 
 # Bin Cells into Hexagons
@@ -61,7 +68,8 @@ is supplied (here, cell type), it also returns per-cell-type bin matrices in
 `counts_by_group`, which are needed downstream for CCI scoring and spatial
 visualisation.
 
-```{r}
+
+``` r
 coords <- as.data.frame(SpatialExperiment::spatialCoords(spe))
 counts <- SummarizedExperiment::assay(spe, "counts")
 
@@ -84,15 +92,51 @@ binned <- hexBinCells(
 CellChatDB, bivariate Moran's I per LR pair, hotspot identification, and (when
 `counts_by_group` is supplied) cell-cell interaction scoring.
 
-```{r}
+
+``` r
 res <- blisa(
   binned$counts_matrix,
   bins            = binned$bins,
   n_cells_col     = "n_cells",
   counts_by_group = binned$counts_by_group
 )
+#> Warning: st_centroid assumes attributes are constant over geometries
+#> 0 bins removed: < 1 cells (column: 'n_cells').
+#> 12 isolated bins with no nearby neighbours: 8125,8513,10255,10290,10339,10431,10814,11537,11687,12662,14325,16648
+#> 0 isolated bins with no neighbours within 250 um:
+#> ccc_mode is 'diffuse' for category: Secreted Signaling, Non-protein Signaling; 'nearby' for others.
+#> CXCL12_CXCR4
+#> ccc mode is diffuse
+#> PTN_SDC4
+#> ccc mode is diffuse
+#> EDN1_EDNRB
+#> ccc mode is diffuse
+#> PTPRC_MRC1
+#> ccc mode is nearby
+#> CD80_CD274
+#> ccc mode is nearby
+#> CD80_CTLA4
+#> ccc mode is nearby
+#> CD86_CTLA4
+#> ccc mode is nearby
+#> CDH1_CDH1
+#> ccc mode is nearby
+#> CLEC2C_KLRB1
+#> ccc mode is nearby
+#> PECAM1_PECAM1
+#> ccc mode is nearby
+#> CEACAM6_CEACAM6
+#> ccc mode is nearby
+#> CEACAM8_CEACAM6
+#> ccc mode is nearby
+#> Running CCI analysis...
 
 res
+#> A blisa object
+#>  LR pairs tested  : 12 
+#>  Significant pairs: 12 
+#>  Bins             : 17215 
+#>  CCI computed     : TRUE
 ```
 
 The result is a `blisa` object with four slots:
@@ -104,17 +148,26 @@ The result is a `blisa` object with four slots:
 
 # Rank LR Pairs by Hotspot Count
 
-```{r fig.width=8, fig.height=6}
+
+``` r
 plotLRrank(res, top = 30)
 ```
+
+![plot of chunk plotLRrank](figure/plotLRrank-1.png)
 
 # Spatial Map of Hotspot Bins
 
 For a chosen LR pair (here, the top-ranked pair by default), shows which bins
 are significant hotspots, coloured by p-value or LISA score.
 
-```{r fig.width=6, fig.height=5}
+
+``` r
 plotHotspots(res, index = 1)
+```
+
+![plot of chunk plotHotspots](figure/plotHotspots-1.png)
+
+``` r
 
 # Or by gene names:
 # plotHotspots(res, ligand = "CXCL12", receptor = "CXCR4")
@@ -126,29 +179,47 @@ plotHotspots(res, index = 1)
 
 Rows are sender→receiver cell-type pairs; columns are LR pairs.
 
-```{r fig.width=8, fig.height=8}
+
+``` r
 plotCCI(res, top_lr = 20, top_pairs = 30)
 ```
 
+![plot of chunk plotCCI](figure/plotCCI-1.png)
+
 Filter by specific senders or receivers:
 
-```{r fig.width=8, fig.height=6}
-plotCCI(res, sender = "Invasive_Tumor", receiver = "Invasive_Tumor")
+
+``` r
+plotCCI(res,
+        sender = c("CD4+_T_Cells", "CD8+_T_Cells", "B_Cells",
+                   "Macrophages", "DCs"),
+        receiver = c("Invasive_Tumor", "DCIS", "Myoepi") )
 ```
+
+![plot of chunk plotCCI-filtered](figure/plotCCI-filtered-1.png)
 
 ## For a single LR pair
 
-```{r fig.width=6, fig.height=5}
+
+``` r
 plotCCILR(res, ligand = "CXCL12", receptor = "CXCR4")
 ```
+
+![plot of chunk plotCCILR](figure/plotCCILR-1.png)
 
 ## Aggregated across LR pairs
 
 Sender × receiver heatmap with scores summed (or any user-supplied function)
 across all LR pairs:
 
-```{r fig.width=6, fig.height=5}
+
+``` r
 plotCCIsummary(res)
+```
+
+![plot of chunk plotCCIsummary](figure/plotCCIsummary-1.png)
+
+``` r
 
 # With a different aggregation:
 # plotCCIsummary(res, agg_fun = mean)
@@ -160,7 +231,8 @@ For each hotspot bin of a chosen LR pair, identifies the dominant sender→recei
 cell-type combination based on ligand expression in the neighbourhood and
 receptor expression inside the bin.
 
-```{r fig.width=8, fig.height=6}
+
+``` r
 plotCCIspatial(
   res,
   counts_by_group = binned$counts_by_group,
@@ -168,8 +240,58 @@ plotCCIspatial(
 )
 ```
 
+![plot of chunk plotCCIspatial](figure/plotCCIspatial-1.png)
+
 # Session Information
 
-```{r eval=TRUE}
+
+``` r
 sessionInfo()
+#> R version 4.6.0 (2026-04-24 ucrt)
+#> Platform: x86_64-w64-mingw32/x64
+#> Running under: Windows 11 x64 (build 26200)
+#> 
+#> Matrix products: default
+#>   LAPACK version 3.12.1
+#> 
+#> locale:
+#> [1] LC_COLLATE=English_Australia.utf8  LC_CTYPE=English_Australia.utf8    LC_MONETARY=English_Australia.utf8
+#> [4] LC_NUMERIC=C                       LC_TIME=English_Australia.utf8    
+#> 
+#> time zone: Australia/Sydney
+#> tzcode source: internal
+#> 
+#> attached base packages:
+#> [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
+#> 
+#> other attached packages:
+#>  [1] blisa_0.2.0                 roxygen2_7.3.3              SpatialExperiment_1.21.0    SingleCellExperiment_1.33.2
+#>  [5] SummarizedExperiment_1.41.1 Biobase_2.71.0              GenomicRanges_1.63.2        Seqinfo_1.1.0              
+#>  [9] IRanges_2.45.0              S4Vectors_0.49.2            BiocGenerics_0.57.1         generics_0.1.4             
+#> [13] MatrixGenerics_1.23.0       matrixStats_1.5.0          
+#> 
+#> loaded via a namespace (and not attached):
+#>   [1] DBI_1.3.0             deldir_2.0-4          httr2_1.2.2           s2_1.1.9              testthat_3.3.2       
+#>   [6] rlang_1.2.0           magrittr_2.0.5        clue_0.3-68           GetoptLong_1.1.1      otel_0.2.0           
+#>  [11] e1071_1.7-17          compiler_4.6.0        callr_3.7.6           png_0.1-9             vctrs_0.7.3          
+#>  [16] stringr_1.6.0         pkgconfig_2.0.3       wk_0.9.5              shape_1.4.6.1         crayon_1.5.3         
+#>  [21] fastmap_1.2.0         magick_2.9.1          XVector_0.51.0        ellipsis_0.3.3        labeling_0.4.3       
+#>  [26] sessioninfo_1.2.3     purrr_1.2.2           gert_2.3.1            xfun_0.57             cachem_1.1.0         
+#>  [31] jsonlite_2.0.0        DelayedArray_0.37.1   prettyunits_1.2.0     parallel_4.6.0        cluster_2.1.8.2      
+#>  [36] rhub_2.0.1            R6_2.6.1              stringi_1.8.7         RColorBrewer_1.1-3    boot_1.3-32          
+#>  [41] pkgload_1.5.2         brio_1.1.5            Rcpp_1.1.1-1.1        iterators_1.0.14      knitr_1.51           
+#>  [46] usethis_3.2.1         gitcreds_0.1.2        Matrix_1.7-5          tidyselect_1.2.1      rstudioapi_0.18.0    
+#>  [51] abind_1.4-8           doParallel_1.0.17     codetools_0.2-20      curl_7.1.0            processx_3.9.0       
+#>  [56] pkgbuild_1.4.8        lattice_0.22-9        tibble_3.3.1          withr_3.0.2           S7_0.2.2             
+#>  [61] askpass_1.2.1         evaluate_1.0.5        desc_1.4.3            sf_1.1-0              units_1.0-1          
+#>  [66] spData_2.3.5          proxy_0.4-29          whoami_1.3.0          xml2_1.5.2            circlize_0.4.18      
+#>  [71] BiocManager_1.30.27   pillar_1.11.1         whisker_0.4.1         KernSmooth_2.23-26    foreach_1.5.2        
+#>  [76] dbscan_1.2.4          credentials_2.0.3     xopen_1.0.1           rprojroot_2.1.1       sp_2.2-1             
+#>  [81] ggplot2_4.0.3         commonmark_2.0.0      scales_1.4.0          class_7.3-23          glue_1.8.1           
+#>  [86] tools_4.6.0           sys_3.4.3             fs_2.1.0              grid_4.6.0            spdep_1.4-2          
+#>  [91] devtools_2.5.2        colorspace_2.1-2      cli_3.6.6             rappdirs_0.3.4        rcmdcheck_1.4.0      
+#>  [96] S4Arrays_1.11.1       viridisLite_0.4.3     rematch_2.0.0         ComplexHeatmap_2.28.0 dplyr_1.2.1          
+#> [101] gtable_0.3.6          digest_0.6.39         classInt_0.4-11       SparseArray_1.11.13   rjson_0.2.23         
+#> [106] farver_2.1.2          memoise_2.0.1         lifecycle_1.0.5       httr_1.4.8            GlobalOptions_0.1.4  
+#> [111] openssl_2.4.0
 ```
