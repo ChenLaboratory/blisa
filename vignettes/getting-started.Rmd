@@ -85,14 +85,14 @@ CellChatDB, bivariate Moran's I per LR pair, hotspot identification, and (when
 `counts_by_group` is supplied) cell-cell interaction scoring.
 
 ```{r}
-BLISAres <- blisa(
+res <- blisa(
   binned$counts_matrix,
   bins            = binned$bins,
   n_cells_col     = "n_cells",
   counts_by_group = binned$counts_by_group
 )
 
-BLISAres
+res
 ```
 
 The result is a `blisa` object with four slots:
@@ -105,7 +105,7 @@ The result is a `blisa` object with four slots:
 # Rank LR Pairs by Hotspot Count
 
 ```{r fig.width=8, fig.height=6}
-plotLRrank(BLISAres, top = 30)
+plotLRrank(res, top = 30)
 ```
 
 # Spatial Map of Hotspot Bins
@@ -114,10 +114,10 @@ For a chosen LR pair (here, the top-ranked pair by default), shows which bins
 are significant hotspots, coloured by p-value or LISA score.
 
 ```{r fig.width=6, fig.height=5}
-plotHotspots(BLISAres, index = 1)
+plotHotspots(res, index = 1)
 
 # Or by gene names:
-# plotHotspots(BLISAres, ligand = "CXCL12", receptor = "CXCR4")
+# plotHotspots(res, ligand = "CXCL12", receptor = "CXCR4")
 ```
 
 # Cell-Cell Interaction (CCI) Heatmaps
@@ -127,19 +127,19 @@ plotHotspots(BLISAres, index = 1)
 Rows are sender→receiver cell-type pairs; columns are LR pairs.
 
 ```{r fig.width=8, fig.height=8}
-plotCCI(BLISAres, top_lr = 20, top_pairs = 30)
+plotCCI(res, top_lr = 20, top_pairs = 30)
 ```
 
 Filter by specific senders or receivers:
 
 ```{r fig.width=8, fig.height=6}
-plotCCI(BLISAres, sender = "Invasive_Tumor", receiver = "Invasive_Tumor")
+plotCCI(res, sender = "Invasive_Tumor", receiver = "Invasive_Tumor")
 ```
 
 ## For a single LR pair
 
 ```{r fig.width=6, fig.height=5}
-plotCCILR(BLISAres, ligand = "CXCL12", receptor = "CXCR4")
+plotCCILR(res, ligand = "CXCL12", receptor = "CXCR4")
 ```
 
 ## Aggregated across LR pairs
@@ -148,10 +148,10 @@ Sender × receiver heatmap with scores summed (or any user-supplied function)
 across all LR pairs:
 
 ```{r fig.width=6, fig.height=5}
-plotCCIsummary(BLISAres)
+plotCCIsummary(res)
 
 # With a different aggregation:
-# plotCCIsummary(BLISAres, agg_fun = mean)
+# plotCCIsummary(res, agg_fun = mean)
 ```
 
 # Spatial Map of Dominant Cell-Type Pairs
@@ -162,7 +162,7 @@ receptor expression inside the bin.
 
 ```{r fig.width=8, fig.height=6}
 plotCCIspatial(
-  BLISAres,
+  res,
   counts_by_group = binned$counts_by_group,
   index = 1
 )
