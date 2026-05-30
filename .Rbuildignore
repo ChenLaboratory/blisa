@@ -4,3 +4,5 @@
 ^CRAN-SUBMISSION$
 ^inst/scripts$
 ^vignettes/getting-started\.Rmd\.orig$
+^vignettes/figure$
+^vignettes/cache$
