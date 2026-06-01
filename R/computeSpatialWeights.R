@@ -98,7 +98,7 @@ computeSpatialWeights <- function(bins,
   dist_nb       <- r$nb;  keep_idx_dist <- r$keep_idx
 
   weight_at_dmax <- 0.01
-  dist_wt <- spdep::nb2listwdist(dist_nb, bins[keep_idx_dist, ],
+  dist_wt <- spdep::nb2listwdist(dist_nb, centroids[keep_idx_dist, ],
                                  type = "exp", style = "W", zero.policy = TRUE,
                                  alpha = -log(weight_at_dmax) / dmax)
 
