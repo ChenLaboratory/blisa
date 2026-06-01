@@ -105,12 +105,12 @@ runCCI.default <- function(x, counts_by_group, ...) {
 
     # Sum receptor counts in hotspot bins per group (receivers)
     receiver_sums <- sapply(ct_names, function(ct) {
-      sum(counts_by_group[[ct]][r_gene, sigHH])
+      sum(get_min_expr(r_gene, counts_by_group[[ct]])[sigHH])
     })
 
     # Sum ligand counts in hotspot + neighbour bins per group (senders)
     sender_sums <- sapply(ct_names, function(ct) {
-      sum(counts_by_group[[ct]][l_gene, sigHH_ng])
+      sum(get_min_expr(l_gene, counts_by_group[[ct]])[sigHH_ng])
     })
 
     score_mat  <- 0.5 * log2(outer(receiver_sums, sender_sums, FUN = "*") + 1)
