@@ -54,13 +54,23 @@ plotLRrank.data.frame <- function(x, top = 30, pt_size = 4, flip = FALSE, ...) {
   LR_results$LR_pair <- factor(LR_results$LR_pair,
                             levels = if (flip) LR_results$LR_pair else rev(LR_results$LR_pair))
 
-  color_scale <- scale_color_manual(
-    values = c(
-      "Secreted Signaling"    = "#90a955",
-      "ECM-Receptor"          = "#219ebc",
-      "Cell-Cell Contact"     = "#f7b801",
-      "Non-protein Signaling" = "#9f86c0"
-    )
+  # Preset colors for the four standard CellChat categories; any additional
+  # annotation values found in the data are assigned colors from the package
+  # palette, and NA values fall back to grey.
+  known_colors <- c(
+    "Secreted Signaling"    = "#90a955",
+    "ECM-Receptor"          = "#219ebc",
+    "Cell-Cell Contact"     = "#f7b801",
+    "Non-protein Signaling" = "#9f86c0"
+  )
+  extra_levels <- setdiff(
+    unique(na.omit(LR_results$annotation)),
+    names(known_colors)
+  )
+  extra_colors <- setNames(cols[seq_along(extra_levels)], extra_levels)
+  color_scale  <- scale_color_manual(
+    values   = c(known_colors, extra_colors),
+    na.value = "grey50"
   )
 
   if (flip) {
