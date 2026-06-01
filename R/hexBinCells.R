@@ -80,9 +80,17 @@ hexBinCells <- function(coords_df, counts_matrix, bin_size = 50, min_cells = 1,
   )
   bins <- sf::st_sf(bin_id = seq_along(hex_geom), geometry = hex_geom)
 
-  # Point-in-polygon: assign each cell to its bin (same row order as cell_sf)
-  cell_bins <- sf::st_join(cell_sf, bins, join = sf::st_intersects)
-  cell_to_bin <- sf::st_drop_geometry(cell_bins)$bin_id
+  # Point-in-polygon: assign each cell to its bin (same row order as cell_sf).
+  # A cell whose coordinates fall exactly on a shared hexagon boundary can
+  # intersect two bins; st_join then emits two rows for that cell, making H
+  # non-conformable with counts_matrix. Stamp each cell with a stable index
+  # before joining and deduplicate afterward, keeping the first bin match.
+  cell_sf$.cell_idx <- seq_len(nrow(cell_sf))
+  cell_bins    <- sf::st_join(cell_sf, bins, join = sf::st_intersects)
+  cell_bins_df <- sf::st_drop_geometry(cell_bins)
+  cell_bins_df <- cell_bins_df[!duplicated(cell_bins_df$.cell_idx), , drop = FALSE]
+  cell_to_bin  <- cell_bins_df$bin_id
+  cell_sf$.cell_idx <- NULL
 
   # Aggregate counts: genes x bins  (H is cells x bins)
   n_bins     <- nrow(bins)
