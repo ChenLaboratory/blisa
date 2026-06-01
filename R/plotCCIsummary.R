@@ -11,6 +11,13 @@
 #' @return A \code{Heatmap} object.
 #' @seealso \code{\link{plotCCILR}} for a per-LR-pair version of this plot;
 #'   \code{\link{plotCCI}} for a heatmap with LR pairs as columns.
+#' @examples
+#' \dontrun{
+#' # Continuing from the blisa() example:
+#' # result <- blisa(spe, bin_size = 50, group = "cell_type")
+#' plotCCIsummary(result)
+#' plotCCIsummary(result, top_lr = 10, agg_fun = mean)
+#' }
 #' @export
 plotCCIsummary <- function(x, ...) UseMethod("plotCCIsummary")
 

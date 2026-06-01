@@ -41,5 +41,8 @@ print.blisa <- function(x, ...) {
 #'
 #' @param x Any R object.
 #' @return Logical.
+#' @examples
+#' is.blisa(list())           # FALSE
+#' is.blisa("not a blisa")    # FALSE
 #' @export
 is.blisa <- function(x) inherits(x, "blisa")

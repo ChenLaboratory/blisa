@@ -28,6 +28,13 @@
 #' @param ... Additional arguments passed to the method.
 #'
 #' @return A \code{ggplot} object.
+#' @examples
+#' \dontrun{
+#' # Continuing from the blisa() example:
+#' # result <- blisa(spe, bin_size = 50, group = "cell_type")
+#' plotHotspots(result, index = 1)
+#' plotHotspots(result, index = 1, log_pval = FALSE)
+#' }
 #' @export
 plotHotspots <- function(x, ...) UseMethod("plotHotspots")
 

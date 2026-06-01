@@ -13,6 +13,13 @@
 #' @param ... Additional arguments passed to the relevant method.
 #'
 #' @return A \code{ggplot} object.
+#' @examples
+#' \dontrun{
+#' # Continuing from the blisa() example:
+#' # result <- blisa(spe, bin_size = 50, group = "cell_type")
+#' plotLRrank(result, top = 30)
+#' plotLRrank(result, top = 20, flip = TRUE)
+#' }
 #' @export
 plotLRrank <- function(x, ...) UseMethod("plotLRrank")
 

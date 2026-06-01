@@ -13,6 +13,12 @@
 #' @seealso \code{\link{plotCCILR}} for a sender-by-receiver heatmap of a
 #'   single LR pair; \code{\link{plotCCIsummary}} for an aggregated
 #'   sender-by-receiver heatmap across all LR pairs.
+#' @examples
+#' \dontrun{
+#' # Continuing from the blisa() example:
+#' # result <- blisa(spe, bin_size = 50, group = "cell_type")
+#' plotCCI(result, top_lr = 20, top_pairs = 30)
+#' }
 #' @export
 plotCCI <- function(x, ...) UseMethod("plotCCI")
 

@@ -16,6 +16,25 @@
 #' @param ... Additional arguments passed to the relevant method.
 #'
 #' @return A list; see individual method documentation for details.
+#' @examples
+#' \dontrun{
+#' # Download and cache the example Xenium breast cancer dataset (~21 MB)
+#' data_url  <- paste0(
+#'   "https://github.com/ChenLaboratory/example_data/releases/",
+#'   "download/v1.0.0/spe_xenium_bc_s1rep1.rds"
+#' )
+#' cache_dir <- tools::R_user_dir("blisa", "cache")
+#' data_file <- file.path(cache_dir, "spe_xenium_bc_s1rep1.rds")
+#' if (!file.exists(data_file)) {
+#'   dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+#'   download.file(data_url, data_file, mode = "wb")
+#' }
+#' spe <- readRDS(data_file)
+#'
+#' # blisa.SpatialExperiment method: bins cells, runs LISA, scores CCI
+#' result <- blisa(spe, bin_size = 50, group = "cell_type")
+#' result
+#' }
 #' @export
 blisa <- function(x, ...) UseMethod("blisa")
 

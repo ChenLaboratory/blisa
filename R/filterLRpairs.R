@@ -43,6 +43,23 @@ getLRpairs <- function(gene_panel, LR_df = NULL, species = c("human", "mouse")){
 #'
 #' @return A subset of \code{LR_df} containing only pairs that pass the
 #'   expression thresholds for both ligand and receptor.
+#' @examples
+#' \dontrun{
+#' # Supply a small custom LR_df to avoid a network download
+#' LR_df <- data.frame(
+#'   ligand.symbol   = c("GENE1", "GENE3"),
+#'   receptor.symbol = c("GENE2", "GENE4"),
+#'   annotation      = c("Secreted Signaling", "ECM-Receptor"),
+#'   row.names       = c("LR1", "LR2")
+#' )
+#' set.seed(1)
+#' counts <- matrix(
+#'   rpois(4 * 50, lambda = c(20, 1, 5, 20)), nrow = 4, ncol = 50,
+#'   dimnames = list(c("GENE1", "GENE2", "GENE3", "GENE4"),
+#'                   paste0("bin_", 1:50))
+#' )
+#' filterLRpairs(counts, min_ligand = 10, min_receptor = 10, LR_df = LR_df)
+#' }
 #' @export
 filterLRpairs <- function(counts, min_ligand = 10, min_receptor = 10,
                           LR_df = NULL, species = c("human", "mouse")) {
