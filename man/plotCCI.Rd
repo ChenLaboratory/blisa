@@ -83,6 +83,13 @@ informative error if \code{CCI_scores} is \code{NULL}.
 \code{CCI_scores} slot of a \code{blisa} object).
 
 }}
+\examples{
+\dontrun{
+# Continuing from the blisa() example:
+# result <- blisa(spe, bin_size = 50, group = "cell_type")
+plotCCI(result, top_lr = 20, top_pairs = 30)
+}
+}
 \seealso{
 \code{\link{plotCCILR}} for a sender-by-receiver heatmap of a
 single LR pair; \code{\link{plotCCIsummary}} for an aggregated

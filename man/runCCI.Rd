@@ -70,3 +70,22 @@ returns only the scores data frame. Typically called internally; use
 in one step.
 
 }}
+\examples{
+\dontrun{
+# Continuing from the blisa() example:
+# result <- blisa(spe, bin_size = 50, group = "cell_type")
+
+# CCI is computed automatically when group is supplied to blisa();
+# access the scores directly:
+head(result$CCI_scores)
+
+# Or compute / recompute scores explicitly:
+binned <- hexBinCells(
+  as.data.frame(SpatialExperiment::spatialCoords(spe)),
+  SummarizedExperiment::assay(spe, "counts"),
+  bin_size = 50, group = spe$cell_type
+)
+result2 <- runCCI(result, counts_by_group = binned$counts_by_group,
+                  overwrite = TRUE)
+}
+}

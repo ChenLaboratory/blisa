@@ -48,3 +48,11 @@ frame directly.
 \code{LR_results} slot of a \code{blisa} object).
 
 }}
+\examples{
+\dontrun{
+# Continuing from the blisa() example:
+# result <- blisa(spe, bin_size = 50, group = "cell_type")
+plotLRrank(result, top = 30)
+plotLRrank(result, top = 20, flip = TRUE)
+}
+}

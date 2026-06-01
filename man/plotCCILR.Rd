@@ -55,6 +55,13 @@ pair has no significant hotspots.
 by column name via \code{lr_pair}.
 
 }}
+\examples{
+\dontrun{
+# Continuing from the blisa() example:
+# result <- blisa(spe, bin_size = 50, group = "cell_type")
+plotCCILR(result, index = 1)
+}
+}
 \seealso{
 \code{\link{plotCCI}} for an overview heatmap across all LR pairs;
 \code{\link{plotCCIsummary}} for an aggregated sender-by-receiver heatmap.

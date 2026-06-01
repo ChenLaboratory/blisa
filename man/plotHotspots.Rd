@@ -59,3 +59,11 @@ non-significant, or significant hotspot (continuous gradient of
 \item \code{plotHotspots(blisa)}: Method for a \code{blisa} object.
 
 }}
+\examples{
+\dontrun{
+# Continuing from the blisa() example:
+# result <- blisa(spe, bin_size = 50, group = "cell_type")
+plotHotspots(result, index = 1)
+plotHotspots(result, index = 1, log_pval = FALSE)
+}
+}

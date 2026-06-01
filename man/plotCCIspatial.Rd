@@ -45,6 +45,18 @@ cell-type pair at each significant hotspot bin and draws a spatial map of
 the tissue coloured by those pairs. Receiver cells are those inside hotspot
 bins; sender cells are drawn from the immediate neighbourhood.
 }
+\examples{
+\dontrun{
+# Continuing from the blisa() example:
+# result <- blisa(spe, bin_size = 50, group = "cell_type")
+binned <- hexBinCells(
+  as.data.frame(SpatialExperiment::spatialCoords(spe)),
+  SummarizedExperiment::assay(spe, "counts"),
+  bin_size = 50, group = spe$cell_type
+)
+plotCCIspatial(result, binned$counts_by_group, index = 1)
+}
+}
 \seealso{
 \code{\link{plotHotspots}} for a significance-based spatial map of
 hotspot bins.

@@ -15,3 +15,7 @@ Logical.
 \description{
 Test if an object is a blisa object
 }
+\examples{
+is.blisa(list())           # FALSE
+is.blisa("not a blisa")    # FALSE
+}

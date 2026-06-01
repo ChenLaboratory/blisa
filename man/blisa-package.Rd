@@ -7,6 +7,14 @@
 \description{
 Identifies cell-cell communication hotspots in spatial transcriptomics data using bivariate Local Moran's I statistics on hexagonally binned cells. Provides functions for spatial weighting, ligand-receptor pair filtering, hotspot detection, and visualisation of sender-receiver cell-type interactions.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ChenLaboratory/blisa}
+  \item Report bugs at \url{https://github.com/ChenLaboratory/blisa/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Yunshun Chen \email{yuchen@wehi.edu.au}
 

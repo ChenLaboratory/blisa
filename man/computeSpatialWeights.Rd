@@ -47,3 +47,18 @@ from a bin-level \code{sf} object, excluding isolated bins and optionally
 excluding low-cell bins. A second-pass isolation check further removes bins
 that become isolated after the initial subset.
 }
+\examples{
+\dontrun{
+set.seed(42)
+pts  <- sf::st_as_sf(
+  data.frame(x = runif(300, 0, 1000), y = runif(300, 0, 1000)),
+  coords = c("x", "y"), crs = NA
+)
+bins <- sf::st_sf(
+  geometry = sf::st_make_grid(pts, cellsize = 100,
+                              what = "polygons", square = FALSE)
+)
+sw <- computeSpatialWeights(bins, bin_size = 100, dmax = 300)
+names(sw)
+}
+}

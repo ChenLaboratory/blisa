@@ -51,3 +51,22 @@ Aggregates single-cell spatial data into hexagonal bins and returns a
 bin-level count matrix together with a matching \code{sf} polygon object,
 ready to pass directly to \code{\link{blisa.default}}.
 }
+\examples{
+\dontrun{
+set.seed(42)
+n <- 500
+coords <- data.frame(
+  x_centroid = runif(n, 0, 1000),
+  y_centroid = runif(n, 0, 1000),
+  row.names  = paste0("cell_", seq_len(n))
+)
+counts <- Matrix::Matrix(
+  matrix(rpois(20L * n, lambda = 5), nrow = 20L, ncol = n,
+         dimnames = list(paste0("gene_", 1:20), paste0("cell_", seq_len(n)))),
+  sparse = TRUE
+)
+group  <- sample(c("TypeA", "TypeB"), n, replace = TRUE)
+binned <- hexBinCells(coords, counts, bin_size = 100, group = group)
+str(binned, max.level = 1)
+}
+}
