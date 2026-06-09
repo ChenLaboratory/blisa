@@ -26,6 +26,8 @@ blisa(x, ...)
   species = c("human", "mouse"),
   genes = NULL,
   counts_by_group = NULL,
+  fast = FALSE,
+  cpu_threads = 4L,
   ...
 )
 
@@ -95,6 +97,16 @@ when \code{group} is supplied. When provided, \code{\link{runCCI}} is
 called automatically after the BLISA loop and its output is included in
 the result as \code{CCI_scores}. Default \code{NULL}.}
 
+\item{fast}{Logical. When \code{TRUE}, uses
+\code{fastLISA::local_moran_bv} (a fast C/OpenMP backend) for the
+bivariate local Moran's I computation. When \code{FALSE} (default), uses
+the original \code{spdep::localmoran_bv} + \code{spdep::hotspot}
+pipeline. \code{fastLISA} must be installed when \code{fast = TRUE}.}
+
+\item{cpu_threads}{Integer. Number of OpenMP threads used by
+\code{fastLISA::local_moran_bv}. Only used when \code{fast = TRUE}.
+Ignored on platforms without OpenMP. Default \code{4L}.}
+
 \item{group}{Character. Column name in \code{colData(x)} to use as the
 grouping variable (e.g. cell type) for per-group bin aggregation and
 downstream CCI analysis via \code{\link{runCCI}}. If the column is not
@@ -109,9 +121,9 @@ An object of class \code{blisa} with four components:
 \item{LR_results}{Data frame of BLISA results for each LR pair, including
 \code{ccc_mode}, \code{sig_numbers}, \code{sig_index}, \code{sig_pval},
 \code{all_pval}, \code{all_lisa}, \code{all_quadrant}, and original
-columns from \code{LR_df}. \code{all_quadrant} is a character vector
-of \code{spdep::hotspot} quadrant labels (\code{"High-High"},
-\code{"Low-Low"}, etc.) for every bin; non-tested bins are \code{NA}.}
+columns from \code{LR_df}. \code{all_quadrant} is a character vector of
+hotspot quadrant labels (\code{"High-High"}, \code{"Low-Low"}, etc.)
+for every bin; non-tested bins are \code{NA}.}
 \item{bins}{Bin-level \code{sf} object of hexagonal polygons.}
 \item{spatial_weights}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
 \item{CCI_scores}{\code{NULL} unless \code{counts_by_group} is supplied,
