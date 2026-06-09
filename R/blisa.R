@@ -84,15 +84,23 @@ blisa <- function(x, ...) UseMethod("blisa")
 #'   when \code{group} is supplied. When provided, \code{\link{runCCI}} is
 #'   called automatically after the BLISA loop and its output is included in
 #'   the result as \code{CCI_scores}. Default \code{NULL}.
+#' @param fast Logical. When \code{TRUE}, uses
+#'   \code{fastLISA::local_moran_bv} (a fast C/OpenMP backend) for the
+#'   bivariate local Moran's I computation. When \code{FALSE} (default), uses
+#'   the original \code{spdep::localmoran_bv} + \code{spdep::hotspot}
+#'   pipeline. \code{fastLISA} must be installed when \code{fast = TRUE}.
+#' @param cpu_threads Integer. Number of OpenMP threads used by
+#'   \code{fastLISA::local_moran_bv}. Only used when \code{fast = TRUE}.
+#'   Ignored on platforms without OpenMP. Default \code{4L}.
 #'
 #' @return An object of class \code{blisa} with four components:
 #' \describe{
 #'   \item{LR_results}{Data frame of BLISA results for each LR pair, including
 #'     \code{ccc_mode}, \code{sig_numbers}, \code{sig_index}, \code{sig_pval},
 #'     \code{all_pval}, \code{all_lisa}, \code{all_quadrant}, and original
-#'     columns from \code{LR_df}. \code{all_quadrant} is a character vector
-#'     of \code{spdep::hotspot} quadrant labels (\code{"High-High"},
-#'     \code{"Low-Low"}, etc.) for every bin; non-tested bins are \code{NA}.}
+#'     columns from \code{LR_df}. \code{all_quadrant} is a character vector of
+#'     hotspot quadrant labels (\code{"High-High"}, \code{"Low-Low"}, etc.)
+#'     for every bin; non-tested bins are \code{NA}.}
 #'   \item{bins}{Bin-level \code{sf} object of hexagonal polygons.}
 #'   \item{spatial_weights}{Spatial weights list from \code{\link{computeSpatialWeights}}.}
 #'   \item{CCI_scores}{\code{NULL} unless \code{counts_by_group} is supplied,
@@ -119,8 +127,12 @@ blisa.default <- function(
     species           = c("human", "mouse"),
     genes             = NULL,
     counts_by_group   = NULL,
+    fast              = FALSE,
+    cpu_threads       = 4L,
     ...
 ) {
+  if (fast && !requireNamespace("fastLISA", quietly = TRUE))
+    stop("fast = TRUE requires the 'fastLISA' package.")
   sw             <- computeSpatialWeights(bins, bin_size, dmax, min_cells, n_cells_col)
   queen_wt       <- sw$queen_wt
   dist_wt        <- sw$dist_wt
@@ -166,20 +178,34 @@ blisa.default <- function(
     x_full <- get_min_expr(receptor, x)
     y_full <- get_min_expr(ligand, x)
 
-    res_bv <- spdep::localmoran_bv(x_full[keep_idx], y_full[keep_idx], wt, nsim = nsim)
+    if (fast) {
+      # fastLISA backend: C/OpenMP. Returns cluster classification (pysal-style,
+      # folded p-values, significance_cutoff applied) as an attribute, so no
+      # separate hotspot() call is needed.
+      res_bv <- fastLISA::local_moran_bv(
+        x_full[keep_idx], y_full[keep_idx], wt,
+        nsim                = nsim,
+        significance_cutoff = p_cutoff,
+        cpu_threads         = cpu_threads
+      )
+      hs <- attr(res_bv, "cluster")
+    } else {
+      # spdep backend (original implementation)
+      res_bv <- spdep::localmoran_bv(x_full[keep_idx], y_full[keep_idx], wt,
+                                     nsim = nsim)
+      hs <- spdep::hotspot(
+        res_bv,
+        Prname        = "Pr(folded) Sim",
+        cutoff        = p_cutoff,
+        quadrant.type = "pysal",
+        p.adjust      = "none"
+      )
+    }
 
     full_pval <- rep(1, ncol(x))
     full_lisa <- rep(0, ncol(x))
     full_pval[keep_idx] <- res_bv[, "Pr(folded) Sim"]
     full_lisa[keep_idx] <- res_bv[, "Ibvi"]
-
-    hs <- spdep::hotspot(
-      res_bv,
-      Prname        = "Pr(folded) Sim",
-      cutoff        = p_cutoff,
-      quadrant.type = "pysal",
-      p.adjust      = "none"
-    )
 
     hs_idx_hh <- !is.na(hs) & hs == "High-High"
     HH_idx    <- keep_idx[which(hs_idx_hh)]

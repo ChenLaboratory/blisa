@@ -1,7 +1,7 @@
 Package: blisa
 Type: Package
 Title: Infer Cell-Cell Communication from Spatial Transcriptomics
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: c(
     person(given = "Yunshun", family = "Chen",
            role = c("aut", "cre"),
@@ -36,4 +36,5 @@ RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 Suggests:
     knitr,
-    rmarkdown
+    rmarkdown,
+    fastLISA
