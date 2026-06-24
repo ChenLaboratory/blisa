@@ -180,13 +180,13 @@ blisa.default <- function(
 
     if (fast) {
       # fastLISA backend: C/OpenMP. Returns cluster classification (pysal-style,
-      # folded p-values, significance_cutoff applied) as an attribute, so no
+      # folded p-values, p.value cutoff applied) as an attribute, so no
       # separate hotspot() call is needed.
       res_bv <- fastLISA::local_moran_bv(
         x_full[keep_idx], y_full[keep_idx], wt,
-        nsim                = nsim,
-        significance_cutoff = p_cutoff,
-        cpu_threads         = cpu_threads
+        nsim    = nsim,
+        p.value = p_cutoff,
+        n.cores = cpu_threads
       )
       hs <- attr(res_bv, "cluster")
     } else {
