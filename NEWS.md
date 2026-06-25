@@ -1,3 +1,9 @@
+# blisa 0.2.3
+
+* plotCCIspatial() now handles multi-subunit ligand/receptor complexes 
+  (previously errored with subscript out of bounds).
+* New row name formatting for multi-subunit ligand/receptor.
+
 # blisa 0.2.2
 
 * Added `fast = TRUE` option to `blisa()` which uses `fastLISA::local_moran_bv`
