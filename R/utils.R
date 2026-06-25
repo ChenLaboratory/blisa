@@ -61,6 +61,16 @@ parse_units <- function(s) {
   unlist(strsplit(s, "[,_]"))
 }
 
+# Build an informative, unique LR identifier from the (comma-separated) ligand
+# and receptor symbol columns. Subunits are joined with "|" within each side and
+# the two sides with "_", e.g. "TGFB1_TGFBR2|TGFBR1". make.unique() disambiguates
+# pairs that collapse to the same symbol set (e.g. same genes, different pathway).
+make_lr_id <- function(ligand, receptor) {
+  fmt <- function(s) vapply(strsplit(as.character(s), ", "),
+                            paste, character(1), collapse = "|")
+  make.unique(paste(fmt(ligand), fmt(receptor), sep = "_"), sep = ".")
+}
+
 get_min_expr <- function(gene_str, hex_gene_counts) {
   genes <- parse_units(gene_str)
   genes <- genes[genes %in% rownames(hex_gene_counts)]

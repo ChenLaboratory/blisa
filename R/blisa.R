@@ -152,6 +152,13 @@ blisa.default <- function(
 
   LR_results <- LR_df_add_mode(LR_df_filtered, annotation_col, default_mode, diffuse_category)
 
+  # Replace the CellChatDB interaction_name row names with informative IDs that
+  # spell out ligand/receptor subunits (e.g. "TGFB1_TGFBR2|TGFBR1"). The original
+  # name is preserved in a column for cross-referencing.
+  LR_results$interaction_name <- rownames(LR_results)
+  rownames(LR_results)        <- make_lr_id(LR_results$ligand.symbol,
+                                            LR_results$receptor.symbol)
+
   LR_results$sig_numbers   <- integer(nrow(LR_results))
   LR_results$sig_index     <- vector("list", nrow(LR_results))
   LR_results$sig_pval      <- vector("list", nrow(LR_results))

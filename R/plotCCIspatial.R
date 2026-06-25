@@ -63,13 +63,14 @@ plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
   dominant_pairs <- do.call(rbind, lapply(sigHH, function(h) {
     nb_h <- unique(c(h, nb_list[[h]]))
 
-    # Receptor expression in bin h per cell type (receivers)
+    # Receptor expression in bin h per cell type (receivers).
+    # get_min_expr collapses multi-subunit complexes to the per-bin minimum.
     r_scores <- sapply(ct_names, function(ct)
-      sum(counts_by_group[[ct]][gene_r, h]))
+      sum(get_min_expr(gene_r, counts_by_group[[ct]])[h]))
 
     # Ligand expression in neighbourhood of h per cell type (senders)
     l_scores <- sapply(ct_names, function(ct)
-      sum(counts_by_group[[ct]][gene_l, nb_h]))
+      sum(get_min_expr(gene_l, counts_by_group[[ct]])[nb_h]))
 
     score_mat <- 0.5 * log2(outer(r_scores, l_scores) + 1)
     best      <- which(score_mat == max(score_mat), arr.ind = TRUE)[1L, ]

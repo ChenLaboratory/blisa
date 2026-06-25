@@ -1,7 +1,7 @@
 Package: blisa
 Type: Package
 Title: Infer Cell-Cell Communication from Spatial Transcriptomics
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: c(
     person(given = "Yunshun", family = "Chen",
            role = c("aut", "cre"),

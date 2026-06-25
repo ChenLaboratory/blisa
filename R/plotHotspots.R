@@ -1,9 +1,24 @@
+# Normalise a (possibly multi-subunit) symbol string to a sorted set of genes,
+# so matching is independent of subunit order, separator (",", "_", "|"), and
+# surrounding whitespace.
+.norm_units <- function(s) {
+  u <- trimws(unlist(strsplit(as.character(s), "[,_|]")))
+  sort(u[u != ""])
+}
+
 # Internal helper: resolve a row index from optional ligand/receptor args.
 # Returns `index` unchanged when neither ligand nor receptor is supplied.
+# Multi-subunit complexes match on the full subunit set, regardless of the
+# order/separator the user supplies (e.g. "TGFBR2,TGFBR1", "TGFBR1_TGFBR2",
+# and "TGFBR1|TGFBR2" all match a stored "TGFBR2, TGFBR1").
 .resolve_lr_index <- function(LR_results, index, ligand, receptor) {
   if (!is.null(ligand) && !is.null(receptor)) {
-    matches <- which(LR_results$ligand.symbol == ligand &
-                       LR_results$receptor.symbol == receptor)
+    want_l <- .norm_units(ligand)
+    want_r <- .norm_units(receptor)
+    same <- function(col, want)
+      vapply(col, function(s) identical(.norm_units(s), want), logical(1))
+    matches <- which(same(LR_results$ligand.symbol, want_l) &
+                       same(LR_results$receptor.symbol, want_r))
     if (length(matches) == 0)
       stop("No LR pair found with ligand = '", ligand,
            "' and receptor = '", receptor, "'.")
