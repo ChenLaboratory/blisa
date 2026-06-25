@@ -58,19 +58,22 @@ plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
 
   nb_list <- if (mode == "nearby") sw$queen_nb_full else sw$dist_nb_full
 
+  # Collapse each cell type's count matrix to a single per-bin expression vector
+  # ONCE (get_min_expr takes the per-bin minimum across multi-subunit complexes).
+  # Doing this outside the hotspot loop avoids recomputing the full-width vector
+  # for every hotspot bin.
+  r_expr <- lapply(counts_by_group, function(m) get_min_expr(gene_r, m))
+  l_expr <- lapply(counts_by_group, function(m) get_min_expr(gene_l, m))
+
   # For each hotspot bin, score all sender-receiver cell-type combinations
   # and retain the dominant (highest-scoring) pair
   dominant_pairs <- do.call(rbind, lapply(sigHH, function(h) {
     nb_h <- unique(c(h, nb_list[[h]]))
 
-    # Receptor expression in bin h per cell type (receivers).
-    # get_min_expr collapses multi-subunit complexes to the per-bin minimum.
-    r_scores <- sapply(ct_names, function(ct)
-      sum(get_min_expr(gene_r, counts_by_group[[ct]])[h]))
-
+    # Receptor expression in bin h per cell type (receivers)
+    r_scores <- vapply(ct_names, function(ct) sum(r_expr[[ct]][h]),    numeric(1))
     # Ligand expression in neighbourhood of h per cell type (senders)
-    l_scores <- sapply(ct_names, function(ct)
-      sum(get_min_expr(gene_l, counts_by_group[[ct]])[nb_h]))
+    l_scores <- vapply(ct_names, function(ct) sum(l_expr[[ct]][nb_h]), numeric(1))
 
     score_mat <- 0.5 * log2(outer(r_scores, l_scores) + 1)
     best      <- which(score_mat == max(score_mat), arr.ind = TRUE)[1L, ]
