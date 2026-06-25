@@ -61,6 +61,14 @@ parse_units <- function(s) {
   unlist(strsplit(s, "[,_]"))
 }
 
+# Normalise a (possibly multi-subunit) symbol string to a sorted set of genes,
+# so matching is independent of subunit order, separator (",", "_", "|"), and
+# surrounding whitespace. Used by .resolve_lr_index() for ligand/receptor lookup.
+.norm_units <- function(s) {
+  u <- trimws(unlist(strsplit(as.character(s), "[,_|]")))
+  sort(u[u != ""])
+}
+
 # Build an informative, unique LR identifier from the (comma-separated) ligand
 # and receptor symbol columns. Subunits are joined with "|" within each side and
 # the two sides with "_", e.g. "TGFB1_TGFBR2|TGFBR1". make.unique() disambiguates

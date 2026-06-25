@@ -1,8 +1,14 @@
 # blisa 0.2.3
 
-* plotCCIspatial() now handles multi-subunit ligand/receptor complexes 
-  (previously errored with subscript out of bounds).
-* New row name formatting for multi-subunit ligand/receptor.
+* `LR_results` row names are now informative IDs built from the ligand/receptor
+  symbols, with subunits joined by `|` and the two sides by `_`
+  (e.g. `TGFB1_TGFBR2|TGFBR1`). The original CellChatDB `interaction_name` is
+  retained in a new `interaction_name` column.
+* `plotCCIspatial()` now handles multi-subunit ligand/receptor complexes
+  (previously errored with `subscript out of bounds`).
+* `plotHotspots()`, `plotCCIspatial()`, and `plotCCILR()` now match the
+  `ligand`/`receptor` arguments by subunit set, independent of order, separator
+  (`,`, `_`, `|`), and whitespace.
 
 # blisa 0.2.2
 

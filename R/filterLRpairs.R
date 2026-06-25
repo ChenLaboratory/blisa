@@ -1,12 +1,14 @@
-filter_genes <- function(gene_column, gene_list) { # function to filter out the whole interaction if missing any L/R subunits
-  sapply(strsplit(as.character(gene_column), ", "), function(genes) {
-    filtered_genes <- genes[genes %in% gene_list]
-    if (length(filtered_genes) != length(genes)) {
-      return(NA)
+filter_genes <- function(gene_column, gene_list) { # filter out the whole interaction if missing any L/R subunit
+  # Use parse_units() so subunit splitting matches get_min_expr() exactly
+  # (tolerant of ",", "_", and whitespace); the two stages can't diverge.
+  vapply(as.character(gene_column), function(s) {
+    genes <- parse_units(s)
+    if (all(genes %in% gene_list)) {
+      paste(genes, collapse = ", ")   # keep: canonical ", " form
     } else {
-      return(paste(filtered_genes, collapse = ", "))
+      NA_character_                   # drop if any subunit is off-panel
     }
-  })
+  }, character(1), USE.NAMES = FALSE)
 }
 
 
