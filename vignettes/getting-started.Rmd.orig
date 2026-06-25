@@ -98,7 +98,8 @@ res <- blisa(
   binned$counts_matrix,
   bins            = binned$bins,
   n_cells_col     = "n_cells",
-  counts_by_group = binned$counts_by_group
+  counts_by_group = binned$counts_by_group,
+  fast            = TRUE
 )
 
 res
