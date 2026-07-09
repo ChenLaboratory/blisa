@@ -260,11 +260,17 @@ blisa.default <- function(
 #' @param genes Character vector of gene names to consider when matching
 #'   ligand-receptor pairs. Defaults to \code{rownames(x)} (all genes in the
 #'   \code{SpatialExperiment} object).
+#' @param min_cells Integer. Bins with fewer cells are dropped during binning
+#'   by \code{\link{hexBinCells}}. Default \code{1}.
+#' @param min_total_counts Numeric. Bins whose total counts (summed over all
+#'   genes) fall below this threshold are dropped during binning by
+#'   \code{\link{hexBinCells}}. Set to \code{0} to disable. Default \code{10}.
 #'
 #' @export
 blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
-                                       group = "cell_type",
-                                       genes = NULL, ...) {
+                                       group = "cell_type", genes = NULL,
+                                       min_cells = 1, min_total_counts = 10,
+                                       ...) {
   coords <- as.data.frame(SpatialExperiment::spatialCoords(x))
 
   # Resolve group vector from colData
@@ -279,7 +285,9 @@ blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
 
   if (is.null(genes)) genes <- rownames(x)
 
-  binned <- hexBinCells(coords, SummarizedExperiment::assay(x, "counts"), bin_size = bin_size, group = group_vec)
+  binned <- hexBinCells(coords, SummarizedExperiment::assay(x, "counts"),
+                        bin_size = bin_size, min_cells = min_cells,
+                        min_total_counts = min_total_counts, group = group_vec)
 
   blisa.default(
     x               = binned$counts_matrix,
