@@ -92,6 +92,11 @@ blisa <- function(x, ...) UseMethod("blisa")
 #' @param cpu_threads Integer. Number of OpenMP threads used by
 #'   \code{fastLISA::local_moran_bv}. Only used when \code{fast = TRUE}.
 #'   Ignored on platforms without OpenMP. Default \code{4L}.
+#' @param verbose Logical. If \code{TRUE}, print progress messages (per-LR-pair
+#'   progress, bin filtering, CCI status). Default \code{FALSE} (silent).
+#'   A progress bar over the ligand-receptor pairs is shown automatically in
+#'   interactive sessions (and includes the current LR pair label when
+#'   \code{verbose = TRUE}).
 #'
 #' @return An object of class \code{blisa} with four components:
 #' \describe{
@@ -129,11 +134,21 @@ blisa.default <- function(
     counts_by_group   = NULL,
     fast              = FALSE,
     cpu_threads       = 4L,
+    verbose           = FALSE,
     ...
 ) {
   if (fast && !requireNamespace("fastLISA", quietly = TRUE))
     stop("fast = TRUE requires the 'fastLISA' package.")
-  sw             <- computeSpatialWeights(bins, bin_size, dmax, min_cells, n_cells_col)
+
+  # msg(): emit a message only when verbose. quiet(): run an expression that
+  # may emit messages/warnings from internal helpers (e.g. the sf st_centroid
+  # "attributes are constant" warning), suppressing them unless verbose.
+  msg   <- function(...) if (verbose) message(...)
+  quiet <- function(expr)
+    if (verbose) expr else suppressWarnings(suppressMessages(expr))
+
+  sw             <- quiet(computeSpatialWeights(bins, bin_size, dmax, min_cells,
+                                                n_cells_col))
   queen_wt       <- sw$queen_wt
   dist_wt        <- sw$dist_wt
   keep_idx_queen <- sw$keep_idx_queen
@@ -150,7 +165,8 @@ blisa.default <- function(
     species      = species
   )
 
-  LR_results <- LR_df_add_mode(LR_df_filtered, annotation_col, default_mode, diffuse_category)
+  LR_results <- quiet(LR_df_add_mode(LR_df_filtered, annotation_col,
+                                     default_mode, diffuse_category))
 
   # Replace the CellChatDB interaction_name row names with informative IDs that
   # spell out ligand/receptor subunits (e.g. "TGFB1_TGFBR2|TGFBR1"). The original
@@ -166,9 +182,11 @@ blisa.default <- function(
   LR_results$all_lisa      <- vector("list", nrow(LR_results))
   LR_results$all_quadrant  <- vector("list", nrow(LR_results))
 
-  for (i in seq_len(nrow(LR_results))) {
-    message(rownames(LR_results)[i])
+  n_pairs <- nrow(LR_results)
+  show_pb <- interactive() && n_pairs > 0
+  if (verbose || show_pb) message("Testing ", n_pairs, " LR pairs...")
 
+  for (i in seq_len(n_pairs)) {
     ligand   <- LR_results$ligand.symbol[i]
     receptor <- LR_results$receptor.symbol[i]
     mode     <- LR_results$ccc_mode[i]
@@ -180,15 +198,28 @@ blisa.default <- function(
       wt       <- dist_wt
       keep_idx <- keep_idx_dist
     }
-    message("ccc mode is ", mode)
+
+    if (show_pb) {
+      frac   <- i / n_pairs
+      width  <- 40L
+      filled <- round(frac * width)
+      lab    <- if (verbose)
+        sprintf("%-42s", paste0(rownames(LR_results)[i], " (", mode, ")")) else ""
+      cat(sprintf("\r  %s|%s%s| %3.0f%%",
+                  lab, strrep("=", filled), strrep(" ", width - filled),
+                  frac * 100))
+      utils::flush.console()
+      if (i == n_pairs) cat("\n")
+    } else {
+      msg(rownames(LR_results)[i])
+      msg("ccc mode is ", mode)
+    }
 
     x_full <- get_min_expr(receptor, x)
     y_full <- get_min_expr(ligand, x)
 
     if (fast) {
-      # fastLISA backend: C/OpenMP. Returns cluster classification (pysal-style,
-      # folded p-values, p.value cutoff applied) as an attribute, so no
-      # separate hotspot() call is needed.
+      # fastLISA backend: C/OpenMP
       res_bv <- fastLISA::local_moran_bv(
         x_full[keep_idx], y_full[keep_idx], wt,
         nsim    = nsim,
@@ -236,7 +267,7 @@ blisa.default <- function(
 
   CCI_scores <- NULL
   if (!is.null(counts_by_group)) {
-    message("Running CCI analysis...")
+    msg("Running CCI analysis...")
     tmp <- new_blisa(LR_results, bins, sw)
     CCI_scores <- runCCI.default(tmp, counts_by_group)
   }
@@ -265,12 +296,14 @@ blisa.default <- function(
 #' @param min_total_counts Numeric. Bins whose total counts (summed over all
 #'   genes) fall below this threshold are dropped during binning by
 #'   \code{\link{hexBinCells}}. Set to \code{0} to disable. Default \code{10}.
+#' @param verbose Logical. If \code{TRUE}, print progress messages. Default
+#'   \code{FALSE} (silent).
 #'
 #' @export
 blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
                                        group = "cell_type", genes = NULL,
                                        min_cells = 1, min_total_counts = 10,
-                                       ...) {
+                                       verbose = FALSE, ...) {
   coords <- as.data.frame(SpatialExperiment::spatialCoords(x))
 
   # Resolve group vector from colData
@@ -278,7 +311,7 @@ blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
   if (!is.null(group) && group %in% cd_cols) {
     group_vec <- SummarizedExperiment::colData(x)[[group]]
   } else {
-    if (!is.null(group))
+    if (!is.null(group) && verbose)
       message("Column '", group, "' not found in colData(x) \u2014 CCI analysis will be skipped.")
     group_vec <- NULL
   }
@@ -287,7 +320,8 @@ blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
 
   binned <- hexBinCells(coords, SummarizedExperiment::assay(x, "counts"),
                         bin_size = bin_size, min_cells = min_cells,
-                        min_total_counts = min_total_counts, group = group_vec)
+                        min_total_counts = min_total_counts, group = group_vec,
+                        verbose = verbose)
 
   blisa.default(
     x               = binned$counts_matrix,
@@ -297,6 +331,7 @@ blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
     n_cells_col     = "n_cells",
     genes           = genes,
     counts_by_group = binned$counts_by_group,
+    verbose         = verbose,
     ...
   )
 }

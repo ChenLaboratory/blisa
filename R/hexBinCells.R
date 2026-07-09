@@ -22,6 +22,8 @@
 #'   giving the cell-type label of each cell. When supplied, a named list of
 #'   per-cell-type gene-by-bin matrices is included in the output as
 #'   \code{counts_by_group}. Default \code{NULL} (not computed).
+#' @param verbose Logical. If \code{TRUE}, print progress messages. Default
+#'   \code{FALSE} (silent).
 #'
 #' @return A list with:
 #' \describe{
@@ -55,7 +57,7 @@
 #' }
 #' @export
 hexBinCells <- function(coords_df, counts_matrix, bin_size = 50, min_cells = 1,
-                        min_total_counts = 10, group = NULL) {
+                        min_total_counts = 10, group = NULL, verbose = FALSE) {
 
   if (!all(c("x_centroid", "y_centroid") %in% colnames(coords_df)))
     stop("coords_df must contain columns 'x_centroid' and 'y_centroid'.")
@@ -107,8 +109,9 @@ hexBinCells <- function(coords_df, counts_matrix, bin_size = 50, min_cells = 1,
 
   # Drop bins below min_cells or below min_total_counts
   keep       <- bins$n_cells >= min_cells & bins$total_counts >= min_total_counts
-  message(sum(!keep), " bins dropped (< ", min_cells, " cells or < ",
-          min_total_counts, " total counts).")
+  if (verbose)
+    message(sum(!keep), " bins dropped (< ", min_cells, " cells or < ",
+            min_total_counts, " total counts).")
   bins       <- bins[keep, , drop = FALSE]
   bin_counts <- bin_counts[, keep, drop = FALSE]
 
