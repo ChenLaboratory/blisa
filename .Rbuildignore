@@ -6,3 +6,7 @@
 ^vignettes/getting-started\.Rmd\.orig$
 ^vignettes/figure$
 ^vignettes/cache$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$

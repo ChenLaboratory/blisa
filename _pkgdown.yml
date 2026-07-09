@@ -1,0 +1,32 @@
+url: https://chenlaboratory.github.io/blisa/
+
+template:
+  bootstrap: 5
+
+reference:
+- title: Main analysis
+  desc: Run the BLISA cell-cell communication workflow.
+  contents:
+  - blisa
+- title: Preprocessing
+  desc: Binning, spatial weights, and ligand-receptor pair filtering.
+  contents:
+  - hexBinCells
+  - computeSpatialWeights
+  - filterLRpairs
+- title: Cell-cell interaction scoring
+  contents:
+  - runCCI
+- title: Visualisation
+  desc: Spatial maps and heatmaps of hotspots and interactions.
+  contents:
+  - plotHotspots
+  - plotLRrank
+  - plotCCI
+  - plotCCILR
+  - plotCCIsummary
+  - plotCCIspatial
+- title: Utilities
+  contents:
+  - is.blisa
+  - blisa-package

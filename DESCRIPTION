@@ -17,7 +17,7 @@ Description: Identifies cell-cell communication hotspots in spatial
     weighting, ligand-receptor pair filtering, hotspot detection,
     and visualisation of sender-receiver cell-type interactions.
 License: GPL (>= 3)
-URL: https://github.com/ChenLaboratory/blisa
+URL: https://github.com/ChenLaboratory/blisa, https://chenlaboratory.github.io/blisa/
 BugReports: https://github.com/ChenLaboratory/blisa/issues
 Encoding: UTF-8
 LazyData: false
