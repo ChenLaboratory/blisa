@@ -8,9 +8,9 @@
 \usage{
 plotCCILR(x, ...)
 
-\method{plotCCILR}{blisa}(x, index = 1, ligand = NULL, receptor = NULL, ...)
+\method{plotCCILR}{blisa}(x, index = 1, ligand = NULL, receptor = NULL, main = NULL, ...)
 
-\method{plotCCILR}{default}(x, lr_pair, ...)
+\method{plotCCILR}{default}(x, lr_pair, main = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{blisa} object or a CCI scores data frame (the
@@ -29,6 +29,12 @@ and \code{index} is ignored. Must be supplied together with
 
 \item{receptor}{Character. Receptor gene symbol. Must be supplied together
 with \code{ligand}.}
+
+\item{main}{Character or \code{NULL}. Title drawn above the heatmap. When
+supplied, the heatmap is drawn with this overall title (via
+\code{ComplexHeatmap::draw}); the \code{Heatmap} object is returned
+invisibly. Default \code{NULL} (no title; object returned for the caller
+to print).}
 
 \item{lr_pair}{Character. Column name in the CCI scores data frame
 corresponding to the ligand-receptor pair to visualise

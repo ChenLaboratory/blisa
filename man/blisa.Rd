@@ -26,12 +26,23 @@ blisa(x, ...)
   species = c("human", "mouse"),
   genes = NULL,
   counts_by_group = NULL,
-  fast = FALSE,
+  fast = TRUE,
   cpu_threads = 4L,
+  verbose = FALSE,
   ...
 )
 
-\method{blisa}{SpatialExperiment}(x, bin_size = 50, LR_df = NULL, group = "cell_type", genes = NULL, ...)
+\method{blisa}{SpatialExperiment}(
+  x,
+  bin_size = 50,
+  LR_df = NULL,
+  group = "cell_type",
+  genes = NULL,
+  min_cells = 1,
+  min_total_counts = 10,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{A gene-by-bin count matrix (for \code{blisa.default}) or a
@@ -65,9 +76,8 @@ Default \code{0.05}.}
 \item{min_receptor}{Numeric. Minimum receptor count threshold.
 Default \code{10}.}
 
-\item{min_cells}{Integer. Bins with fewer cells are excluded from
-Moran's I and assigned neutral statistics (\emph{p} = 1, LISA = 0).
-Ignored when \code{n_cells_col = NA}. Default \code{1}.}
+\item{min_cells}{Integer. Bins with fewer cells are dropped during binning
+by \code{\link{hexBinCells}}. Default \code{1}.}
 
 \item{n_cells_col}{Character or \code{NA}. Column in \code{bins} holding
 per-bin cell counts used for \code{min_cells} filtering.
@@ -97,21 +107,27 @@ when \code{group} is supplied. When provided, \code{\link{runCCI}} is
 called automatically after the BLISA loop and its output is included in
 the result as \code{CCI_scores}. Default \code{NULL}.}
 
-\item{fast}{Logical. When \code{TRUE}, uses
+\item{fast}{Logical. When \code{TRUE} (default), uses
 \code{fastLISA::local_moran_bv} (a fast C/OpenMP backend) for the
-bivariate local Moran's I computation. When \code{FALSE} (default), uses
-the original \code{spdep::localmoran_bv} + \code{spdep::hotspot}
-pipeline. \code{fastLISA} must be installed when \code{fast = TRUE}.}
+bivariate local Moran's I computation. When \code{FALSE}, uses the
+original \code{spdep::localmoran_bv} + \code{spdep::hotspot} pipeline.}
 
 \item{cpu_threads}{Integer. Number of OpenMP threads used by
 \code{fastLISA::local_moran_bv}. Only used when \code{fast = TRUE}.
 Ignored on platforms without OpenMP. Default \code{4L}.}
+
+\item{verbose}{Logical. If \code{TRUE}, print progress messages. Default
+\code{FALSE} (silent).}
 
 \item{group}{Character. Column name in \code{colData(x)} to use as the
 grouping variable (e.g. cell type) for per-group bin aggregation and
 downstream CCI analysis via \code{\link{runCCI}}. If the column is not
 found in \code{colData(x)}, a message is issued and CCI is skipped.
 Default \code{"cell_type"}.}
+
+\item{min_total_counts}{Numeric. Bins whose total counts (summed over all
+genes) fall below this threshold are dropped during binning by
+\code{\link{hexBinCells}}. Set to \code{0} to disable. Default \code{10}.}
 }
 \value{
 A list; see individual method documentation for details.

@@ -9,7 +9,9 @@ hexBinCells(
   counts_matrix,
   bin_size = 50,
   min_cells = 1,
-  group = NULL
+  min_total_counts = 10,
+  group = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -28,10 +30,17 @@ coordinate units (e.g. microns). Analogous to \code{grid.length.x} in
 \item{min_cells}{Integer. Bins containing fewer than \code{min_cells} cells
 are dropped from the output. Default \code{1}.}
 
+\item{min_total_counts}{Numeric. Bins whose total counts (summed over all
+genes) fall below this threshold are dropped from the output, alongside
+the \code{min_cells} filter. Set to \code{0} to disable. Default \code{10}.}
+
 \item{group}{Factor or character vector of length \code{ncol(counts_matrix)}
 giving the cell-type label of each cell. When supplied, a named list of
 per-cell-type gene-by-bin matrices is included in the output as
 \code{counts_by_group}. Default \code{NULL} (not computed).}
+
+\item{verbose}{Logical. If \code{TRUE}, print progress messages. Default
+\code{FALSE} (silent).}
 }
 \value{
 A list with:
@@ -39,7 +48,8 @@ A list with:
 \item{counts_matrix}{Gene-by-bin sparse count matrix (all cells combined).
 Column \emph{i} corresponds to row \emph{i} of \code{bins}.}
 \item{bins}{An \code{sf} object of hexagonal bin polygons with an
-\code{n_cells} column recording how many cells fall in each bin. Row
+\code{n_cells} column recording how many cells fall in each bin and a
+\code{total_counts} column recording the summed counts per bin. Row
 order matches the columns of \code{counts_matrix}.}
 \item{counts_by_group}{(Only when \code{group} is supplied.) A named list
 of gene-by-bin sparse matrices, one per cell-type level, with the same

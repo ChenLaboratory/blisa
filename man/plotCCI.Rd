@@ -12,10 +12,12 @@ plotCCI(x, ...)
   x,
   top_lr = 20,
   top_pairs = 30,
+  lr_pairs = NULL,
   sender = NULL,
   receiver = NULL,
   colors = NULL,
   colours = NULL,
+  main = NULL,
   ...
 )
 
@@ -23,10 +25,12 @@ plotCCI(x, ...)
   x,
   top_lr = 20,
   top_pairs = 30,
+  lr_pairs = NULL,
   sender = NULL,
   receiver = NULL,
   colors = NULL,
   colours = NULL,
+  main = NULL,
   ...
 )
 }
@@ -40,12 +44,17 @@ contain columns \code{Sender}, \code{Receiver}, and one column per LR pair.}
 \item{top_lr}{Integer or \code{NULL}. Number of top-ranked LR pairs (by
 \code{sig_numbers}) to display as columns. LR pairs in \code{CCI_scores}
 are already ordered by rank, so this simply takes the first \code{top_lr}
-columns. Default \code{20}.}
+columns. Ignored when \code{lr_pairs} is supplied. Default \code{20}.}
 
 \item{top_pairs}{Integer or \code{NULL}. Number of top sender-receiver pairs
 to display as rows, ranked by their maximum interaction score across the
-displayed LR pairs (after \code{top_lr} is applied). When \code{NULL} all
-rows are shown. Default \code{30}.}
+displayed LR pairs (after \code{top_lr} / \code{lr_pairs} is applied).
+When \code{NULL} all rows are shown. Default \code{30}.}
+
+\item{lr_pairs}{Character vector or \code{NULL}. When supplied, only these
+LR pair column names are shown, in the order given, overriding
+\code{top_lr}. Names not found in \code{CCI_scores} are dropped with a
+warning. Default \code{NULL} (use \code{top_lr}).}
 
 \item{sender}{Character vector or \code{NULL}. If provided, only rows where
 \code{Sender} is in this vector are kept. Applied independently of
@@ -64,6 +73,10 @@ spelling \code{colours} is accepted as an alias.}
 
 \item{colours}{Alias for \code{colors} (British spelling). Ignored when
 \code{colors} is supplied.}
+
+\item{main}{Character or \code{NULL}. Title drawn above the heatmap
+(mapped to the \code{column_title} of \code{ComplexHeatmap::Heatmap}).
+Default \code{NULL} (no title).}
 }
 \value{
 Invisibly returns the \code{Heatmap} object.

@@ -14,6 +14,7 @@ plotCCIsummary(x, ...)
   sender = NULL,
   receiver = NULL,
   agg_fun = sum,
+  main = NULL,
   ...
 )
 
@@ -23,6 +24,7 @@ plotCCIsummary(x, ...)
   sender = NULL,
   receiver = NULL,
   agg_fun = sum,
+  main = NULL,
   ...
 )
 }
@@ -48,6 +50,12 @@ where \code{Receiver} is in this vector are kept (AND logic with
 \item{agg_fun}{Function used to aggregate scores across LR pairs for each
 Sender \eqn{\rightarrow} Receiver combination. Receives a numeric vector
 with \code{NA}s already removed. Default \code{sum}.}
+
+\item{main}{Character or \code{NULL}. Title drawn above the heatmap. When
+supplied, the heatmap is drawn with this overall title (via
+\code{ComplexHeatmap::draw}); the \code{Heatmap} object is returned
+invisibly. Default \code{NULL} (no title; object returned for the caller
+to print).}
 }
 \value{
 A \code{Heatmap} object.
