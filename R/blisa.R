@@ -84,11 +84,10 @@ blisa <- function(x, ...) UseMethod("blisa")
 #'   when \code{group} is supplied. When provided, \code{\link{runCCI}} is
 #'   called automatically after the BLISA loop and its output is included in
 #'   the result as \code{CCI_scores}. Default \code{NULL}.
-#' @param fast Logical. When \code{TRUE}, uses
+#' @param fast Logical. When \code{TRUE} (default), uses
 #'   \code{fastLISA::local_moran_bv} (a fast C/OpenMP backend) for the
-#'   bivariate local Moran's I computation. When \code{FALSE} (default), uses
-#'   the original \code{spdep::localmoran_bv} + \code{spdep::hotspot}
-#'   pipeline. \code{fastLISA} must be installed when \code{fast = TRUE}.
+#'   bivariate local Moran's I computation. When \code{FALSE}, uses the
+#'   original \code{spdep::localmoran_bv} + \code{spdep::hotspot} pipeline.
 #' @param cpu_threads Integer. Number of OpenMP threads used by
 #'   \code{fastLISA::local_moran_bv}. Only used when \code{fast = TRUE}.
 #'   Ignored on platforms without OpenMP. Default \code{4L}.
@@ -132,14 +131,11 @@ blisa.default <- function(
     species           = c("human", "mouse"),
     genes             = NULL,
     counts_by_group   = NULL,
-    fast              = FALSE,
+    fast              = TRUE,
     cpu_threads       = 4L,
     verbose           = FALSE,
     ...
 ) {
-  if (fast && !requireNamespace("fastLISA", quietly = TRUE))
-    stop("fast = TRUE requires the 'fastLISA' package.")
-
   # msg(): emit a message only when verbose. quiet(): run an expression that
   # may emit messages/warnings from internal helpers (e.g. the sf st_centroid
   # "attributes are constant" warning), suppressing them unless verbose.
