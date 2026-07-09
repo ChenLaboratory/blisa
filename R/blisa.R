@@ -136,9 +136,6 @@ blisa.default <- function(
     verbose           = FALSE,
     ...
 ) {
-  # msg(): emit a message only when verbose. quiet(): run an expression that
-  # may emit messages/warnings from internal helpers (e.g. the sf st_centroid
-  # "attributes are constant" warning), suppressing them unless verbose.
   msg   <- function(...) if (verbose) message(...)
   quiet <- function(expr)
     if (verbose) expr else suppressWarnings(suppressMessages(expr))
@@ -196,16 +193,27 @@ blisa.default <- function(
     }
 
     if (show_pb) {
-      frac   <- i / n_pairs
-      width  <- 40L
-      filled <- round(frac * width)
-      lab    <- if (verbose)
-        sprintf("%-42s", paste0(rownames(LR_results)[i], " (", mode, ")")) else ""
-      cat(sprintf("\r  %s|%s%s| %3.0f%%",
-                  lab, strrep("=", filled), strrep(" ", width - filled),
-                  frac * 100))
-      utils::flush.console()
-      if (i == n_pairs) cat("\n")
+      # Under knitr, carriage-return updates are each captured as separate
+      # lines, so only the final (100%) line is drawn there; in an interactive
+      # console the bar updates in place every iteration.
+      in_knit <- isTRUE(getOption("knitr.in.progress"))
+      if (!in_knit || i == n_pairs) {
+        frac   <- i / n_pairs
+        width  <- 40L
+        filled <- round(frac * width)
+        lab    <- if (verbose)
+          sprintf("%-42s", paste0(rownames(LR_results)[i], " (", mode, ")")) else ""
+        bar <- sprintf("  %s|%s%s| %3.0f%%",
+                       lab, strrep("=", filled), strrep(" ", width - filled),
+                       frac * 100)
+        if (in_knit) {
+          cat(bar, "\n", sep = "")
+        } else {
+          cat("\r", bar, sep = "")
+          utils::flush.console()
+          if (i == n_pairs) cat("\n")
+        }
+      }
     } else {
       msg(rownames(LR_results)[i])
       msg("ccc mode is ", mode)
