@@ -38,14 +38,20 @@ plotCCIsummary <- function(x, ...) UseMethod("plotCCIsummary")
 #' @param agg_fun Function used to aggregate scores across LR pairs for each
 #'   Sender \eqn{\rightarrow} Receiver combination. Receives a numeric vector
 #'   with \code{NA}s already removed. Default \code{sum}.
+#' @param main Character or \code{NULL}. Title drawn above the heatmap. When
+#'   supplied, the heatmap is drawn with this overall title (via
+#'   \code{ComplexHeatmap::draw}); the \code{Heatmap} object is returned
+#'   invisibly. Default \code{NULL} (no title; object returned for the caller
+#'   to print).
 #'
 #' @export
 plotCCIsummary.blisa <- function(x, top_lr = NULL, sender = NULL,
-                                  receiver = NULL, agg_fun = sum, ...) {
+                                  receiver = NULL, agg_fun = sum, main = NULL,
+                                  ...) {
   if (is.null(x$CCI_scores))
     stop("CCI_scores is NULL. Run runCCI() first to compute CCI scores.")
   plotCCIsummary.default(x$CCI_scores, top_lr = top_lr, sender = sender,
-                          receiver = receiver, agg_fun = agg_fun)
+                          receiver = receiver, agg_fun = agg_fun, main = main)
 }
 
 
@@ -54,7 +60,8 @@ plotCCIsummary.blisa <- function(x, top_lr = NULL, sender = NULL,
 #'
 #' @export
 plotCCIsummary.default <- function(x, top_lr = NULL, sender = NULL,
-                                    receiver = NULL, agg_fun = sum, ...) {
+                                    receiver = NULL, agg_fun = sum, main = NULL,
+                                    ...) {
   CCI_df <- x
 
   if (!is.null(sender)) {
@@ -104,5 +111,10 @@ plotCCIsummary.default <- function(x, top_lr = NULL, sender = NULL,
                na_col = "grey90",
                heatmap_legend_param = list(title_position = "topcenter"))
 
+  if (!is.null(main)) {
+    draw(p, column_title = main,
+         column_title_gp = gpar(fontsize = 14, fontface = "bold"))
+    return(invisible(p))
+  }
   return(p)
 }

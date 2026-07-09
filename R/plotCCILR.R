@@ -36,10 +36,15 @@ plotCCILR <- function(x, ...) UseMethod("plotCCILR")
 #'   \code{receptor}.
 #' @param receptor Character. Receptor gene symbol. Must be supplied together
 #'   with \code{ligand}.
+#' @param main Character or \code{NULL}. Title drawn above the heatmap. When
+#'   supplied, the heatmap is drawn with this overall title (via
+#'   \code{ComplexHeatmap::draw}); the \code{Heatmap} object is returned
+#'   invisibly. Default \code{NULL} (no title; object returned for the caller
+#'   to print).
 #'
 #' @export
 plotCCILR.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
-                               ...) {
+                               main = NULL, ...) {
   if (is.null(x$CCI_scores))
     stop("CCI_scores is NULL. Run runCCI() first to compute CCI scores.")
 
@@ -56,7 +61,7 @@ plotCCILR.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
   if (!lr_pair %in% colnames(x$CCI_scores))
     stop("LR pair '", lr_pair, "' not found in CCI_scores.")
 
-  plotCCILR.default(x$CCI_scores, lr_pair)
+  plotCCILR.default(x$CCI_scores, lr_pair, main = main)
 }
 
 
@@ -69,7 +74,7 @@ plotCCILR.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
 #'   (e.g. \code{"CXCL12_CXCR4"}).
 #'
 #' @export
-plotCCILR.default <- function(x, lr_pair, ...) {
+plotCCILR.default <- function(x, lr_pair, main = NULL, ...) {
   CCI_df <- x
 
   if (!lr_pair %in% colnames(CCI_df))
@@ -105,5 +110,10 @@ plotCCILR.default <- function(x, lr_pair, ...) {
                column_names_rot = 45,
                heatmap_legend_param = list(title_position = "topcenter"))
 
+  if (!is.null(main)) {
+    draw(p, column_title = main,
+         column_title_gp = gpar(fontsize = 14, fontface = "bold"))
+    return(invisible(p))
+  }
   return(p)
 }

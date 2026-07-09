@@ -103,9 +103,12 @@ plotHotspots.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
     lgd_title <- "1-pval"
   }
 
-  # Pre-compute a fill colour for every bin
-  fill_cols <- rep("#F0F0F0", nrow(bins))    # empty
-  fill_cols[bins$n_cells > 0] <- "#D3D3D3"  # non-significant
+  # Pre-compute a fill colour for every bin. Bins not included in this LR
+  # pair's LISA test (empty, isolated, low-cell, or low total counts) are
+  # treated the same as empty bins; only tested bins can be "non-significant".
+  tested    <- !is.na(LR_results$all_quadrant[[index]])
+  fill_cols <- rep("#FFFFFF", nrow(bins))    # empty / excluded from testing (white)
+  fill_cols[tested] <- "#D3D3D3"             # tested but non-significant (light grey)
 
   if (length(sig_indices) > 0) {
     pval_range <- range(plot_vals)
@@ -138,7 +141,7 @@ plotHotspots.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
     guides(color = guide_colorbar(title.position = "top")) +
     labs(
       title    = paste0(interaction, " - ", sig_num, " hotspots", title_suffix),
-      subtitle = "Grey scale: Light (Empty bins) | Medium (Non-sig bins)"
+      subtitle = "White: Empty/untested bins | Light grey: Non-significant bins"
     ) +
     theme_void() +
     theme(legend.position = "right")

@@ -30,11 +30,15 @@ plotCCI <- function(x, ...) UseMethod("plotCCI")
 #' @param top_lr Integer or \code{NULL}. Number of top-ranked LR pairs (by
 #'   \code{sig_numbers}) to display as columns. LR pairs in \code{CCI_scores}
 #'   are already ordered by rank, so this simply takes the first \code{top_lr}
-#'   columns. Default \code{20}.
+#'   columns. Ignored when \code{lr_pairs} is supplied. Default \code{20}.
+#' @param lr_pairs Character vector or \code{NULL}. When supplied, only these
+#'   LR pair column names are shown, in the order given, overriding
+#'   \code{top_lr}. Names not found in \code{CCI_scores} are dropped with a
+#'   warning. Default \code{NULL} (use \code{top_lr}).
 #' @param top_pairs Integer or \code{NULL}. Number of top sender-receiver pairs
 #'   to display as rows, ranked by their maximum interaction score across the
-#'   displayed LR pairs (after \code{top_lr} is applied). When \code{NULL} all
-#'   rows are shown. Default \code{30}.
+#'   displayed LR pairs (after \code{top_lr} / \code{lr_pairs} is applied).
+#'   When \code{NULL} all rows are shown. Default \code{30}.
 #' @param sender Character vector or \code{NULL}. If provided, only rows where
 #'   \code{Sender} is in this vector are kept. Applied independently of
 #'   \code{receiver} (AND logic when both are supplied). Default \code{NULL}
@@ -49,16 +53,20 @@ plotCCI <- function(x, ...) UseMethod("plotCCI")
 #'   spelling \code{colours} is accepted as an alias.
 #' @param colours Alias for \code{colors} (British spelling). Ignored when
 #'   \code{colors} is supplied.
+#' @param main Character or \code{NULL}. Title drawn above the heatmap
+#'   (mapped to the \code{column_title} of \code{ComplexHeatmap::Heatmap}).
+#'   Default \code{NULL} (no title).
 #'
 #' @export
-plotCCI.blisa <- function(x, top_lr = 20, top_pairs = 30,
+plotCCI.blisa <- function(x, top_lr = 20, top_pairs = 30, lr_pairs = NULL,
                           sender = NULL, receiver = NULL,
-                          colors = NULL, colours = NULL, ...) {
+                          colors = NULL, colours = NULL, main = NULL, ...) {
   if (is.null(x$CCI_scores))
     stop("CCI_scores is NULL. Run runCCI() first to compute CCI scores.")
   if (is.null(colors)) colors <- colours
   plotCCI.default(x$CCI_scores, top_lr = top_lr, top_pairs = top_pairs,
-                  sender = sender, receiver = receiver, colors = colors)
+                  lr_pairs = lr_pairs, sender = sender, receiver = receiver,
+                  colors = colors, main = main)
 }
 
 
@@ -66,9 +74,9 @@ plotCCI.blisa <- function(x, top_lr = 20, top_pairs = 30,
 #'   \code{CCI_scores} slot of a \code{blisa} object).
 #'
 #' @export
-plotCCI.default <- function(x, top_lr = 20, top_pairs = 30,
+plotCCI.default <- function(x, top_lr = 20, top_pairs = 30, lr_pairs = NULL,
                             sender = NULL, receiver = NULL,
-                            colors = NULL, colours = NULL, ...) {
+                            colors = NULL, colours = NULL, main = NULL, ...) {
   if (is.null(colors)) colors <- colours
   CCI_df <- x
 
@@ -86,10 +94,21 @@ plotCCI.default <- function(x, top_lr = 20, top_pairs = 30,
       stop("No rows remaining after filtering by receiver.")
   }
 
-  # Subset to top_lr LR pair columns (already ranked by sig_numbers)
-  lr_cols <- setdiff(colnames(CCI_df), c("Sender", "Receiver"))
-  if (!is.null(top_lr))
-    lr_cols <- lr_cols[seq_len(min(top_lr, length(lr_cols)))]
+  # Choose LR pair columns: explicit lr_pairs takes precedence over top_lr
+  all_lr <- setdiff(colnames(CCI_df), c("Sender", "Receiver"))
+  if (!is.null(lr_pairs)) {
+    missing_pairs <- setdiff(lr_pairs, all_lr)
+    if (length(missing_pairs) > 0)
+      warning("LR pair(s) not found in CCI_scores: ",
+              paste(missing_pairs, collapse = ", "))
+    lr_cols <- intersect(lr_pairs, all_lr)
+    if (length(lr_cols) == 0)
+      stop("None of the specified 'lr_pairs' are present in CCI_scores.")
+  } else {
+    lr_cols <- all_lr
+    if (!is.null(top_lr))
+      lr_cols <- lr_cols[seq_len(min(top_lr, length(lr_cols)))]
+  }
 
   # Subset to top_pairs rows by max score across the displayed LR columns
   if (!is.null(top_pairs) && nrow(CCI_df) > top_pairs) {
@@ -107,9 +126,14 @@ plotCCI.default <- function(x, top_lr = 20, top_pairs = 30,
     colors  <- setNames(cols[seq_along(all_cts)], all_cts)
   }
 
+  # Order legend entries by the order in colors (top-to-bottom = first-to-last)
+  lvls <- names(colors)
+  sender_factor   <- factor(senders,   levels = lvls[lvls %in% senders])
+  receiver_factor <- factor(receivers, levels = lvls[lvls %in% receivers])
+
   row_ha <- rowAnnotation(
-    Sender = senders,
-    Receiver = receivers,
+    Sender   = sender_factor,
+    Receiver = receiver_factor,
     col = list(
       Sender = colors,
       Receiver = colors
@@ -132,6 +156,8 @@ plotCCI.default <- function(x, top_lr = 20, top_pairs = 30,
                 row_names_gp = gpar(fontsize = 10, fontface = "bold"),
                 column_names_gp = gpar(fontsize = 10, fontface = "bold"),
                 column_names_rot = 45,
+                column_title = main,
+                column_title_gp = gpar(fontsize = 14, fontface = "bold"),
                 heatmap_legend_param = list(title_position = "topcenter"),
                 left_annotation = row_ha)
 

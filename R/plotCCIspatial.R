@@ -97,9 +97,12 @@ plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
   dominant_pairs$cell_pair_plot <- ifelse(dominant_pairs$cell_pair %in% shown_pairs,
                                      dominant_pairs$cell_pair, "rare pairs")
 
-  # Label every bin: Empty / Non-Significant / dominant interacting pair
-  bins$cell_pair_plot                   <- ifelse(bins$n_cells > 0,
-                                                   "Non-Significant", "Empty")
+  # Label every bin: Empty / Non-Significant / dominant interacting pair.
+  # Bins not included in this LR pair's LISA test (empty, isolated, low-cell,
+  # or low total counts) are treated the same as empty bins.
+  tested <- !is.na(LR_results$all_quadrant[[index]])
+  bins$cell_pair_plot                        <- ifelse(tested,
+                                                       "Non-Significant", "Empty")
   bins$cell_pair_plot[dominant_pairs$hex_id] <- dominant_pairs$cell_pair_plot
   legend_levels       <- c(shown_pairs, "rare pairs", "Non-Significant", "Empty")
   bins$cell_pair_plot <- factor(bins$cell_pair_plot, levels = legend_levels)
@@ -108,7 +111,7 @@ plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
     setNames(cols[seq_along(shown_pairs)], shown_pairs),
     "rare pairs"      = "#404040",
     "Non-Significant" = "#D3D3D3",
-    "Empty"           = "#F5F5F5"
+    "Empty"           = "#FFFFFF"
   )
 
   p <- ggplot(bins) +
