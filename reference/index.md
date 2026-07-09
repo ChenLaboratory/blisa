@@ -1,0 +1,51 @@
+# Package index
+
+## Main analysis
+
+Run the BLISA cell-cell communication workflow.
+
+- [`blisa()`](https://chenlaboratory.github.io/blisa/reference/blisa.md)
+  : Run BLISA spatial cell-cell communication analysis
+
+## Preprocessing
+
+Binning, spatial weights, and ligand-receptor pair filtering.
+
+- [`hexBinCells()`](https://chenlaboratory.github.io/blisa/reference/hexBinCells.md)
+  : Bin cells into hexagonal spatial bins
+- [`computeSpatialWeights()`](https://chenlaboratory.github.io/blisa/reference/computeSpatialWeights.md)
+  : Compute Spatial Weights for BLISA
+- [`filterLRpairs()`](https://chenlaboratory.github.io/blisa/reference/filterLRpairs.md)
+  : Filter ligand-receptor pairs by expression threshold
+
+## Cell-cell interaction scoring
+
+- [`runCCI()`](https://chenlaboratory.github.io/blisa/reference/runCCI.md)
+  : Score cell-cell interactions from BLISA hotspots
+
+## Visualisation
+
+Spatial maps and heatmaps of hotspots and interactions.
+
+- [`plotHotspots()`](https://chenlaboratory.github.io/blisa/reference/plotHotspots.md)
+  : Spatial hotspot map for one ligand-receptor pair
+- [`plotLRrank()`](https://chenlaboratory.github.io/blisa/reference/plotLRrank.md)
+  : Dot plot ranking LR pairs by number of significant hotspot bins
+- [`plotCCI()`](https://chenlaboratory.github.io/blisa/reference/plotCCI.md)
+  : Heatmap of CCI scores across all ligand-receptor pairs
+- [`plotCCILR()`](https://chenlaboratory.github.io/blisa/reference/plotCCILR.md)
+  : Sender-by-receiver heatmap of CCI scores for one ligand-receptor
+  pair
+- [`plotCCIsummary()`](https://chenlaboratory.github.io/blisa/reference/plotCCIsummary.md)
+  : Sender-by-receiver heatmap of aggregated CCI scores across LR pairs
+- [`plotCCIspatial()`](https://chenlaboratory.github.io/blisa/reference/plotCCIspatial.md)
+  : Spatial map of dominant sender-receiver cell-type pairs at BLISA
+  hotspots
+
+## Utilities
+
+- [`is.blisa()`](https://chenlaboratory.github.io/blisa/reference/is.blisa.md)
+  : Test if an object is a blisa object
+- [`blisa-package`](https://chenlaboratory.github.io/blisa/reference/blisa-package.md)
+  : blisa: Bivariate Local Indicator of Spatial Association for spatial
+  transcriptomics
