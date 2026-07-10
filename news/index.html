@@ -37,6 +37,15 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.0" id="blisa-100">blisa 1.0.0<a class="anchor" aria-label="anchor" href="#blisa-100"></a></h2>
+<ul><li>
+<code><a href="../reference/blisa.html">blisa()</a></code> now uses the <code>fastLISA</code> C/OpenMP backend by default (<code>fast = TRUE</code>) for the bivariate local Moran’s I computation. <code>fastLISA</code> moved from Suggests to Imports. Results are statistically equivalent to the previous <code><a href="https://r-spatial.github.io/spdep/reference/localmoran_bv.html" class="external-link">spdep::localmoran_bv</a></code> backend but not bit-identical (different RNG).</li>
+<li>New <code>min_total_counts</code> argument to <code><a href="../reference/blisa.html">blisa()</a></code> and <code><a href="../reference/hexBinCells.html">hexBinCells()</a></code> drops bins whose total counts (summed over all genes) fall below the threshold during binning. Default <code>10</code>.</li>
+<li>New <code>verbose</code> argument (default <code>FALSE</code>) to <code><a href="../reference/blisa.html">blisa()</a></code> and <code><a href="../reference/hexBinCells.html">hexBinCells()</a></code> gates progress messages; <code><a href="../reference/blisa.html">blisa()</a></code> also shows a progress bar over the ligand-receptor pairs in interactive sessions.</li>
+<li>New <code>lr_pairs</code> argument to <code><a href="../reference/plotCCI.html">plotCCI()</a></code> selects specific ligand-receptor pairs to display, overriding <code>top_lr</code>.</li>
+<li>New <code>main</code> argument to <code><a href="../reference/plotCCI.html">plotCCI()</a></code>, <code><a href="../reference/plotCCILR.html">plotCCILR()</a></code>, and <code><a href="../reference/plotCCIsummary.html">plotCCIsummary()</a></code> adds a title above the heatmap.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.3" id="blisa-023">blisa 0.2.3<a class="anchor" aria-label="anchor" href="#blisa-023"></a></h2>
 <ul><li>
 <code>LR_results</code> row names are now informative IDs built from the ligand/receptor symbols, with subunits joined by <code>|</code> and the two sides by <code>_</code> (e.g. <code>TGFB1_TGFBR2|TGFBR1</code>). The original CellChatDB <code>interaction_name</code> is retained in a new <code>interaction_name</code> column.</li>
