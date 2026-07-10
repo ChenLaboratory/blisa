@@ -1,3 +1,20 @@
+# blisa 1.0.0
+
+* `blisa()` now uses the `fastLISA` C/OpenMP backend by default (`fast = TRUE`)
+  for the bivariate local Moran's I computation. `fastLISA` moved from Suggests
+  to Imports. Results are statistically equivalent to the previous
+  `spdep::localmoran_bv` backend but not bit-identical (different RNG).
+* New `min_total_counts` argument to `blisa()` and `hexBinCells()` drops bins
+  whose total counts (summed over all genes) fall below the threshold during
+  binning. Default `10`.
+* New `verbose` argument (default `FALSE`) to `blisa()` and `hexBinCells()`
+  gates progress messages; `blisa()` also shows a progress bar over the
+  ligand-receptor pairs in interactive sessions.
+* New `lr_pairs` argument to `plotCCI()` selects specific ligand-receptor pairs
+  to display, overriding `top_lr`.
+* New `main` argument to `plotCCI()`, `plotCCILR()`, and `plotCCIsummary()`
+  adds a title above the heatmap.
+
 # blisa 0.2.3
 
 * `LR_results` row names are now informative IDs built from the ligand/receptor

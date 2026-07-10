@@ -11,6 +11,7 @@ Identifies cell-cell communication hotspots in spatial transcriptomics data usin
 Useful links:
 \itemize{
   \item \url{https://github.com/ChenLaboratory/blisa}
+  \item \url{https://chenlaboratory.github.io/blisa/}
   \item Report bugs at \url{https://github.com/ChenLaboratory/blisa/issues}
 }
 
