@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">blisa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.0.0" id="blisa-100">blisa 1.0.0<a class="anchor" aria-label="anchor" href="#blisa-100"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.0.0" id="blisa-100">blisa 1.0.0<a class="anchor" aria-label="anchor" href="#blisa-100"></a></h2><p class="text-muted">CRAN release: 2026-07-10</p>
 <ul><li>
 <code><a href="../reference/blisa.html">blisa()</a></code> now uses the <code>fastLISA</code> C/OpenMP backend by default (<code>fast = TRUE</code>) for the bivariate local Moran’s I computation. <code>fastLISA</code> moved from Suggests to Imports. Results are statistically equivalent to the previous <code><a href="https://r-spatial.github.io/spdep/reference/localmoran_bv.html" class="external-link">spdep::localmoran_bv</a></code> backend but not bit-identical (different RNG).</li>
 <li>New <code>min_total_counts</code> argument to <code><a href="../reference/blisa.html">blisa()</a></code> and <code><a href="../reference/hexBinCells.html">hexBinCells()</a></code> drops bins whose total counts (summed over all genes) fall below the threshold during binning. Default <code>10</code>.</li>

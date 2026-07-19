@@ -2,6 +2,8 @@
 
 ## blisa 1.0.0
 
+CRAN release: 2026-07-10
+
 - [`blisa()`](https://chenlaboratory.github.io/blisa/reference/blisa.md)
   now uses the `fastLISA` C/OpenMP backend by default (`fast = TRUE`)
   for the bivariate local Moran’s I computation. `fastLISA` moved from
