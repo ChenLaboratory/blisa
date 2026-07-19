@@ -57,6 +57,17 @@ plotHotspots <- function(x, ...) UseMethod("plotHotspots")
 #'   \code{receptor}.
 #' @param receptor Character. Receptor gene symbol. Must be supplied together
 #'   with \code{ligand}.
+#' @param as_points Logical. If \code{TRUE}, draw each bin as a dot at its
+#'   centroid instead of its polygon. Useful for Visium, where each bin is a
+#'   single spot. Default \code{FALSE} (draw polygons).
+#' @param size Numeric. Point size when \code{as_points = TRUE} (or when
+#'   \code{background} is supplied). Default \code{1.5}.
+#' @param background A \code{ggplot} object to draw the hotspots on top of, e.g.
+#'   \code{scider::plotImage(spe)} to place the H&E image behind the spots.
+#'   When supplied, the hotspots are always rendered as dots (the raster
+#'   background is incompatible with \code{geom_sf} coordinates), and the bins
+#'   must share the background plot's coordinate frame (true for objects read by
+#'   \code{scider::readVisium()}). Default \code{NULL}.
 #' @param log_pval Logical. If \code{TRUE} (default), colour significant bins
 #'   by -log10(p-value). If \code{FALSE}, use 1 - p-value.
 #' @param p_cutoff Numeric or \code{NULL}. When \code{NULL} (default), the
@@ -70,6 +81,7 @@ plotHotspots <- function(x, ...) UseMethod("plotHotspots")
 #'
 #' @export
 plotHotspots.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
+                               as_points = FALSE, size = 1.5, background = NULL,
                                log_pval = TRUE, p_cutoff = NULL, ...) {
   bins       <- x$bins
   LR_results <- x$LR_results
@@ -133,8 +145,56 @@ plotHotspots.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
 
   title_suffix <- if (!is.null(p_cutoff)) paste0(" (p \u2264 ", p_cutoff, ")") else ""
 
+  # Overlay on an existing background plot (e.g. scider::plotImage(spe)), which
+  # already places the H&E image in the (micron) coordinate frame of the spots.
+  # We add the hotspot dots on top -- the same pattern scider::plotSpatial uses.
+  # Requires the bins to share that coordinate frame (true for objects read by
+  # scider::readVisium()).
+  if (!is.null(background)) {
+    # Prefer the raw image-registered coordinates (stored by visiumSpotBins) so
+    # the dots align with the H&E; fall back to bin centroids otherwise (which
+    # may be in a de-tilted/rescaled analysis frame and not match the image).
+    if (!is.null(bins$img_x) && !is.null(bins$img_y)) {
+      pts_df <- data.frame(x = bins$img_x, y = bins$img_y,
+                           fill_col = bins$fill_col)
+    } else {
+      cent   <- sf::st_coordinates(sf::st_centroid(sf::st_geometry(bins)))
+      pts_df <- data.frame(x = cent[, 1], y = cent[, 2],
+                           fill_col = bins$fill_col)
+    }
+    p <- background +
+      geom_point(data = pts_df, aes(x = x, y = y, fill = fill_col),
+                 shape = 21, color = "transparent", size = size) +
+      scale_fill_identity() +
+      geom_point(data = dummy, aes(x = x, y = y, color = val), alpha = 0) +
+      scale_color_gradientn(colours = LRI_spatial_colors, name = lgd_title) +
+      guides(color = guide_colorbar(title.position = "top")) +
+      labs(
+        title    = paste0(interaction, " - ", sig_num, " hotspots", title_suffix),
+        subtitle = "White: Empty/untested bins | Light grey: Non-significant bins"
+      )
+    return(p)
+  }
+
+  # Draw the bins either as polygons (geom_sf) or as dots at their centroids.
+  # Dots use shape 21 so they carry the same `fill` scale as the polygons,
+  # leaving the `color` scale free for the p-value colorbar legend.
+  if (as_points) {
+    cent   <- sf::st_coordinates(sf::st_centroid(sf::st_geometry(bins)))
+    pts_df <- data.frame(x = cent[, 1], y = cent[, 2], fill_col = bins$fill_col)
+    # shape 21 = filled circle carrying the `fill` scale; use a transparent
+    # (not NA) border, since colour = NA drops every point via remove_missing.
+    bin_layer   <- geom_point(data = pts_df, aes(x = x, y = y, fill = fill_col),
+                              shape = 21, color = "transparent", size = size)
+    coord_layer <- ggplot2::coord_equal()
+  } else {
+    bin_layer   <- geom_sf(aes(fill = fill_col), color = NA)
+    coord_layer <- NULL
+  }
+
   p <- ggplot(bins) +
-    geom_sf(aes(fill = fill_col), color = NA) +
+    bin_layer +
+    coord_layer +
     scale_fill_identity() +
     geom_point(data = dummy, aes(x = x, y = y, color = val), alpha = 0) +
     scale_color_gradientn(colours = LRI_spatial_colors, name = lgd_title) +
