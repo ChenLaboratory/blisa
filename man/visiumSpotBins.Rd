@@ -47,7 +47,7 @@ plots on the H&E image) columns. Row order matches the columns of
 \code{counts_matrix}.}
 \item{pitch}{The spot spacing used (= the recommended \code{bin_size}).}
 \item{coord_unit}{\code{"micron"}, \code{"pixel/other"}, or \code{NA}
-(when \code{spot_pitch} was supplied) — the inferred coordinate unit.}
+(when \code{spot_pitch} was supplied) -- the inferred coordinate unit.}
 }
 }
 \description{

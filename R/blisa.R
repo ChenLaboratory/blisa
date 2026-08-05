@@ -327,13 +327,13 @@ blisa.SpatialExperiment <- function(x, bin_size = 50, LR_df = NULL,
   }
   if (platform == "visium" && !has_array && verbose)
     message("platform = 'visium' but no array_col/array_row in colData; ",
-            "spatialCoords will be used directly (no de-tilt) — ensure ",
+            "spatialCoords will be used directly (no de-tilt) \u2014 ensure ",
             "bin_size matches the coordinate units.")
 
   ## ---- Visium: each spot is already a bin ------------------------------
   if (platform == "visium") {
     if (!is.null(group) && group %in% cd_cols && verbose)
-      message("Visium spots have no per-cell labels — group '", group,
+      message("Visium spots have no per-cell labels \u2014 group '", group,
               "' ignored; CCI analysis skipped.")
 
     # bin_size unset -> let visiumSpotBins pick it (100 um for the array-index
