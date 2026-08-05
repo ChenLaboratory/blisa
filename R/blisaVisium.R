@@ -55,7 +55,7 @@
 #'   polygons; if \code{FALSE}, use point geometry (faster, but
 #'   \code{plotHotspots} then draws points).
 #' @param min_total_counts Numeric. Drop spots whose total counts fall below
-#'   this threshold. Default \code{0} (keep all).
+#'   this threshold. Default \code{10}. Set to \code{0} to keep all spots.
 #' @param verbose Logical. Print progress messages. Default \code{FALSE}.
 #'
 #' @return A list with:
@@ -76,7 +76,7 @@ visiumSpotBins <- function(spe,
                            spot_pitch       = NULL,
                            in_tissue_only   = TRUE,
                            hexagons         = TRUE,
-                           min_total_counts = 0,
+                           min_total_counts = 10,
                            verbose          = FALSE) {
   cd        <- SummarizedExperiment::colData(spe)
   has_array <- all(c("array_col", "array_row") %in% colnames(cd))
