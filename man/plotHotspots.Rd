@@ -12,6 +12,9 @@ plotHotspots(x, ...)
   index = 1,
   ligand = NULL,
   receptor = NULL,
+  as_points = FALSE,
+  size = 1.5,
+  background = NULL,
   log_pval = TRUE,
   p_cutoff = NULL,
   ...
@@ -33,6 +36,20 @@ and \code{index} is ignored. Must be supplied together with
 
 \item{receptor}{Character. Receptor gene symbol. Must be supplied together
 with \code{ligand}.}
+
+\item{as_points}{Logical. If \code{TRUE}, draw each bin as a dot at its
+centroid instead of its polygon. Useful for Visium, where each bin is a
+single spot. Default \code{FALSE} (draw polygons).}
+
+\item{size}{Numeric. Point size when \code{as_points = TRUE} (or when
+\code{background} is supplied). Default \code{1.5}.}
+
+\item{background}{A \code{ggplot} object to draw the hotspots on top of, e.g.
+\code{scider::plotImage(spe)} to place the H&E image behind the spots.
+When supplied, the hotspots are always rendered as dots (the raster
+background is incompatible with \code{geom_sf} coordinates), and the bins
+must share the background plot's coordinate frame (true for objects read by
+\code{scider::readVisium()}). Default \code{NULL}.}
 
 \item{log_pval}{Logical. If \code{TRUE} (default), colour significant bins
 by -log10(p-value). If \code{FALSE}, use 1 - p-value.}

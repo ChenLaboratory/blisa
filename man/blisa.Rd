@@ -40,6 +40,7 @@ blisa(x, ...)
   genes = NULL,
   min_cells = 1,
   min_total_counts = 10,
+  platform = c("auto", "xenium", "visium"),
   verbose = FALSE,
   ...
 )
@@ -60,7 +61,9 @@ CellChatDB for the chosen \code{species} is downloaded automatically.}
 
 \item{bin_size}{Numeric. Width of each hexagonal bin in coordinate units
 (e.g. microns). Passed to \code{\link{hexBinCells}} and
-\code{\link{computeSpatialWeights}}. Default \code{50}.}
+\code{\link{computeSpatialWeights}}. Default \code{50}; for the Visium
+path it defaults to \code{100} (spot center-to-center spacing) when left
+unset.}
 
 \item{dmax}{Numeric. Maximum distance for diffuse-mode neighbours.
 Default \code{250}.}
@@ -128,6 +131,11 @@ Default \code{"cell_type"}.}
 \item{min_total_counts}{Numeric. Bins whose total counts (summed over all
 genes) fall below this threshold are dropped during binning by
 \code{\link{hexBinCells}}. Set to \code{0} to disable. Default \code{10}.}
+
+\item{platform}{Character. \code{"auto"} (default) inspects
+\code{colData(x)}: if \code{array_col}/\code{array_row} are present the
+object is treated as \code{"visium"}, otherwise \code{"xenium"}.
+Set explicitly to override the detection.}
 }
 \value{
 A list; see individual method documentation for details.
@@ -164,8 +172,10 @@ internally via \code{\link{hexBinCells}} before running the analysis.
 \item \code{blisa(default)}: Method for a gene-by-bin count matrix.
 
 \item \code{blisa(SpatialExperiment)}: Method for a cell-level SpatialExperiment object.
-Bins cells into hexagonal tiles via \code{\link{hexBinCells}} then
-delegates to \code{blisa.default}.
+For cell-level platforms (e.g. Xenium) it bins cells into hexagonal tiles
+via \code{\link{hexBinCells}}; for Visium it treats each spot as a bin via
+\code{\link{visiumSpotBins}}. Either way it then delegates to
+\code{blisa.default}. The path is chosen by \code{platform}.
 
 }}
 \examples{
