@@ -57,9 +57,13 @@ blisa <- function(x, ...) UseMethod("blisa")
 #' @param min_ligand Numeric. Minimum ligand count threshold. Default \code{10}.
 #' @param min_receptor Numeric. Minimum receptor count threshold.
 #'   Default \code{10}.
-#' @param min_cells Integer. Bins with fewer cells are excluded from
-#'   Moran's I and assigned neutral statistics (\emph{p} = 1, LISA = 0).
-#'   Ignored when \code{n_cells_col = NA}. Default \code{1}.
+#' @param min_cells Integer. Minimum number of cells per bin. For a
+#'   \code{SpatialExperiment}, bins below this threshold are dropped during
+#'   binning by \code{\link{hexBinCells}}. For pre-binned input supplied
+#'   directly to \code{blisa.default}, they are dropped from \code{bins},
+#'   \code{x} and \code{counts_by_group} before the spatial weights are built;
+#'   this requires \code{n_cells_col} and is ignored when
+#'   \code{n_cells_col = NA}. Default \code{1}.
 #' @param n_cells_col Character or \code{NA}. Column in \code{bins} holding
 #'   per-bin cell counts used for \code{min_cells} filtering.
 #'   Set to \code{NA} to skip (default).
@@ -140,8 +144,36 @@ blisa.default <- function(
   quiet <- function(expr)
     if (verbose) expr else suppressWarnings(suppressMessages(expr))
 
-  sw             <- quiet(computeSpatialWeights(bins, bin_size, dmax, min_cells,
-                                                n_cells_col))
+  ## ---------------------------
+  ## Drop low-cell bins
+  ## For users who supply their own binned data and want cell-number filtering
+  ## without going through the blisa binning pipeline, where hexBinCells() has
+  ## already applied this filter. 
+  ## ---------------------------
+  if (!is.na(n_cells_col)) {
+    if (!n_cells_col %in% colnames(bins))
+      stop("Column '", n_cells_col, "' not found in bins.")
+
+    keep_bins <- bins[[n_cells_col]] >= min_cells
+
+    if (all(keep_bins)) {
+      msg("No bins below ", min_cells, " cells — subsetting skipped.")
+    } else {
+      if (ncol(x) != nrow(bins))
+        stop("ncol(x) (", ncol(x), ") must match nrow(bins) (", nrow(bins),
+             ") to subset bins.")
+      msg(sum(!keep_bins), " bins dropped (< ", min_cells, " cells, column '",
+          n_cells_col, "').")
+
+      bins <- bins[keep_bins, , drop = FALSE]
+      x    <- x[, keep_bins, drop = FALSE]
+      if (!is.null(counts_by_group))
+        counts_by_group <- lapply(counts_by_group,
+                                  function(m) m[, keep_bins, drop = FALSE])
+    }
+  }
+
+  sw             <- quiet(computeSpatialWeights(bins, bin_size, dmax))
   queen_wt       <- sw$queen_wt
   dist_wt        <- sw$dist_wt
   keep_idx_queen <- sw$keep_idx_queen
@@ -303,8 +335,6 @@ blisa.default <- function(
 #' @param genes Character vector of gene names to consider when matching
 #'   ligand-receptor pairs. Defaults to \code{rownames(x)} (all genes in the
 #'   \code{SpatialExperiment} object).
-#' @param min_cells Integer. Bins with fewer cells are dropped during binning
-#'   by \code{\link{hexBinCells}}. Default \code{1}.
 #' @param min_total_counts Numeric. Bins whose total counts (summed over all
 #'   genes) fall below this threshold are dropped during binning by
 #'   \code{\link{hexBinCells}}. Set to \code{0} to disable. Default \code{10}.

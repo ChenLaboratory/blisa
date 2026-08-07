@@ -79,8 +79,13 @@ Default \code{0.05}.}
 \item{min_receptor}{Numeric. Minimum receptor count threshold.
 Default \code{10}.}
 
-\item{min_cells}{Integer. Bins with fewer cells are dropped during binning
-by \code{\link{hexBinCells}}. Default \code{1}.}
+\item{min_cells}{Integer. Minimum number of cells per bin. For a
+\code{SpatialExperiment}, bins below this threshold are dropped during
+binning by \code{\link{hexBinCells}}. For pre-binned input supplied
+directly to \code{blisa.default}, they are dropped from \code{bins},
+\code{x} and \code{counts_by_group} before the spatial weights are built;
+this requires \code{n_cells_col} and is ignored when
+\code{n_cells_col = NA}. Default \code{1}.}
 
 \item{n_cells_col}{Character or \code{NA}. Column in \code{bins} holding
 per-bin cell counts used for \code{min_cells} filtering.

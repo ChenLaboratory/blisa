@@ -4,13 +4,7 @@
 \alias{computeSpatialWeights}
 \title{Compute Spatial Weights for BLISA}
 \usage{
-computeSpatialWeights(
-  bins,
-  bin_size = 50,
-  dmax = 250,
-  min_cells = 1,
-  n_cells_col = NA
-)
+computeSpatialWeights(bins, bin_size = 50, dmax = 250)
 }
 \arguments{
 \item{bins}{An \code{sf} object of spatial bins.}
@@ -19,13 +13,6 @@ computeSpatialWeights(
 (\code{1.2 * bin_size} radius).}
 
 \item{dmax}{Numeric. Maximum distance for diffuse-mode neighbours.}
-
-\item{min_cells}{Integer. Minimum cell count for a bin to be
-included. Ignored when \code{n_cells_col = NA}.}
-
-\item{n_cells_col}{Character or \code{NA}. Column name in \code{bins}
-holding per-bin cell counts. Set to \code{NA} to skip cell-count
-filtering (default).}
 }
 \value{
 A list with:
@@ -36,16 +23,13 @@ A list with:
 \item{keep_idx_dist}{Integer indices of bins used in diffuse-mode Moran.}
 \item{isolate_idx_queen}{Integer indices of original queen-mode isolates.}
 \item{isolate_idx_dist}{Integer indices of original diffuse-mode isolates.}
-\item{low_cell_idx}{Integer indices of bins excluded for low cell counts.}
 \item{queen_nb_full}{Full (unsubset) neighbour list for nearby mode, indexed over all bins.}
 \item{dist_nb_full}{Full (unsubset) neighbour list for diffuse mode, indexed over all bins.}
 }
 }
 \description{
 Builds queen (nearby) and distance-decay (diffuse) spatial weight matrices
-from a bin-level \code{sf} object, excluding isolated bins and optionally
-excluding low-cell bins. A second-pass isolation check further removes bins
-that become isolated after the initial subset.
+from a bin-level \code{sf} object, excluding bins that have no neighbours.
 }
 \examples{
 \dontrun{
