@@ -4,7 +4,13 @@
 \alias{new_blisa}
 \title{Create a blisa object}
 \usage{
-new_blisa(LR_results, bins, spatial_weights, CCI_scores = NULL)
+new_blisa(
+  LR_results,
+  bins,
+  spatial_weights,
+  CCI_scores = NULL,
+  level = c("lr", "pathway")
+)
 }
 \arguments{
 \item{LR_results}{Data frame of BLISA results, one row per ligand-receptor
@@ -17,6 +23,10 @@ pair.}
 
 \item{CCI_scores}{Wide data frame of cell-cell interaction scores from
 \code{\link{runCCI}}, or \code{NULL} if CCI was not computed.}
+
+\item{level}{Character. The unit each row of \code{LR_results} represents:
+\code{"lr"} (ligand-receptor pairs, the default) or \code{"pathway"} (from
+\code{\link{blisaPathway}}). Controls labelling in \code{print} and plots.}
 }
 \value{
 An object of class \code{blisa}.

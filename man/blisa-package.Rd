@@ -5,6 +5,8 @@
 \alias{blisa-package}
 \title{blisa: Bivariate Local Indicator of Spatial Association for spatial transcriptomics}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Identifies cell-cell communication hotspots in spatial transcriptomics data using bivariate Local Moran's I statistics on hexagonally binned cells. Provides functions for spatial weighting, ligand-receptor pair filtering, hotspot detection, and visualisation of sender-receiver cell-type interactions.
 }
 \seealso{

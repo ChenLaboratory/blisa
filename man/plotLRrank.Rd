@@ -8,9 +8,17 @@
 \usage{
 plotLRrank(x, ...)
 
-\method{plotLRrank}{blisa}(x, top = 30, pt_size = 4, flip = FALSE, ...)
+\method{plotLRrank}{blisa}(x, top = 30, pt_size = 4, flip = FALSE, size_by = "auto", ...)
 
-\method{plotLRrank}{data.frame}(x, top = 30, pt_size = 4, flip = FALSE, ...)
+\method{plotLRrank}{data.frame}(
+  x,
+  top = 30,
+  pt_size = 4,
+  flip = FALSE,
+  item_label = "Ligand-Receptor Pair",
+  size_by = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{blisa} object or a data frame of LR results. The data frame
@@ -26,6 +34,18 @@ must contain columns \code{sig_numbers} and \code{annotation}.}
 \item{flip}{Logical. When \code{TRUE}, LR pairs are placed on the x-axis
 and the hotspot count on the y-axis (vertical orientation). Default
 \code{FALSE} (LR pairs on y-axis, horizontal orientation).}
+
+\item{size_by}{Character or \code{NULL}. Name of a numeric column to map to
+point size. When \code{NULL}, all points use the fixed \code{pt_size}.
+For \code{plotLRrank.blisa} the default is \code{"auto"}, which sizes
+pathway-level results (from \code{\link{blisaPathway}}) by
+\code{"n_LR_pairs"} and leaves LR-level results unsized; pass a column
+name, or \code{NULL} to disable, to override. Relabel the legend with
+\code{+ ggplot2::labs(size = ...)}.}
+
+\item{item_label}{Character. Axis label for the ranked items. Defaults to
+\code{"Ligand-Receptor Pair"}; \code{plotLRrank.blisa} sets it to
+\code{"Pathway"} for pathway-level objects.}
 }
 \value{
 A \code{ggplot} object.

@@ -17,6 +17,9 @@ plotHotspots(x, ...)
   background = NULL,
   log_pval = TRUE,
   p_cutoff = NULL,
+  spots = NULL,
+  spot_pval = NULL,
+  title = NULL,
   ...
 )
 }
@@ -62,6 +65,19 @@ bins are re-defined on the fly as those with \code{all_pval <= p_cutoff}
 and quadrant label \code{"High-High"} (from the stored
 \code{all_quadrant}), giving an exact re-threshold consistent with the
 original classification.}
+
+\item{spots}{Integer vector or \code{NULL}. Significant spot indices to plot
+directly, bypassing the LR-pair lookup -- e.g. a \code{sig_spot_index}
+entry from \code{\link{blisaPathway}}. When supplied, \code{index}/
+\code{ligand}/\code{receptor}/\code{p_cutoff} are ignored and every bin is
+drawn as grey background with these spots coloured. Default \code{NULL}.}
+
+\item{spot_pval}{Numeric vector. P-values for \code{spots} (same length and
+order); required when \code{spots} is supplied.}
+
+\item{title}{Character or \code{NULL}. Plot title. Defaults to the LR pair id
+(or "hotspots" in \code{spots} mode). Useful to label a pathway, e.g.
+\code{title = "MDK pathway"}.}
 }
 \value{
 A \code{ggplot} object.

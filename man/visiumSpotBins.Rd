@@ -9,7 +9,7 @@ visiumSpotBins(
   spot_pitch = NULL,
   in_tissue_only = TRUE,
   hexagons = TRUE,
-  min_total_counts = 0,
+  min_total_counts = 10,
   verbose = FALSE
 )
 }
@@ -32,7 +32,7 @@ polygons; if \code{FALSE}, use point geometry (faster, but
 \code{plotHotspots} then draws points).}
 
 \item{min_total_counts}{Numeric. Drop spots whose total counts fall below
-this threshold. Default \code{0} (keep all).}
+this threshold. Default \code{10}. Set to \code{0} to keep all spots.}
 
 \item{verbose}{Logical. Print progress messages. Default \code{FALSE}.}
 }
