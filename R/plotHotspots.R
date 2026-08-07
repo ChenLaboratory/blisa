@@ -78,31 +78,59 @@ plotHotspots <- function(x, ...) UseMethod("plotHotspots")
 #'   and quadrant label \code{"High-High"} (from the stored
 #'   \code{all_quadrant}), giving an exact re-threshold consistent with the
 #'   original classification.
+#' @param spots Integer vector or \code{NULL}. Significant spot indices to plot
+#'   directly, bypassing the LR-pair lookup -- e.g. a \code{sig_spot_index}
+#'   entry from \code{\link{blisaPathway}}. When supplied, \code{index}/
+#'   \code{ligand}/\code{receptor}/\code{p_cutoff} are ignored and every bin is
+#'   drawn as grey background with these spots coloured. Default \code{NULL}.
+#' @param spot_pval Numeric vector. P-values for \code{spots} (same length and
+#'   order); required when \code{spots} is supplied.
+#' @param title Character or \code{NULL}. Plot title. Defaults to the LR pair id
+#'   (or "hotspots" in \code{spots} mode). Useful to label a pathway, e.g.
+#'   \code{title = "MDK pathway"}.
 #'
 #' @export
 plotHotspots.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
                                as_points = FALSE, size = 1.5, background = NULL,
-                               log_pval = TRUE, p_cutoff = NULL, ...) {
+                               log_pval = TRUE, p_cutoff = NULL,
+                               spots = NULL, spot_pval = NULL, title = NULL, ...) {
   bins       <- x$bins
   LR_results <- x$LR_results
 
-  # Resolve which LR pair to plot
-  index <- .resolve_lr_index(LR_results, index, ligand, receptor)
-
-  interaction <- rownames(LR_results)[index]
-
-  # Resolve significant bin indices and their p-values
-  if (!is.null(p_cutoff)) {
-    all_pval      <- LR_results$all_pval[[index]]
-    all_quadrant  <- LR_results$all_quadrant[[index]]
-    if (is.null(all_pval) || is.null(all_quadrant))
-      stop("'all_pval' and 'all_quadrant' must be present in LR_results to ",
-           "use 'p_cutoff'. Ensure blisa() was run to completion.")
-    sig_indices <- which(all_pval <= p_cutoff & all_quadrant == "High-High")
-    p_values    <- all_pval[sig_indices]
+  if (!is.null(spots)) {
+    # Custom spot field, e.g. a blisaPathway() row: plot the supplied significant
+    # spots and their p-values directly, bypassing the LR-pair lookup. All bins
+    # are shown as the grey background; the supplied spots get the colour scale.
+    if (is.null(spot_pval))
+      stop("'spot_pval' must be supplied together with 'spots'.")
+    sig_indices <- spots
+    p_values    <- spot_pval
+    interaction <- if (is.null(title)) "hotspots" else title
+    tested      <- rep(TRUE, nrow(bins))
   } else {
-    sig_indices <- LR_results$sig_index[[index]]
-    p_values    <- LR_results$sig_pval[[index]]
+    # Resolve which LR pair to plot
+    index <- .resolve_lr_index(LR_results, index, ligand, receptor)
+    interaction <- if (is.null(title)) rownames(LR_results)[index] else title
+
+    # Resolve significant bin indices and their p-values
+    if (!is.null(p_cutoff)) {
+      all_pval      <- LR_results$all_pval[[index]]
+      all_quadrant  <- LR_results$all_quadrant[[index]]
+      if (is.null(all_pval) || is.null(all_quadrant))
+        stop("'all_pval' and 'all_quadrant' must be present in LR_results to ",
+             "use 'p_cutoff'. Ensure blisa() was run to completion.")
+      sig_indices <- which(all_pval <= p_cutoff & all_quadrant == "High-High")
+      p_values    <- all_pval[sig_indices]
+    } else {
+      sig_indices <- LR_results$sig_index[[index]]
+      p_values    <- LR_results$sig_pval[[index]]
+    }
+    # Bins not included in this LR pair's LISA test (empty, isolated, low-cell,
+    # or low total counts) are treated as empty; only tested bins can be
+    # "non-significant". Pathway-level objects (from blisaPathway) have no
+    # all_quadrant column, so all bins are shown as background there.
+    tested <- if (is.null(LR_results$all_quadrant))
+      rep(TRUE, nrow(bins)) else !is.na(LR_results$all_quadrant[[index]])
   }
 
   sig_num <- length(sig_indices)
@@ -115,10 +143,7 @@ plotHotspots.blisa <- function(x, index = 1, ligand = NULL, receptor = NULL,
     lgd_title <- "1-pval"
   }
 
-  # Pre-compute a fill colour for every bin. Bins not included in this LR
-  # pair's LISA test (empty, isolated, low-cell, or low total counts) are
-  # treated the same as empty bins; only tested bins can be "non-significant".
-  tested    <- !is.na(LR_results$all_quadrant[[index]])
+  # Pre-compute a fill colour for every bin.
   fill_cols <- rep("#FFFFFF", nrow(bins))    # empty / excluded from testing (white)
   fill_cols[tested] <- "#D3D3D3"             # tested but non-significant (light grey)
 

@@ -35,16 +35,38 @@ plotLRrank <- function(x, ...) UseMethod("plotLRrank")
 #'   \code{FALSE} (LR pairs on y-axis, horizontal orientation).
 #'
 #' @export
-plotLRrank.blisa <- function(x, top = 30, pt_size = 4, flip = FALSE, ...) {
-  plotLRrank.data.frame(x$LR_results, top = top, pt_size = pt_size, flip = flip)
+plotLRrank.blisa <- function(x, top = 30, pt_size = 4, flip = FALSE,
+                             size_by = "auto", ...) {
+  is_pathway <- identical(x$level, "pathway")
+  item_label <- if (is_pathway) "Pathway" else "Ligand-Receptor Pair"
+  # For pathway results, size points by the number of LR pairs per pathway by
+  # default; for LR-level results, no size mapping. Pass size_by explicitly
+  # (a column name, or NULL to disable) to override.
+  if (identical(size_by, "auto"))
+    size_by <- if (is_pathway) "n_LR_pairs" else NULL
+  plotLRrank.data.frame(x$LR_results, top = top, pt_size = pt_size, flip = flip,
+                        item_label = item_label, size_by = size_by, ...)
 }
 
 
 #' @describeIn plotLRrank Method for a data frame of LR results (e.g. the
 #'   \code{LR_results} slot of a \code{blisa} object).
 #'
+#' @param item_label Character. Axis label for the ranked items. Defaults to
+#'   \code{"Ligand-Receptor Pair"}; \code{plotLRrank.blisa} sets it to
+#'   \code{"Pathway"} for pathway-level objects.
+#' @param size_by Character or \code{NULL}. Name of a numeric column to map to
+#'   point size. When \code{NULL}, all points use the fixed \code{pt_size}.
+#'   For \code{plotLRrank.blisa} the default is \code{"auto"}, which sizes
+#'   pathway-level results (from \code{\link{blisaPathway}}) by
+#'   \code{"n_LR_pairs"} and leaves LR-level results unsized; pass a column
+#'   name, or \code{NULL} to disable, to override. Relabel the legend with
+#'   \code{+ ggplot2::labs(size = ...)}.
+#'
 #' @export
-plotLRrank.data.frame <- function(x, top = 30, pt_size = 4, flip = FALSE, ...) {
+plotLRrank.data.frame <- function(x, top = 30, pt_size = 4, flip = FALSE,
+                                  item_label = "Ligand-Receptor Pair",
+                                  size_by = NULL, ...) {
   LR_results <- x
 
   if (!is.null(top)) {
@@ -52,7 +74,7 @@ plotLRrank.data.frame <- function(x, top = 30, pt_size = 4, flip = FALSE, ...) {
   }
 
   n_shown <- nrow(LR_results)
-  title   <- paste0("Top ", n_shown, " LR pairs by hotspot count")
+  title   <- paste0("Top ", n_shown, " by hotspot count")
 
   LR_results$LR_pair <- rownames(LR_results)
   LR_results <- LR_results[order(-LR_results$sig_numbers), ]
@@ -61,32 +83,61 @@ plotLRrank.data.frame <- function(x, top = 30, pt_size = 4, flip = FALSE, ...) {
   LR_results$LR_pair <- factor(LR_results$LR_pair,
                             levels = if (flip) LR_results$LR_pair else rev(LR_results$LR_pair))
 
-  # Preset colors for the four standard CellChat categories; any additional
-  # annotation values found in the data are assigned colors from the package
-  # palette, and NA values fall back to grey.
-  known_colors <- c(
-    "Secreted Signaling"    = "#90a955",
-    "ECM-Receptor"          = "#219ebc",
-    "Cell-Cell Contact"     = "#f7b801",
-    "Non-protein Signaling" = "#9f86c0"
-  )
-  extra_levels <- setdiff(
-    unique(na.omit(LR_results$annotation)),
-    names(known_colors)
-  )
-  extra_colors <- setNames(cols[seq_along(extra_levels)], extra_levels)
-  color_scale  <- scale_color_manual(
-    values   = c(known_colors, extra_colors),
-    na.value = "grey50"
-  )
+  # Colour the points by CellChat annotation category when that column is
+  # present. Pathway-level tables (from blisaPathway) have no 'annotation'
+  # column, so the colour mapping (and legend) are dropped and points are black.
+  has_annotation <- "annotation" %in% colnames(LR_results)
+  has_size       <- !is.null(size_by) && size_by %in% colnames(LR_results)
+
+  if (has_annotation) {
+    # Preset colors for the four standard CellChat categories; any additional
+    # annotation values found in the data are assigned colors from the package
+    # palette, and NA values fall back to grey.
+    known_colors <- c(
+      "Secreted Signaling"    = "#90a955",
+      "ECM-Receptor"          = "#219ebc",
+      "Cell-Cell Contact"     = "#f7b801",
+      "Non-protein Signaling" = "#9f86c0"
+    )
+    extra_levels <- setdiff(
+      unique(na.omit(LR_results$annotation)),
+      names(known_colors)
+    )
+    extra_colors <- setNames(cols[seq_along(extra_levels)], extra_levels)
+    color_scale  <- scale_color_manual(
+      values   = c(known_colors, extra_colors),
+      na.value = "grey50"
+    )
+    color_lab <- "Annotation"
+  } else {
+    color_scale <- NULL
+    color_lab   <- NULL
+  }
+
+  # Optionally scale point size by a numeric column (e.g. the number of LR pairs
+  # per pathway). When absent, a fixed 'pt_size' is used for all points.
+  if (has_size) {
+    LR_results$rank_size_val <- LR_results[[size_by]]
+    size_scale <- scale_size_continuous(name = size_by)
+  } else {
+    size_scale <- NULL
+  }
+
+  # Build the point aesthetic mapping from the active encodings.
+  map <- aes()
+  if (has_annotation) map <- modifyList(map, aes(colour = annotation))
+  if (has_size)       map <- modifyList(map, aes(size   = rank_size_val))
+  point_layer <- if (has_size) geom_point(mapping = map) else
+    geom_point(mapping = map, size = pt_size)
 
   if (flip) {
-    p <- ggplot(LR_results, aes(x = LR_pair, y = sig_numbers, color = annotation)) +
-      geom_point(size = pt_size) +
+    p <- ggplot(LR_results, aes(x = LR_pair, y = sig_numbers)) +
+      point_layer +
       color_scale +
+      size_scale +
       scale_y_continuous(expand = expansion(add = 100)) +
-      labs(x = "Ligand\u2013Receptor Pair", y = "Sig Spot Numbers",
-           color = "Annotation", title = title) +
+      labs(x = item_label, y = "Sig Spot Numbers",
+           color = color_lab, title = title) +
       theme_minimal() +
       theme(
         legend.position = "right",
@@ -98,12 +149,13 @@ plotLRrank.data.frame <- function(x, top = 30, pt_size = 4, flip = FALSE, ...) {
       ) +
       coord_cartesian(clip = "off")
   } else {
-    p <- ggplot(LR_results, aes(x = sig_numbers, y = LR_pair, color = annotation)) +
-      geom_point(size = pt_size) +
+    p <- ggplot(LR_results, aes(x = sig_numbers, y = LR_pair)) +
+      point_layer +
       color_scale +
+      size_scale +
       scale_x_continuous(expand = expansion(add = 100)) +
-      labs(x = "Sig Spot Numbers", y = "Ligand\u2013Receptor Pair",
-           color = "Annotation", title = title) +
+      labs(x = "Sig Spot Numbers", y = item_label,
+           color = color_lab, title = title) +
       theme_minimal() +
       theme(
         legend.position = "right",

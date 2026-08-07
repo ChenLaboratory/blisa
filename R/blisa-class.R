@@ -10,16 +10,22 @@
 #'   \code{\link{computeSpatialWeights}}.
 #' @param CCI_scores Wide data frame of cell-cell interaction scores from
 #'   \code{\link{runCCI}}, or \code{NULL} if CCI was not computed.
+#' @param level Character. The unit each row of \code{LR_results} represents:
+#'   \code{"lr"} (ligand-receptor pairs, the default) or \code{"pathway"} (from
+#'   \code{\link{blisaPathway}}). Controls labelling in \code{print} and plots.
 #'
 #' @return An object of class \code{blisa}.
 #' @keywords internal
-new_blisa <- function(LR_results, bins, spatial_weights, CCI_scores = NULL) {
+new_blisa <- function(LR_results, bins, spatial_weights, CCI_scores = NULL,
+                      level = c("lr", "pathway")) {
+  level <- match.arg(level)
   structure(
     list(
       LR_results      = LR_results,
       bins            = bins,
       spatial_weights = spatial_weights,
-      CCI_scores      = CCI_scores
+      CCI_scores      = CCI_scores,
+      level           = level
     ),
     class = "blisa"
   )
@@ -28,10 +34,13 @@ new_blisa <- function(LR_results, bins, spatial_weights, CCI_scores = NULL) {
 
 #' @export
 print.blisa <- function(x, ...) {
+  level <- if (is.null(x$level)) "lr" else x$level
   cat("A blisa object\n")
-  cat(" LR pairs tested  :", nrow(x$LR_results), "\n")
-  cat(" Significant pairs:", sum(x$LR_results$sig_numbers > 0), "\n")
-  cat(" Bins             :", nrow(x$bins), "\n")
+  cat(" Level            :", level, "\n")
+  cat(if (level == "pathway") " Pathways tested  :" else " LR pairs tested  :",
+      nrow(x$LR_results), "\n")
+  cat(" Significant      :", sum(x$LR_results$sig_numbers > 0), "\n")
+  cat(" Bins             :", if (is.null(x$bins)) 0L else nrow(x$bins), "\n")
   cat(" CCI computed     :", !is.null(x$CCI_scores), "\n")
   invisible(x)
 }

@@ -6,7 +6,7 @@ if (getRversion() >= "2.15.1") {
     # ggplot2 aes (plotHotspots)
     "fill_col", "val", "x", "y",
     # ggplot2 aes (plotLRrank)
-    "LR_pair", "sig_numbers", "annotation"
+    "LR_pair", "sig_numbers", "annotation", "rank_size_val"
   ))
 }
 
