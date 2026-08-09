@@ -1,20 +1,13 @@
 # Compute Spatial Weights for BLISA
 
 Builds queen (nearby) and distance-decay (diffuse) spatial weight
-matrices from a bin-level `sf` object, excluding isolated bins and
-optionally excluding low-cell bins. A second-pass isolation check
-further removes bins that become isolated after the initial subset.
+matrices from a bin-level `sf` object, excluding bins that have no
+neighbours.
 
 ## Usage
 
 ``` r
-computeSpatialWeights(
-  bins,
-  bin_size = 50,
-  dmax = 250,
-  min_cells = 1,
-  n_cells_col = NA
-)
+computeSpatialWeights(bins, bin_size = 50, dmax = 250)
 ```
 
 ## Arguments
@@ -31,16 +24,6 @@ computeSpatialWeights(
 - dmax:
 
   Numeric. Maximum distance for diffuse-mode neighbours.
-
-- min_cells:
-
-  Integer. Minimum cell count for a bin to be included. Ignored when
-  `n_cells_col = NA`.
-
-- n_cells_col:
-
-  Character or `NA`. Column name in `bins` holding per-bin cell counts.
-  Set to `NA` to skip cell-count filtering (default).
 
 ## Value
 
@@ -69,10 +52,6 @@ A list with:
 - isolate_idx_dist:
 
   Integer indices of original diffuse-mode isolates.
-
-- low_cell_idx:
-
-  Integer indices of bins excluded for low cell counts.
 
 - queen_nb_full:
 

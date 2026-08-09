@@ -13,6 +13,8 @@ Binning, spatial weights, and ligand-receptor pair filtering.
 
 - [`hexBinCells()`](https://chenlaboratory.github.io/blisa/reference/hexBinCells.md)
   : Bin cells into hexagonal spatial bins
+- [`visiumSpotBins()`](https://chenlaboratory.github.io/blisa/reference/visiumSpotBins.md)
+  : Build spot-level hexagonal bins from a Visium SpatialExperiment
 - [`computeSpatialWeights()`](https://chenlaboratory.github.io/blisa/reference/computeSpatialWeights.md)
   : Compute Spatial Weights for BLISA
 - [`filterLRpairs()`](https://chenlaboratory.github.io/blisa/reference/filterLRpairs.md)
@@ -22,6 +24,13 @@ Binning, spatial weights, and ligand-receptor pair filtering.
 
 - [`runCCI()`](https://chenlaboratory.github.io/blisa/reference/runCCI.md)
   : Score cell-cell interactions from BLISA hotspots
+
+## Pathway-level analysis
+
+Aggregate BLISA hotspots to the pathway level.
+
+- [`blisaPathway()`](https://chenlaboratory.github.io/blisa/reference/blisaPathway.md)
+  : Aggregate BLISA hotspots to the pathway level
 
 ## Visualisation
 

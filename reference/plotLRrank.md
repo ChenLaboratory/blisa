@@ -13,10 +13,18 @@ Generic function for ranking LR pairs. Dispatches on the class of `x`:
 plotLRrank(x, ...)
 
 # S3 method for class 'blisa'
-plotLRrank(x, top = 30, pt_size = 4, flip = FALSE, ...)
+plotLRrank(x, top = 30, pt_size = 4, flip = FALSE, size_by = "auto", ...)
 
 # S3 method for class 'data.frame'
-plotLRrank(x, top = 30, pt_size = 4, flip = FALSE, ...)
+plotLRrank(
+  x,
+  top = 30,
+  pt_size = 4,
+  flip = FALSE,
+  item_label = "Ligand-Receptor Pair",
+  size_by = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -44,6 +52,23 @@ plotLRrank(x, top = 30, pt_size = 4, flip = FALSE, ...)
   Logical. When `TRUE`, LR pairs are placed on the x-axis and the
   hotspot count on the y-axis (vertical orientation). Default `FALSE`
   (LR pairs on y-axis, horizontal orientation).
+
+- size_by:
+
+  Character or `NULL`. Name of a numeric column to map to point size.
+  When `NULL`, all points use the fixed `pt_size`. For
+  `plotLRrank.blisa` the default is `"auto"`, which sizes pathway-level
+  results (from
+  [`blisaPathway`](https://chenlaboratory.github.io/blisa/reference/blisaPathway.md))
+  by `"n_LR_pairs"` and leaves LR-level results unsized; pass a column
+  name, or `NULL` to disable, to override. Relabel the legend with
+  `+ ggplot2::labs(size = ...)`.
+
+- item_label:
+
+  Character. Axis label for the ranked items. Defaults to
+  `"Ligand-Receptor Pair"`; `plotLRrank.blisa` sets it to `"Pathway"`
+  for pathway-level objects.
 
 ## Value
 

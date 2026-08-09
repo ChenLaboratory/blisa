@@ -50,6 +50,7 @@ blisa(
   genes = NULL,
   min_cells = 1,
   min_total_counts = 10,
+  platform = c("auto", "xenium", "visium"),
   verbose = FALSE,
   ...
 )
@@ -84,7 +85,8 @@ blisa(
   [`hexBinCells`](https://chenlaboratory.github.io/blisa/reference/hexBinCells.md)
   and
   [`computeSpatialWeights`](https://chenlaboratory.github.io/blisa/reference/computeSpatialWeights.md).
-  Default `50`.
+  Default `50`; for the Visium path it defaults to `100` (spot
+  center-to-center spacing) when left unset.
 
 - dmax:
 
@@ -109,9 +111,13 @@ blisa(
 
 - min_cells:
 
-  Integer. Bins with fewer cells are dropped during binning by
+  Integer. Minimum number of cells per bin. For a `SpatialExperiment`,
+  bins below this threshold are dropped during binning by
   [`hexBinCells`](https://chenlaboratory.github.io/blisa/reference/hexBinCells.md).
-  Default `1`.
+  For pre-binned input supplied directly to `blisa.default`, they are
+  dropped from `bins`, `x` and `counts_by_group` before the spatial
+  weights are built; this requires `n_cells_col` and is ignored when
+  `n_cells_col = NA`. Default `1`.
 
 - n_cells_col:
 
@@ -191,6 +197,13 @@ blisa(
   [`hexBinCells`](https://chenlaboratory.github.io/blisa/reference/hexBinCells.md).
   Set to `0` to disable. Default `10`.
 
+- platform:
+
+  Character. `"auto"` (default) inspects `colData(x)`: if
+  `array_col`/`array_row` are present the object is treated as
+  `"visium"`, otherwise `"xenium"`. Set explicitly to override the
+  detection.
+
 ## Value
 
 A list; see individual method documentation for details.
@@ -226,9 +239,13 @@ An object of class `blisa` with four components:
 - `blisa(default)`: Method for a gene-by-bin count matrix.
 
 - `blisa(SpatialExperiment)`: Method for a cell-level SpatialExperiment
-  object. Bins cells into hexagonal tiles via
-  [`hexBinCells`](https://chenlaboratory.github.io/blisa/reference/hexBinCells.md)
-  then delegates to `blisa.default`.
+  object. For cell-level platforms (e.g. Xenium) it bins cells into
+  hexagonal tiles via
+  [`hexBinCells`](https://chenlaboratory.github.io/blisa/reference/hexBinCells.md);
+  for Visium it treats each spot as a bin via
+  [`visiumSpotBins`](https://chenlaboratory.github.io/blisa/reference/visiumSpotBins.md).
+  Either way it then delegates to `blisa.default`. The path is chosen by
+  `platform`.
 
 ## Examples
 

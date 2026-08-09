@@ -6,7 +6,13 @@ Constructor for the `blisa` S3 class, which stores the full output of
 ## Usage
 
 ``` r
-new_blisa(LR_results, bins, spatial_weights, CCI_scores = NULL)
+new_blisa(
+  LR_results,
+  bins,
+  spatial_weights,
+  CCI_scores = NULL,
+  level = c("lr", "pathway")
+)
 ```
 
 ## Arguments
@@ -29,6 +35,13 @@ new_blisa(LR_results, bins, spatial_weights, CCI_scores = NULL)
   Wide data frame of cell-cell interaction scores from
   [`runCCI`](https://chenlaboratory.github.io/blisa/reference/runCCI.md),
   or `NULL` if CCI was not computed.
+
+- level:
+
+  Character. The unit each row of `LR_results` represents: `"lr"`
+  (ligand-receptor pairs, the default) or `"pathway"` (from
+  [`blisaPathway`](https://chenlaboratory.github.io/blisa/reference/blisaPathway.md)).
+  Controls labelling in `print` and plots.
 
 ## Value
 

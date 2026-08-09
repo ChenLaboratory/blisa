@@ -15,7 +15,7 @@ blisa.SpatialExperiment accepts a cell-level
 SpatialExperiment object and bins cells into hexagonal tiles
 internally via hexBinCells before running the analysis.
 
-"></head><body>
+"><meta property="og:image" content="https://chenlaboratory.github.io/blisa/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -23,7 +23,7 @@ internally via hexBinCells before running the analysis.
 
     <a class="navbar-brand me-2" href="../index.html">blisa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,8 +47,7 @@ internally via hexBinCells before running the analysis.
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Run BLISA spatial cell-cell communication analysis</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Run BLISA spatial cell-cell communication analysis</h1>
       <small class="dont-index">Source: <a href="https://github.com/ChenLaboratory/blisa/blob/main/R/blisa.R" class="external-link"><code>R/blisa.R</code></a></small>
       <div class="d-none name"><code>blisa.Rd</code></div>
     </div>
@@ -100,6 +99,7 @@ internally via <code><a href="hexBinCells.html">hexBinCells</a></code> before ru
 <span>  genes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_cells <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  min_total_counts <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  platform <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"xenium"</span>, <span class="st">"visium"</span><span class="op">)</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -133,7 +133,9 @@ CellChatDB for the chosen <code>species</code> is downloaded automatically.</p><
 <dt id="arg-bin-size">bin_size<a class="anchor" aria-label="anchor" href="#arg-bin-size"></a></dt>
 <dd><p>Numeric. Width of each hexagonal bin in coordinate units
 (e.g. microns). Passed to <code><a href="hexBinCells.html">hexBinCells</a></code> and
-<code><a href="computeSpatialWeights.html">computeSpatialWeights</a></code>. Default <code>50</code>.</p></dd>
+<code><a href="computeSpatialWeights.html">computeSpatialWeights</a></code>. Default <code>50</code>; for the Visium
+path it defaults to <code>100</code> (spot center-to-center spacing) when left
+unset.</p></dd>
 
 
 <dt id="arg-dmax">dmax<a class="anchor" aria-label="anchor" href="#arg-dmax"></a></dt>
@@ -161,8 +163,13 @@ Default <code>10</code>.</p></dd>
 
 
 <dt id="arg-min-cells">min_cells<a class="anchor" aria-label="anchor" href="#arg-min-cells"></a></dt>
-<dd><p>Integer. Bins with fewer cells are dropped during binning
-by <code><a href="hexBinCells.html">hexBinCells</a></code>. Default <code>1</code>.</p></dd>
+<dd><p>Integer. Minimum number of cells per bin. For a
+<code>SpatialExperiment</code>, bins below this threshold are dropped during
+binning by <code><a href="hexBinCells.html">hexBinCells</a></code>. For pre-binned input supplied
+directly to <code>blisa.default</code>, they are dropped from <code>bins</code>,
+<code>x</code> and <code>counts_by_group</code> before the spatial weights are built;
+this requires <code>n_cells_col</code> and is ignored when
+<code>n_cells_col = NA</code>. Default <code>1</code>.</p></dd>
 
 
 <dt id="arg-n-cells-col">n_cells_col<a class="anchor" aria-label="anchor" href="#arg-n-cells-col"></a></dt>
@@ -238,6 +245,13 @@ Default <code>"cell_type"</code>.</p></dd>
 genes) fall below this threshold are dropped during binning by
 <code><a href="hexBinCells.html">hexBinCells</a></code>. Set to <code>0</code> to disable. Default <code>10</code>.</p></dd>
 
+
+<dt id="arg-platform">platform<a class="anchor" aria-label="anchor" href="#arg-platform"></a></dt>
+<dd><p>Character. <code>"auto"</code> (default) inspects
+<code>colData(x)</code>: if <code>array_col</code>/<code>array_row</code> are present the
+object is treated as <code>"visium"</code>, otherwise <code>"xenium"</code>.
+Set explicitly to override the detection.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -269,8 +283,10 @@ columns are LR pairs.</p></dd>
 
 <ul><li><p><code>blisa(default)</code>: Method for a gene-by-bin count matrix.</p></li>
 <li><p><code>blisa(SpatialExperiment)</code>: Method for a cell-level SpatialExperiment object.
-Bins cells into hexagonal tiles via <code><a href="hexBinCells.html">hexBinCells</a></code> then
-delegates to <code>blisa.default</code>.</p></li>
+For cell-level platforms (e.g. Xenium) it bins cells into hexagonal tiles
+via <code><a href="hexBinCells.html">hexBinCells</a></code>; for Visium it treats each spot as a bin via
+<code><a href="visiumSpotBins.html">visiumSpotBins</a></code>. Either way it then delegates to
+<code>blisa.default</code>. The path is chosen by <code>platform</code>.</p></li>
 </ul></div>
 
     <div class="section level2">

@@ -3,7 +3,7 @@
 non-significant, or significant hotspot (continuous gradient of
 -log10 p-value or 1 - p-value)."><meta property="og:description" content="Generic function. Plots each bin coloured by significance status: empty,
 non-significant, or significant hotspot (continuous gradient of
--log10 p-value or 1 - p-value)."></head><body>
+-log10 p-value or 1 - p-value)."><meta property="og:image" content="https://chenlaboratory.github.io/blisa/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -11,7 +11,7 @@ non-significant, or significant hotspot (continuous gradient of
 
     <a class="navbar-brand me-2" href="../index.html">blisa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,8 +35,7 @@ non-significant, or significant hotspot (continuous gradient of
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Spatial hotspot map for one ligand-receptor pair</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Spatial hotspot map for one ligand-receptor pair</h1>
       <small class="dont-index">Source: <a href="https://github.com/ChenLaboratory/blisa/blob/main/R/plotHotspots.R" class="external-link"><code>R/plotHotspots.R</code></a></small>
       <div class="d-none name"><code>plotHotspots.Rd</code></div>
     </div>
@@ -57,8 +56,14 @@ non-significant, or significant hotspot (continuous gradient of
 <span>  index <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  ligand <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  receptor <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  as_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">1.5</span>,</span>
+<span>  background <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_pval <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  p_cutoff <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  spots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  spot_pval <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -93,6 +98,26 @@ and <code>index</code> is ignored. Must be supplied together with
 with <code>ligand</code>.</p></dd>
 
 
+<dt id="arg-as-points">as_points<a class="anchor" aria-label="anchor" href="#arg-as-points"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, draw each bin as a dot at its
+centroid instead of its polygon. Useful for Visium, where each bin is a
+single spot. Default <code>FALSE</code> (draw polygons).</p></dd>
+
+
+<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
+<dd><p>Numeric. Point size when <code>as_points = TRUE</code> (or when
+<code>background</code> is supplied). Default <code>1.5</code>.</p></dd>
+
+
+<dt id="arg-background">background<a class="anchor" aria-label="anchor" href="#arg-background"></a></dt>
+<dd><p>A <code>ggplot</code> object to draw the hotspots on top of, e.g.
+<code>scider::plotImage(spe)</code> to place the H&amp;E image behind the spots.
+When supplied, the hotspots are always rendered as dots (the raster
+background is incompatible with <code>geom_sf</code> coordinates), and the bins
+must share the background plot's coordinate frame (true for objects read by
+<code>scider::readVisium()</code>). Default <code>NULL</code>.</p></dd>
+
+
 <dt id="arg-log-pval">log_pval<a class="anchor" aria-label="anchor" href="#arg-log-pval"></a></dt>
 <dd><p>Logical. If <code>TRUE</code> (default), colour significant bins
 by -log10(p-value). If <code>FALSE</code>, use 1 - p-value.</p></dd>
@@ -107,6 +132,25 @@ bins are re-defined on the fly as those with <code>all_pval &lt;= p_cutoff</code
 and quadrant label <code>"High-High"</code> (from the stored
 <code>all_quadrant</code>), giving an exact re-threshold consistent with the
 original classification.</p></dd>
+
+
+<dt id="arg-spots">spots<a class="anchor" aria-label="anchor" href="#arg-spots"></a></dt>
+<dd><p>Integer vector or <code>NULL</code>. Significant spot indices to plot
+directly, bypassing the LR-pair lookup – e.g. a <code>sig_spot_index</code>
+entry from <code><a href="blisaPathway.html">blisaPathway</a></code>. When supplied, <code>index</code>/
+<code>ligand</code>/<code>receptor</code>/<code>p_cutoff</code> are ignored and every bin is
+drawn as grey background with these spots coloured. Default <code>NULL</code>.</p></dd>
+
+
+<dt id="arg-spot-pval">spot_pval<a class="anchor" aria-label="anchor" href="#arg-spot-pval"></a></dt>
+<dd><p>Numeric vector. P-values for <code>spots</code> (same length and
+order); required when <code>spots</code> is supplied.</p></dd>
+
+
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
+<dd><p>Character or <code>NULL</code>. Plot title. Defaults to the LR pair id
+(or "hotspots" in <code>spots</code> mode). Useful to label a pathway, e.g.
+<code>title = "MDK pathway"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

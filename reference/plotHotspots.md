@@ -15,8 +15,14 @@ plotHotspots(
   index = 1,
   ligand = NULL,
   receptor = NULL,
+  as_points = FALSE,
+  size = 1.5,
+  background = NULL,
   log_pval = TRUE,
   p_cutoff = NULL,
+  spots = NULL,
+  spot_pval = NULL,
+  title = NULL,
   ...
 )
 ```
@@ -48,6 +54,26 @@ plotHotspots(
   Character. Receptor gene symbol. Must be supplied together with
   `ligand`.
 
+- as_points:
+
+  Logical. If `TRUE`, draw each bin as a dot at its centroid instead of
+  its polygon. Useful for Visium, where each bin is a single spot.
+  Default `FALSE` (draw polygons).
+
+- size:
+
+  Numeric. Point size when `as_points = TRUE` (or when `background` is
+  supplied). Default `1.5`.
+
+- background:
+
+  A `ggplot` object to draw the hotspots on top of, e.g.
+  `scider::plotImage(spe)` to place the H&E image behind the spots. When
+  supplied, the hotspots are always rendered as dots (the raster
+  background is incompatible with `geom_sf` coordinates), and the bins
+  must share the background plot's coordinate frame (true for objects
+  read by `scider::readVisium()`). Default `NULL`.
+
 - log_pval:
 
   Logical. If `TRUE` (default), colour significant bins by
@@ -63,6 +89,26 @@ plotHotspots(
   those with `all_pval <= p_cutoff` and quadrant label `"High-High"`
   (from the stored `all_quadrant`), giving an exact re-threshold
   consistent with the original classification.
+
+- spots:
+
+  Integer vector or `NULL`. Significant spot indices to plot directly,
+  bypassing the LR-pair lookup – e.g. a `sig_spot_index` entry from
+  [`blisaPathway`](https://chenlaboratory.github.io/blisa/reference/blisaPathway.md).
+  When supplied, `index`/ `ligand`/`receptor`/`p_cutoff` are ignored and
+  every bin is drawn as grey background with these spots coloured.
+  Default `NULL`.
+
+- spot_pval:
+
+  Numeric vector. P-values for `spots` (same length and order); required
+  when `spots` is supplied.
+
+- title:
+
+  Character or `NULL`. Plot title. Defaults to the LR pair id (or
+  "hotspots" in `spots` mode). Useful to label a pathway, e.g.
+  `title = "MDK pathway"`.
 
 ## Value
 

@@ -7,6 +7,7 @@
 <url><loc>https://chenlaboratory.github.io/blisa/news/index.html</loc></url>
 <url><loc>https://chenlaboratory.github.io/blisa/reference/blisa-package.html</loc></url>
 <url><loc>https://chenlaboratory.github.io/blisa/reference/blisa.html</loc></url>
+<url><loc>https://chenlaboratory.github.io/blisa/reference/blisaPathway.html</loc></url>
 <url><loc>https://chenlaboratory.github.io/blisa/reference/computeSpatialWeights.html</loc></url>
 <url><loc>https://chenlaboratory.github.io/blisa/reference/filterLRpairs.html</loc></url>
 <url><loc>https://chenlaboratory.github.io/blisa/reference/hexBinCells.html</loc></url>
@@ -20,5 +21,6 @@
 <url><loc>https://chenlaboratory.github.io/blisa/reference/plotHotspots.html</loc></url>
 <url><loc>https://chenlaboratory.github.io/blisa/reference/plotLRrank.html</loc></url>
 <url><loc>https://chenlaboratory.github.io/blisa/reference/runCCI.html</loc></url>
+<url><loc>https://chenlaboratory.github.io/blisa/reference/visiumSpotBins.html</loc></url>
 </urlset>
 
