@@ -12,11 +12,16 @@ reference:
   desc: Binning, spatial weights, and ligand-receptor pair filtering.
   contents:
   - hexBinCells
+  - visiumSpotBins
   - computeSpatialWeights
   - filterLRpairs
 - title: Cell-cell interaction scoring
   contents:
   - runCCI
+- title: Pathway-level analysis
+  desc: Aggregate BLISA hotspots to the pathway level.
+  contents:
+  - blisaPathway
 - title: Visualisation
   desc: Spatial maps and heatmaps of hotspots and interactions.
   contents:
