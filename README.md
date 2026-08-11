@@ -25,9 +25,9 @@ Step-by-step case studies showing blisa in action. Browse the full list under
 the [**Vignettes**](https://chenlaboratory.github.io/blisa/articles/index.html)
 tab, or start here:
 
-- [Exploring cell-cell interaction with blisa](https://chenlaboratory.github.io/blisa/articles/xenium.html) —
+- [Exploring cell-cell interaction with blisa](https://chenlaboratory.github.io/blisa/articles/xenium.html) -
   the core workflow on an imaging-based (Xenium) breast cancer dataset: hex
   binning, LR hotspot detection, and sender-receiver interaction scoring.
-- [Visium profile of human breast tumour](https://chenlaboratory.github.io/blisa/articles/visium.html) —
+- [Visium profile of human breast tumour](https://chenlaboratory.github.io/blisa/articles/visium.html) -
   applying blisa to spot-based (Visium) data, including pathway-level
   aggregation with `blisaPathway()` and hotspots over the H&E image.

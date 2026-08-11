@@ -47,6 +47,3 @@ reference:
   contents:
   - is.blisa
   - blisa-package
-- title: Other
-  contents:
-  - everything()
