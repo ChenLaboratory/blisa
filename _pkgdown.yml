@@ -3,6 +3,18 @@ url: https://chenlaboratory.github.io/blisa/
 template:
   bootstrap: 5
 
+navbar:
+  components:
+    articles:
+      text: Vignettes
+      href: articles/index.html
+
+articles:
+- title: Case studies
+  navbar: ~
+  contents:
+  - matches(".")
+
 reference:
 - title: Main analysis
   desc: Run the BLISA cell-cell communication workflow.

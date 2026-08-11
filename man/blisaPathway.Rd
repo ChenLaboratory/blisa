@@ -57,20 +57,14 @@ driving each spot.
 \details{
 The per-spot pathway p-value is computed by one of three \code{method}s:
 \describe{
-\item{\code{"minP"}}{Faithful port of the original \code{run_BLISA_pathway()}:
-the union of each LR pair's significant hotspot spots, with the minimum
-(best) p-value per spot (a Tippett/min-P summary). Uses the pre-thresholded
-\code{sig_index}/\code{sig_pval} from \code{blisa()}, so \code{p_cutoff} and
-\code{p_adjust} are ignored. Note this favours pathways with more LR pairs
-(more chances to flag a spot) and applies no multiplicity correction.}
+\item{\code{"minP"}}
+{The union of each LR pair's significant hotspot spots, with the minimum
+p-value per spot. \code{p_cutoff} and \code{p_adjust} are ignored.}
 \item{\code{"simes"}}{Per-spot Simes combination across \emph{all} LR pairs
 in the pathway, using the full per-spot p-values (\code{all_pval})
-restricted to the High-High co-expression direction (\code{all_quadrant});
-non-High-High/untested contributions are set to 1. Valid under positive
-dependence, so generally the safest choice for correlated LR pairs.}
-\item{\code{"fisher"}}{As \code{"simes"} but Fisher's method. More powerful
-but assumes independent p-values, so it is anti-conservative when LR pairs
-in a pathway are correlated (which they typically are).}
+restricted to the High-High co-expression direction.
+Non-High-High/untested contributions are set to 1.}
+\item{\code{"fisher"}}{As \code{"simes"} but Fisher's method.}
 }
 For \code{"simes"}/\code{"fisher"}, a spot is a pathway hotspot when its
 combined p-value is \eqn{\le} \code{p_cutoff} (after optional \code{p_adjust}).

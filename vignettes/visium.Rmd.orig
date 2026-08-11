@@ -1,0 +1,135 @@
+---
+title: "Visium profile of human breast tumour"
+output:
+  rmarkdown::html_vignette:
+    self_contained: true
+    pandoc_args: ["--embed-resources", "--standalone"]
+vignette: >
+  %\VignetteIndexEntry{Visium profile of human breast tumour}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  fig.width  = 6,
+  fig.height = 4,
+  out.width = "100%",
+  eval = TRUE,
+  dev = "png",
+  dpi = 150,
+  fig.cap = "",
+  cache = TRUE,
+  autodep = TRUE
+)
+```
+
+## Introduction
+
+This vignette walks through a typical workflow on a Visium breast cancer dataset.
+
+## Load Package
+
+```{r load-package, message=FALSE, warning=FALSE}
+library(blisa)
+library(SpatialExperiment)
+library(ggplot2)
+```
+
+## Load Example Data
+
+The example dataset is a small `SpatialExperiment` object (one Visium breast
+cancer section) hosted as a GitHub Release asset. Download it once and cache
+locally:
+
+```{r load-data}
+data_url   <- "https://github.com/ChenLaboratory/example_data/releases/download/v1.0.0/spe_visium_bc_s1.rds"
+cache_dir  <- tools::R_user_dir("blisa", "cache")
+data_file  <- file.path(cache_dir, "spe_visium_bc_s1.rds")
+
+if (!file.exists(data_file)) {
+  dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+  download.file(data_url, data_file, mode = "wb")
+}
+
+spe <- readRDS(data_file)
+spe
+```
+
+## Quality control
+
+For a Visium data, there is no need to run `hexBinCells()` to bin the data.
+Here we remove spots with less than 3000 total counts.
+
+```{r qc}
+kp <- Matrix::colSums(counts(spe)) > 3000
+table(kp)
+spe <- spe[,kp]
+```
+
+## Run BLISA at the LR level
+
+`blisa()` does everything in one call: spatial weights, LR pair filtering against
+CellChatDB, bivariate Moran's I per LR pair, and hotspot identification.
+However, as Visium data is spot-based, there is no cell type annotation by default.
+Therefore, `blisa()` doesn't calculate cell-cell interaction scoring as for imaging-based 
+data such as Xenium.
+
+```{r run-blisa}
+res <- blisa(spe) 
+res
+```
+
+The result is a `blisa` object with five slots:
+
+- `Level` - whether it is LR level or pathway level
+- `LR_results` — one row per LR pair, sorted by number of hotspot bins
+- `bins` — the hexagonal grid as an `sf` object
+- `spatial_weights` — queen and distance-decay weights from `computeSpatialWeights()`
+- `CCI_scores` — wide data frame of sender-receiver interaction scores per LR pair
+
+
+## Run BLISA at the pathway level
+
+To perform pathway level cell-cell communication analyses, we run `blisaPathway()`.
+
+```{r run-blisa-pathway}
+res_pathway <- blisaPathway(res)
+res_pathway
+```
+
+By default, the pathway level result is the union of each LR pair's significant hotspot spots, 
+with the minimum (best) p-value per spot.
+Two alternative methods, Simes' and Fisher's methods, are supported to combine p-values of 
+all LR pair's across hotspot spots.
+
+
+### Visualization
+
+The `plotLRrank` function visualizes the top interacting pathways across the tissue,
+ranked by the number of significant hotspot spots.
+
+```{r plotLRrank, fig.width=8, fig.height=6}
+plotLRrank(res_pathway, flip=TRUE)
+```
+
+
+## Spatial Map of Hotspot Bins
+
+For a chosen pathway (here, the top-ranked pathway by default), `plotHotspots` shows which bins
+are significant hotspots, coloured by p-value.
+The H&E image can be shown in the backgound using `plotImage` from `scider`.
+
+```{r plotHotspots, fig.width=6, fig.height=5, dpi = 200}
+p_img <- scider::plotImage(spe)
+plotHotspots(res_pathway, index = 1, background = p_img, size = 1.5)
+```
+
+
+## Session Information
+
+```{r eval=TRUE}
+sessionInfo()
+```
