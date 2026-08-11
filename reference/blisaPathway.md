@@ -85,30 +85,20 @@ descending), so the standard blisa methods work directly
 
 The per-spot pathway p-value is computed by one of three `method`s:
 
-- `"minP"`:
+`"minP"`
 
-  Faithful port of the original `run_BLISA_pathway()`: the union of each
-  LR pair's significant hotspot spots, with the minimum (best) p-value
-  per spot (a Tippett/min-P summary). Uses the pre-thresholded
-  `sig_index`/`sig_pval` from
-  [`blisa()`](https://chenlaboratory.github.io/blisa/reference/blisa.md),
-  so `p_cutoff` and `p_adjust` are ignored. Note this favours pathways
-  with more LR pairs (more chances to flag a spot) and applies no
-  multiplicity correction.
+:   
 
-- `"simes"`:
+`"simes"`
 
-  Per-spot Simes combination across *all* LR pairs in the pathway, using
-  the full per-spot p-values (`all_pval`) restricted to the High-High
-  co-expression direction (`all_quadrant`); non-High-High/untested
-  contributions are set to 1. Valid under positive dependence, so
-  generally the safest choice for correlated LR pairs.
+:   Per-spot Simes combination across *all* LR pairs in the pathway,
+    using the full per-spot p-values (`all_pval`) restricted to the
+    High-High co-expression direction. Non-High-High/untested
+    contributions are set to 1.
 
-- `"fisher"`:
+`"fisher"`
 
-  As `"simes"` but Fisher's method. More powerful but assumes
-  independent p-values, so it is anti-conservative when LR pairs in a
-  pathway are correlated (which they typically are).
+:   As `"simes"` but Fisher's method.
 
 For `"simes"`/`"fisher"`, a spot is a pathway hotspot when its combined
 p-value is \\\le\\ `p_cutoff` (after optional `p_adjust`).
