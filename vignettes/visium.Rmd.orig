@@ -111,7 +111,7 @@ all LR pair's across hotspot spots.
 The `plotLRrank` function visualizes the top interacting pathways across the tissue,
 ranked by the number of significant hotspot spots.
 
-```{r plotLRrank, fig.width=8, fig.height=6}
+```{r plotLRrank, fig.width=8, fig.height=4.5}
 plotLRrank(res_pathway, flip=TRUE)
 ```
 
@@ -124,7 +124,7 @@ The H&E image can be shown in the backgound using `plotImage` from `scider`.
 
 ```{r plotHotspots, fig.width=6, fig.height=5, dpi = 200}
 p_img <- scider::plotImage(spe)
-plotHotspots(res_pathway, index = 1, background = p_img, size = 1.5)
+plotHotspots(res_pathway, index = 1, background = p_img, size = 1.2)
 ```
 
 
