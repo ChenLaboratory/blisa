@@ -1,5 +1,26 @@
 # Changelog
 
+## blisa (development version)
+
+- [`plotCCIspatial()`](https://chenlaboratory.github.io/blisa/reference/plotCCIspatial.md)
+  gains a `weighted` argument (default `TRUE`). The ligand contribution
+  of each sender cell type at a hotspot is now the spatially weighted
+  sum over its neighbours, using the same row-standardised weights as
+  the bivariate Moran’s I test and excluding the hotspot bin itself. Set
+  `weighted = FALSE` for the previous unweighted sum over the hotspot
+  and its neighbours. Dominant sender-receiver pairs can differ from
+  earlier versions.
+- [`runCCI()`](https://chenlaboratory.github.io/blisa/reference/runCCI.md)
+  gains a `weighted` argument (default `TRUE`), also used by
+  [`blisa()`](https://chenlaboratory.github.io/blisa/reference/blisa.md)
+  when `group` is supplied. The global ligand count of each sender group
+  is now the sum over hotspots of the local weighted ligand counts used
+  by
+  [`plotCCIspatial()`](https://chenlaboratory.github.io/blisa/reference/plotCCIspatial.md),
+  so that global and local scores are defined consistently. Set
+  `weighted = FALSE` for the previous unweighted sum over hotspot bins
+  and their neighbours. Global CCI scores differ from earlier versions.
+
 ## blisa 1.0.0
 
 CRAN release: 2026-07-10

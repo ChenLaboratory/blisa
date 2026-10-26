@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">blisa</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,13 @@
       <small>Source: <a href="https://github.com/ChenLaboratory/blisa/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="blisa-development-version">blisa (development version)<a class="anchor" aria-label="anchor" href="#blisa-development-version"></a></h2>
+<ul><li>
+<code><a href="../reference/plotCCIspatial.html">plotCCIspatial()</a></code> gains a <code>weighted</code> argument (default <code>TRUE</code>). The ligand contribution of each sender cell type at a hotspot is now the spatially weighted sum over its neighbours, using the same row-standardised weights as the bivariate Moran’s I test and excluding the hotspot bin itself. Set <code>weighted = FALSE</code> for the previous unweighted sum over the hotspot and its neighbours. Dominant sender-receiver pairs can differ from earlier versions.</li>
+<li>
+<code><a href="../reference/runCCI.html">runCCI()</a></code> gains a <code>weighted</code> argument (default <code>TRUE</code>), also used by <code><a href="../reference/blisa.html">blisa()</a></code> when <code>group</code> is supplied. The global ligand count of each sender group is now the sum over hotspots of the local weighted ligand counts used by <code><a href="../reference/plotCCIspatial.html">plotCCIspatial()</a></code>, so that global and local scores are defined consistently. Set <code>weighted = FALSE</code> for the previous unweighted sum over hotspot bins and their neighbours. Global CCI scores differ from earlier versions.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="blisa-100">blisa 1.0.0<a class="anchor" aria-label="anchor" href="#blisa-100"></a></h2><p class="text-muted">CRAN release: 2026-07-10</p>
 <ul><li>
