@@ -58,13 +58,22 @@ runCCI <- function(x, ...) UseMethod("runCCI")
 #'   is already populated, the object is returned unchanged. If \code{TRUE} and
 #'   \code{counts_by_group} is supplied, existing scores are recomputed and
 #'   replaced.
+#' @param weighted Logical. If \code{TRUE} (default), the ligand count of each
+#'   sender group is the sum over hotspots \eqn{h} of its spatially weighted
+#'   ligand counts around \eqn{h}, \eqn{\sum_h \sum_j w_{hj} L_j}, using the
+#'   same neighbours and row-standardised spatial weights as the bivariate
+#'   Moran's I test. This is the sum of the local ligand terms used by
+#'   \code{\link{plotCCIspatial}}. If \code{FALSE}, ligand counts are summed
+#'   without weights over the hotspot bins and their neighbours, each bin
+#'   counted once.
 #'
 #' @return \code{runCCI.blisa}: the input \code{blisa} object with
 #'   \code{CCI_scores} populated (a wide data frame -- rows are
 #'   \code{"Sender->Receiver"} group pairs, columns are LR pairs).
 #'
 #' @export
-runCCI.blisa <- function(x, counts_by_group = NULL, overwrite = FALSE, ...) {
+runCCI.blisa <- function(x, counts_by_group = NULL, overwrite = FALSE,
+                         weighted = TRUE, ...) {
   if (!is.null(x$CCI_scores)) {
     if (!overwrite) {
       message("CCI_scores already present \u2014 returning object unchanged. ",
@@ -77,7 +86,7 @@ runCCI.blisa <- function(x, counts_by_group = NULL, overwrite = FALSE, ...) {
         "Supply counts_by_group explicitly or set overwrite = FALSE to keep existing scores."
       )
     message("Recomputing CCI_scores (overwrite = TRUE)...")
-    x$CCI_scores <- runCCI.default(x, counts_by_group)
+    x$CCI_scores <- runCCI.default(x, counts_by_group, weighted = weighted)
     message("CCI_scores replaced.")
     return(x)
   }
@@ -87,7 +96,7 @@ runCCI.blisa <- function(x, counts_by_group = NULL, overwrite = FALSE, ...) {
       "Re-run blisa() with a 'group' argument, or supply counts_by_group explicitly."
     )
   message("Computing CCI_scores...")
-  x$CCI_scores <- runCCI.default(x, counts_by_group)
+  x$CCI_scores <- runCCI.default(x, counts_by_group, weighted = weighted)
   message("CCI_scores added.")
   x
 }
@@ -103,11 +112,9 @@ runCCI.blisa <- function(x, counts_by_group = NULL, overwrite = FALSE, ...) {
 #'   interaction score \code{0.5 * log2(receiver * sender + 1)}.
 #'
 #' @export
-runCCI.default <- function(x, counts_by_group, ...) {
+runCCI.default <- function(x, counts_by_group, weighted = TRUE, ...) {
   LRI_sum       <- x$LR_results
   sw            <- x$spatial_weights
-  queen_nb_full <- sw$queen_nb_full
-  dist_nb_full  <- sw$dist_nb_full
   ct_names      <- names(counts_by_group)
 
   scores_list <- lapply(seq_len(nrow(LRI_sum)), function(idx) {
@@ -118,17 +125,35 @@ runCCI.default <- function(x, counts_by_group, ...) {
     mode   <- LRI_sum$ccc_mode[idx]
     sigHH  <- LRI_sum$sig_index[[idx]]
 
-    nb_list  <- if (mode == "nearby") queen_nb_full else dist_nb_full
-    sigHH_ng <- unique(c(sigHH, unlist(nb_list[sigHH])))
+    if (mode == "nearby") {
+      nb_list  <- sw$queen_nb_full
+      wt       <- sw$queen_wt
+      keep_idx <- sw$keep_idx_queen
+    } else {
+      nb_list  <- sw$dist_nb_full
+      wt       <- sw$dist_wt
+      keep_idx <- sw$keep_idx_dist
+    }
+
+    if (weighted) {
+      k          <- match(sigHH, keep_idx)
+      nb_idx     <- keep_idx[unlist(wt$neighbours[k])]
+      c_j        <- tapply(unlist(wt$weights[k]), nb_idx, sum)
+      sender_idx <- as.integer(names(c_j))
+      sender_w   <- as.vector(c_j)
+    } else {
+      sender_idx <- unique(c(sigHH, unlist(nb_list[sigHH])))
+      sender_w   <- 1
+    }
 
     # Sum receptor counts in hotspot bins per group (receivers)
     receiver_sums <- sapply(ct_names, function(ct) {
       sum(get_min_expr(r_gene, counts_by_group[[ct]])[sigHH])
     })
 
-    # Sum ligand counts in hotspot + neighbour bins per group (senders)
+    # Sum (weighted) ligand counts around hotspots per group (senders)
     sender_sums <- sapply(ct_names, function(ct) {
-      sum(get_min_expr(l_gene, counts_by_group[[ct]])[sigHH_ng])
+      sum(sender_w * get_min_expr(l_gene, counts_by_group[[ct]])[sender_idx])
     })
 
     score_mat  <- 0.5 * log2(outer(receiver_sums, sender_sums, FUN = "*") + 1)

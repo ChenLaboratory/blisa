@@ -3,7 +3,8 @@
 #' For a selected ligand-receptor pair, identifies the dominant interacting
 #' cell-type pair at each significant hotspot bin and draws a spatial map of
 #' the tissue coloured by those pairs. Receiver cells are those inside hotspot
-#' bins; sender cells are drawn from the immediate neighbourhood.
+#' bins; sender cells are drawn from the neighbouring bins defined by the
+#' LR pair's signalling mode.
 #'
 #' @param x A \code{blisa} object as returned by \code{\link{blisa}}.
 #' @param counts_by_group Named list of gene-by-bin count matrices, one per
@@ -21,6 +22,12 @@
 #' @param top_pairs Integer. Maximum number of distinct cell-type pairs to show
 #'   in the legend; remaining pairs are grouped as \code{"rare pairs"}. Default
 #'   \code{30}.
+#' @param weighted Logical. If \code{TRUE} (default), the ligand contribution
+#'   of each sender cell type at hotspot \eqn{h} is
+#'   \eqn{\sum_{j \in N(h)} w_{hj} L_j}, using the same neighbours and
+#'   row-standardised spatial weights as the bivariate Moran's I test (the
+#'   hotspot bin itself is excluded). If \code{FALSE}, ligand counts are summed
+#'   without weights over the hotspot bin and its neighbours.
 #'
 #' @return A \code{ggplot} object.
 #' @seealso \code{\link{plotHotspots}} for a significance-based spatial map of
@@ -38,7 +45,7 @@
 #' }
 #' @export
 plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
-                            receptor = NULL, top_pairs = 30) {
+                            receptor = NULL, top_pairs = 30, weighted = TRUE) {
 
   LR_results <- x$LR_results
   bins       <- x$bins
@@ -56,7 +63,15 @@ plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
   if (length(sigHH) == 0)
     stop("LR pair '", lr_pair, "' has no significant hotspots.")
 
-  nb_list <- if (mode == "nearby") sw$queen_nb_full else sw$dist_nb_full
+  if (mode == "nearby") {
+    nb_list  <- sw$queen_nb_full
+    wt       <- sw$queen_wt
+    keep_idx <- sw$keep_idx_queen
+  } else {
+    nb_list  <- sw$dist_nb_full
+    wt       <- sw$dist_wt
+    keep_idx <- sw$keep_idx_dist
+  }
 
   # Collapse each cell type's count matrix to a single per-bin expression vector
   # ONCE (get_min_expr takes the per-bin minimum across multi-subunit complexes).
@@ -68,12 +83,19 @@ plotCCIspatial <- function(x, counts_by_group, index = 1, ligand = NULL,
   # For each hotspot bin, score all sender-receiver cell-type combinations
   # and retain the dominant (highest-scoring) pair
   dominant_pairs <- do.call(rbind, lapply(sigHH, function(h) {
-    nb_h <- unique(c(h, nb_list[[h]]))
+    if (weighted) {
+      k    <- match(h, keep_idx)
+      nb_h <- keep_idx[wt$neighbours[[k]]]
+      w_h  <- wt$weights[[k]]
+    } else {
+      nb_h <- unique(c(h, nb_list[[h]]))
+      w_h  <- 1
+    }
 
     # Receptor expression in bin h per cell type (receivers)
     r_scores <- vapply(ct_names, function(ct) sum(r_expr[[ct]][h]),    numeric(1))
     # Ligand expression in neighbourhood of h per cell type (senders)
-    l_scores <- vapply(ct_names, function(ct) sum(l_expr[[ct]][nb_h]), numeric(1))
+    l_scores <- vapply(ct_names, function(ct) sum(w_h * l_expr[[ct]][nb_h]), numeric(1))
 
     score_mat <- 0.5 * log2(outer(r_scores, l_scores) + 1)
     best      <- which(score_mat == max(score_mat), arr.ind = TRUE)[1L, ]
