@@ -85,7 +85,6 @@ data such as Xenium.
 
 ``` r
 res <- blisa(spe) 
-#> Downloading CellChatDB.human from GitHub (once per session)...
 #> Testing 462 LR pairs...
 #>   |========================================| 100%
 res
