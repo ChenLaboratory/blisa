@@ -33,11 +33,24 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="blisa-development-version">blisa (development version)<a class="anchor" aria-label="anchor" href="#blisa-development-version"></a></h2>
-<ul><li>
-<code><a href="../reference/plotCCIspatial.html">plotCCIspatial()</a></code> gains a <code>weighted</code> argument (default <code>TRUE</code>). The ligand contribution of each sender cell type at a hotspot is now the spatially weighted sum over its neighbours, using the same row-standardised weights as the bivariate Moran’s I test and excluding the hotspot bin itself. Set <code>weighted = FALSE</code> for the previous unweighted sum over the hotspot and its neighbours. Dominant sender-receiver pairs can differ from earlier versions.</li>
+<h2 class="pkg-version" data-toc-text="1.0.3" id="blisa-103">blisa 1.0.3<a class="anchor" aria-label="anchor" href="#blisa-103"></a></h2>
+<ul><li>New argument <code>weighted</code> in <code><a href="../reference/plotCCIspatial.html">plotCCIspatial()</a></code>. The ligand contribution of each sender cell type at a hotspot is now the spatially weighted sum over its neighbours.</li>
+<li>New argument <code>weighted</code> in <code><a href="../reference/runCCI.html">runCCI()</a></code>. The global ligand count of each sender group is now the sum over hotspots of the local weighted ligand counts used by <code><a href="../reference/plotCCIspatial.html">plotCCIspatial()</a></code>.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.2" id="blisa-102">blisa 1.0.2<a class="anchor" aria-label="anchor" href="#blisa-102"></a></h2>
+<ul><li>Added functionality for visium data</li>
+<li>New function <code><a href="../reference/blisaPathway.html">blisaPathway()</a></code> for summarizing blisa results at the pathway level</li>
+<li>Added a new element <code>level</code> to the <code>blisa</code> object class, specifying whether the results are lr level or pathway level</li>
 <li>
-<code><a href="../reference/runCCI.html">runCCI()</a></code> gains a <code>weighted</code> argument (default <code>TRUE</code>), also used by <code><a href="../reference/blisa.html">blisa()</a></code> when <code>group</code> is supplied. The global ligand count of each sender group is now the sum over hotspots of the local weighted ligand counts used by <code><a href="../reference/plotCCIspatial.html">plotCCIspatial()</a></code>, so that global and local scores are defined consistently. Set <code>weighted = FALSE</code> for the previous unweighted sum over hotspot bins and their neighbours. Global CCI scores differ from earlier versions.</li>
+<code><a href="../reference/plotLRrank.html">plotLRrank()</a></code> and <code><a href="../reference/plotHotspots.html">plotHotspots()</a></code> not works for pathway level results</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.1" id="blisa-101">blisa 1.0.1<a class="anchor" aria-label="anchor" href="#blisa-101"></a></h2>
+<ul><li>New argument <code>platform</code> in blisa to handle xenium and visium</li>
+<li>New argument <code>as_points</code> in <code><a href="../reference/plotHotspots.html">plotHotspots()</a></code> to plot dots instead of hexagons</li>
+<li>New argument <code>size</code> in <code><a href="../reference/plotHotspots.html">plotHotspots()</a></code> to change the size of the dots</li>
+<li>New argument <code>background</code> in <code><a href="../reference/plotHotspots.html">plotHotspots()</a></code> to add background image (e.g., H&amp;E)</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="blisa-100">blisa 1.0.0<a class="anchor" aria-label="anchor" href="#blisa-100"></a></h2><p class="text-muted">CRAN release: 2026-07-10</p>
