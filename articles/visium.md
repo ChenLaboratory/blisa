@@ -155,7 +155,7 @@ plotHotspots(res_pathway, index = 1, background = p_img, size = 1.2)
 sessionInfo()
 #> R version 4.6.0 (2026-04-24 ucrt)
 #> Platform: x86_64-w64-mingw32/x64
-#> Running under: Windows 11 x64 (build 26200)
+#> Running under: Windows 11 x64 (build 26300)
 #> 
 #> Matrix products: default
 #>   LAPACK version 3.12.1
@@ -171,25 +171,37 @@ sessionInfo()
 #> [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] SpatialExperiment_1.21.0    SingleCellExperiment_1.33.2 SummarizedExperiment_1.41.1 Biobase_2.71.0             
-#>  [5] GenomicRanges_1.63.2        Seqinfo_1.1.0               IRanges_2.45.0              S4Vectors_0.49.2           
-#>  [9] BiocGenerics_0.57.1         generics_0.1.4              MatrixGenerics_1.23.0       matrixStats_1.5.0          
-#> [13] blisa_1.0.0                
+#>  [1] ggplot2_4.0.3               SpatialExperiment_1.21.0    SingleCellExperiment_1.33.2
+#>  [4] SummarizedExperiment_1.41.1 Biobase_2.71.0              GenomicRanges_1.63.2       
+#>  [7] Seqinfo_1.1.0               IRanges_2.45.0              S4Vectors_0.49.2           
+#> [10] BiocGenerics_0.57.1         generics_0.1.4              MatrixGenerics_1.23.0      
+#> [13] matrixStats_1.5.0           blisa_1.0.3                
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6          circlize_0.4.18       shape_1.4.6.1         rjson_0.2.23          xfun_0.57            
-#>  [6] ggplot2_4.0.3         GlobalOptions_0.1.4   lattice_0.22-9        Cairo_1.7-0           vctrs_0.7.3          
-#> [11] tools_4.6.0           spdep_1.4-2           parallel_4.6.0        tibble_3.3.1          proxy_0.4-29         
-#> [16] cluster_2.1.8.2       pkgconfig_2.0.3       Matrix_1.7-5          KernSmooth_2.23-26    RColorBrewer_1.1-3   
-#> [21] S7_0.2.2              lifecycle_1.0.5       deldir_2.0-4          compiler_4.6.0        farver_2.1.2         
-#> [26] codetools_0.2-20      ComplexHeatmap_2.28.0 clue_0.3-68           class_7.3-23          fastLISA_1.0.1       
-#> [31] pillar_1.11.1         crayon_1.5.3          classInt_0.4-11       DelayedArray_0.37.1   dbscan_1.2.4         
-#> [36] wk_0.9.5              magick_2.9.1          iterators_1.0.14      boot_1.3-32           abind_1.4-8          
-#> [41] foreach_1.5.2         tidyselect_1.2.1      digest_0.6.39         sf_1.1-1              dplyr_1.2.1          
-#> [46] labeling_0.4.3        grid_4.6.0            colorspace_2.1-2      cli_3.6.6             SparseArray_1.11.13  
-#> [51] magrittr_2.0.5        S4Arrays_1.11.1       e1071_1.7-17          withr_3.0.3           scales_1.4.0         
-#> [56] sp_2.2-1              spData_2.3.5          XVector_0.51.0        otel_0.2.0            png_0.1-9            
-#> [61] GetoptLong_1.1.1      evaluate_1.0.5        knitr_1.51            doParallel_1.0.17     viridisLite_0.4.3    
-#> [66] s2_1.1.11             rlang_1.2.0           Rcpp_1.1.1-1.1        glue_1.8.1            DBI_1.3.0            
-#> [71] R6_2.6.1              units_1.0-1
+#>   [1] DBI_1.3.0              deldir_2.0-4           s2_1.1.11              rlang_1.2.0           
+#>   [5] magrittr_2.0.5         clue_0.3-68            GetoptLong_1.1.1       otel_0.2.0            
+#>   [9] spatstat.geom_3.7-3    e1071_1.7-17           compiler_4.6.0         png_0.1-9             
+#>  [13] vctrs_0.7.3            pkgconfig_2.0.3        wk_0.9.5               shape_1.4.6.1         
+#>  [17] crayon_1.5.3           fastmap_1.2.0          magick_2.9.1           XVector_0.51.0        
+#>  [21] labeling_0.4.3         promises_1.5.0         purrr_1.2.2            xfun_0.57             
+#>  [25] jsonlite_2.0.0         goftest_1.2-3          later_1.4.8            DelayedArray_0.37.1   
+#>  [29] spatstat.utils_3.2-2   parallel_4.6.0         cluster_2.1.8.2        R6_2.6.1              
+#>  [33] spatstat.data_3.1-9    RColorBrewer_1.1-3     spatstat.univar_3.1-7  boot_1.3-32           
+#>  [37] Rcpp_1.1.1-1.1         iterators_1.0.14       knitr_1.51             tensor_1.5.1          
+#>  [41] scider_1.9.9           httpuv_1.6.17          Matrix_1.7-5           igraph_2.3.0          
+#>  [45] tidyselect_1.2.1       abind_1.4-8            spatstat.random_3.4-5  spatstat.explore_3.8-0
+#>  [49] doParallel_1.0.17      codetools_0.2-20       lattice_0.22-9         tibble_3.3.1          
+#>  [53] shiny_1.13.0           withr_3.0.3            S7_0.2.2               evaluate_1.0.5        
+#>  [57] sf_1.1-1               polyclip_1.10-7        units_1.0-1            spData_2.3.5          
+#>  [61] proxy_0.4-29           circlize_0.4.18        pillar_1.11.1          KernSmooth_2.23-26    
+#>  [65] foreach_1.5.2          plotly_4.12.0          dbscan_1.2.4           sp_2.2-1              
+#>  [69] scales_1.4.0           xtable_1.8-8           class_7.3-23           glue_1.8.1            
+#>  [73] lazyeval_0.2.3         tools_4.6.0            data.table_1.18.2.1    grid_4.6.0            
+#>  [77] Cairo_1.7-0            spdep_1.4-2            tidyr_1.3.2            colorspace_2.1-2      
+#>  [81] nlme_3.1-169           fastLISA_1.0.1         fastmatrix_0.6-6       cli_3.6.6             
+#>  [85] spatstat.sparse_3.1-0  S4Arrays_1.11.1        viridisLite_0.4.3      ComplexHeatmap_2.28.0 
+#>  [89] dplyr_1.2.1            gtable_0.3.6           SpatialPack_0.4-1      digest_0.6.39         
+#>  [93] classInt_0.4-11        SparseArray_1.11.13    htmlwidgets_1.6.4      rjson_0.2.23          
+#>  [97] farver_2.1.2           htmltools_0.5.9        lifecycle_1.0.5        httr_1.4.8            
+#> [101] GlobalOptions_0.1.4    mime_0.13
 ```

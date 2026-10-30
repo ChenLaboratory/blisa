@@ -85,20 +85,21 @@ descending), so the standard blisa methods work directly
 
 The per-spot pathway p-value is computed by one of three `method`s:
 
-`"minP"`
+- `"minP"`:
 
-:   
+  The union of each LR pair's significant hotspot spots, with the
+  minimum p-value per spot. `p_cutoff` and `p_adjust` are ignored.
 
-`"simes"`
+- `"simes"`:
 
-:   Per-spot Simes combination across *all* LR pairs in the pathway,
-    using the full per-spot p-values (`all_pval`) restricted to the
-    High-High co-expression direction. Non-High-High/untested
-    contributions are set to 1.
+  Per-spot Simes combination across *all* LR pairs in the pathway, using
+  the full per-spot p-values (`all_pval`) restricted to the High-High
+  co-expression direction. Non-High-High/untested contributions are set
+  to 1.
 
-`"fisher"`
+- `"fisher"`:
 
-:   As `"simes"` but Fisher's method.
+  As `"simes"` but Fisher's method.
 
 For `"simes"`/`"fisher"`, a spot is a pathway hotspot when its combined
 p-value is \\\le\\ `p_cutoff` (after optional `p_adjust`).

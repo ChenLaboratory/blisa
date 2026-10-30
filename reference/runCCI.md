@@ -21,10 +21,10 @@ class of `x`:
 runCCI(x, ...)
 
 # S3 method for class 'blisa'
-runCCI(x, counts_by_group = NULL, overwrite = FALSE, ...)
+runCCI(x, counts_by_group = NULL, overwrite = FALSE, weighted = TRUE, ...)
 
 # Default S3 method
-runCCI(x, counts_by_group, ...)
+runCCI(x, counts_by_group, weighted = TRUE, ...)
 ```
 
 ## Arguments
@@ -51,6 +51,17 @@ runCCI(x, counts_by_group, ...)
   Logical. If `FALSE` (default) and `x$CCI_scores` is already populated,
   the object is returned unchanged. If `TRUE` and `counts_by_group` is
   supplied, existing scores are recomputed and replaced.
+
+- weighted:
+
+  Logical. If `TRUE` (default), the ligand count of each sender group is
+  the sum over hotspots \\h\\ of its spatially weighted ligand counts
+  around \\h\\, \\\sum_h \sum_j w\_{hj} L_j\\, using the same neighbours
+  and row-standardised spatial weights as the bivariate Moran's I test.
+  This is the sum of the local ligand terms used by
+  [`plotCCIspatial`](https://chenlaboratory.github.io/blisa/reference/plotCCIspatial.md).
+  If `FALSE`, ligand counts are summed without weights over the hotspot
+  bins and their neighbours, each bin counted once.
 
 ## Value
 

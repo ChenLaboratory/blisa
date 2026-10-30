@@ -122,9 +122,10 @@ contributing p-value.</p></dd>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The per-spot pathway p-value is computed by one of three <code>method</code>s:</p><dl><dt><code>"minP"</code></dt>
-<dd><p></p></dd>
-The union of each LR pair's significant hotspot spots, with the minimum
-p-value per spot. <code>p_cutoff</code> and <code>p_adjust</code> are ignored.
+<dd><p>The union of each LR pair's significant hotspot spots,
+with the minimum p-value per spot. <code>p_cutoff</code> and <code>p_adjust</code>
+are ignored.</p></dd>
+
 <dt><code>"simes"</code></dt>
 <dd><p>Per-spot Simes combination across <em>all</em> LR pairs
 in the pathway, using the full per-spot p-values (<code>all_pval</code>)

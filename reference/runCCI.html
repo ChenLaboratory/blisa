@@ -78,10 +78,10 @@ the scores data frame. Used internally by <code>runCCI.blisa</code> and
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">runCCI</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'blisa'</span></span>
-<span><span class="fu">runCCI</span><span class="op">(</span><span class="va">x</span>, counts_by_group <span class="op">=</span> <span class="cn">NULL</span>, overwrite <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">runCCI</span><span class="op">(</span><span class="va">x</span>, counts_by_group <span class="op">=</span> <span class="cn">NULL</span>, overwrite <span class="op">=</span> <span class="cn">FALSE</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Default S3 method</span></span>
-<span><span class="fu">runCCI</span><span class="op">(</span><span class="va">x</span>, <span class="va">counts_by_group</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">runCCI</span><span class="op">(</span><span class="va">x</span>, <span class="va">counts_by_group</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -109,6 +109,17 @@ when <code>x$CCI_scores</code> is <code>NULL</code> or when <code>overwrite = TR
 is already populated, the object is returned unchanged. If <code>TRUE</code> and
 <code>counts_by_group</code> is supplied, existing scores are recomputed and
 replaced.</p></dd>
+
+
+<dt id="arg-weighted">weighted<a class="anchor" aria-label="anchor" href="#arg-weighted"></a></dt>
+<dd><p>Logical. If <code>TRUE</code> (default), the ligand count of each
+sender group is the sum over hotspots \(h\) of its spatially weighted
+ligand counts around \(h\), \(\sum_h \sum_j w_{hj} L_j\), using the
+same neighbours and row-standardised spatial weights as the bivariate
+Moran's I test. This is the sum of the local ligand terms used by
+<code><a href="plotCCIspatial.html">plotCCIspatial</a></code>. If <code>FALSE</code>, ligand counts are summed
+without weights over the hotspot bins and their neighbours, each bin
+counted once.</p></dd>
 
 </dl></div>
     <div class="section level2">

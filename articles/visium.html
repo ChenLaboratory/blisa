@@ -206,7 +206,7 @@ using <code>plotImage</code> from <code>scider</code>.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.6.0 (2026-04-24 ucrt)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-w64-mingw32/x64</span></span>
-<span><span class="co">#&gt; Running under: Windows 11 x64 (build 26200)</span></span>
+<span><span class="co">#&gt; Running under: Windows 11 x64 (build 26300)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt;   LAPACK version 3.12.1</span></span>
@@ -222,27 +222,39 @@ using <code>plotImage</code> from <code>scider</code>.</p>
 <span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] SpatialExperiment_1.21.0    SingleCellExperiment_1.33.2 SummarizedExperiment_1.41.1 Biobase_2.71.0             </span></span>
-<span><span class="co">#&gt;  [5] GenomicRanges_1.63.2        Seqinfo_1.1.0               IRanges_2.45.0              S4Vectors_0.49.2           </span></span>
-<span><span class="co">#&gt;  [9] BiocGenerics_0.57.1         generics_0.1.4              MatrixGenerics_1.23.0       matrixStats_1.5.0          </span></span>
-<span><span class="co">#&gt; [13] blisa_1.0.0                </span></span>
+<span><span class="co">#&gt;  [1] ggplot2_4.0.3               SpatialExperiment_1.21.0    SingleCellExperiment_1.33.2</span></span>
+<span><span class="co">#&gt;  [4] SummarizedExperiment_1.41.1 Biobase_2.71.0              GenomicRanges_1.63.2       </span></span>
+<span><span class="co">#&gt;  [7] Seqinfo_1.1.0               IRanges_2.45.0              S4Vectors_0.49.2           </span></span>
+<span><span class="co">#&gt; [10] BiocGenerics_0.57.1         generics_0.1.4              MatrixGenerics_1.23.0      </span></span>
+<span><span class="co">#&gt; [13] matrixStats_1.5.0           blisa_1.0.3                </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] gtable_0.3.6          circlize_0.4.18       shape_1.4.6.1         rjson_0.2.23          xfun_0.57            </span></span>
-<span><span class="co">#&gt;  [6] ggplot2_4.0.3         GlobalOptions_0.1.4   lattice_0.22-9        Cairo_1.7-0           vctrs_0.7.3          </span></span>
-<span><span class="co">#&gt; [11] tools_4.6.0           spdep_1.4-2           parallel_4.6.0        tibble_3.3.1          proxy_0.4-29         </span></span>
-<span><span class="co">#&gt; [16] cluster_2.1.8.2       pkgconfig_2.0.3       Matrix_1.7-5          KernSmooth_2.23-26    RColorBrewer_1.1-3   </span></span>
-<span><span class="co">#&gt; [21] S7_0.2.2              lifecycle_1.0.5       deldir_2.0-4          compiler_4.6.0        farver_2.1.2         </span></span>
-<span><span class="co">#&gt; [26] codetools_0.2-20      ComplexHeatmap_2.28.0 clue_0.3-68           class_7.3-23          fastLISA_1.0.1       </span></span>
-<span><span class="co">#&gt; [31] pillar_1.11.1         crayon_1.5.3          classInt_0.4-11       DelayedArray_0.37.1   dbscan_1.2.4         </span></span>
-<span><span class="co">#&gt; [36] wk_0.9.5              magick_2.9.1          iterators_1.0.14      boot_1.3-32           abind_1.4-8          </span></span>
-<span><span class="co">#&gt; [41] foreach_1.5.2         tidyselect_1.2.1      digest_0.6.39         sf_1.1-1              dplyr_1.2.1          </span></span>
-<span><span class="co">#&gt; [46] labeling_0.4.3        grid_4.6.0            colorspace_2.1-2      cli_3.6.6             SparseArray_1.11.13  </span></span>
-<span><span class="co">#&gt; [51] magrittr_2.0.5        S4Arrays_1.11.1       e1071_1.7-17          withr_3.0.3           scales_1.4.0         </span></span>
-<span><span class="co">#&gt; [56] sp_2.2-1              spData_2.3.5          XVector_0.51.0        otel_0.2.0            png_0.1-9            </span></span>
-<span><span class="co">#&gt; [61] GetoptLong_1.1.1      evaluate_1.0.5        knitr_1.51            doParallel_1.0.17     viridisLite_0.4.3    </span></span>
-<span><span class="co">#&gt; [66] s2_1.1.11             rlang_1.2.0           Rcpp_1.1.1-1.1        glue_1.8.1            DBI_1.3.0            </span></span>
-<span><span class="co">#&gt; [71] R6_2.6.1              units_1.0-1</span></span></code></pre></div>
+<span><span class="co">#&gt;   [1] DBI_1.3.0              deldir_2.0-4           s2_1.1.11              rlang_1.2.0           </span></span>
+<span><span class="co">#&gt;   [5] magrittr_2.0.5         clue_0.3-68            GetoptLong_1.1.1       otel_0.2.0            </span></span>
+<span><span class="co">#&gt;   [9] spatstat.geom_3.7-3    e1071_1.7-17           compiler_4.6.0         png_0.1-9             </span></span>
+<span><span class="co">#&gt;  [13] vctrs_0.7.3            pkgconfig_2.0.3        wk_0.9.5               shape_1.4.6.1         </span></span>
+<span><span class="co">#&gt;  [17] crayon_1.5.3           fastmap_1.2.0          magick_2.9.1           XVector_0.51.0        </span></span>
+<span><span class="co">#&gt;  [21] labeling_0.4.3         promises_1.5.0         purrr_1.2.2            xfun_0.57             </span></span>
+<span><span class="co">#&gt;  [25] jsonlite_2.0.0         goftest_1.2-3          later_1.4.8            DelayedArray_0.37.1   </span></span>
+<span><span class="co">#&gt;  [29] spatstat.utils_3.2-2   parallel_4.6.0         cluster_2.1.8.2        R6_2.6.1              </span></span>
+<span><span class="co">#&gt;  [33] spatstat.data_3.1-9    RColorBrewer_1.1-3     spatstat.univar_3.1-7  boot_1.3-32           </span></span>
+<span><span class="co">#&gt;  [37] Rcpp_1.1.1-1.1         iterators_1.0.14       knitr_1.51             tensor_1.5.1          </span></span>
+<span><span class="co">#&gt;  [41] scider_1.9.9           httpuv_1.6.17          Matrix_1.7-5           igraph_2.3.0          </span></span>
+<span><span class="co">#&gt;  [45] tidyselect_1.2.1       abind_1.4-8            spatstat.random_3.4-5  spatstat.explore_3.8-0</span></span>
+<span><span class="co">#&gt;  [49] doParallel_1.0.17      codetools_0.2-20       lattice_0.22-9         tibble_3.3.1          </span></span>
+<span><span class="co">#&gt;  [53] shiny_1.13.0           withr_3.0.3            S7_0.2.2               evaluate_1.0.5        </span></span>
+<span><span class="co">#&gt;  [57] sf_1.1-1               polyclip_1.10-7        units_1.0-1            spData_2.3.5          </span></span>
+<span><span class="co">#&gt;  [61] proxy_0.4-29           circlize_0.4.18        pillar_1.11.1          KernSmooth_2.23-26    </span></span>
+<span><span class="co">#&gt;  [65] foreach_1.5.2          plotly_4.12.0          dbscan_1.2.4           sp_2.2-1              </span></span>
+<span><span class="co">#&gt;  [69] scales_1.4.0           xtable_1.8-8           class_7.3-23           glue_1.8.1            </span></span>
+<span><span class="co">#&gt;  [73] lazyeval_0.2.3         tools_4.6.0            data.table_1.18.2.1    grid_4.6.0            </span></span>
+<span><span class="co">#&gt;  [77] Cairo_1.7-0            spdep_1.4-2            tidyr_1.3.2            colorspace_2.1-2      </span></span>
+<span><span class="co">#&gt;  [81] nlme_3.1-169           fastLISA_1.0.1         fastmatrix_0.6-6       cli_3.6.6             </span></span>
+<span><span class="co">#&gt;  [85] spatstat.sparse_3.1-0  S4Arrays_1.11.1        viridisLite_0.4.3      ComplexHeatmap_2.28.0 </span></span>
+<span><span class="co">#&gt;  [89] dplyr_1.2.1            gtable_0.3.6           SpatialPack_0.4-1      digest_0.6.39         </span></span>
+<span><span class="co">#&gt;  [93] classInt_0.4-11        SparseArray_1.11.13    htmlwidgets_1.6.4      rjson_0.2.23          </span></span>
+<span><span class="co">#&gt;  [97] farver_2.1.2           htmltools_0.5.9        lifecycle_1.0.5        httr_1.4.8            </span></span>
+<span><span class="co">#&gt; [101] GlobalOptions_0.1.4    mime_0.13</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -3,7 +3,8 @@
 For a selected ligand-receptor pair, identifies the dominant interacting
 cell-type pair at each significant hotspot bin and draws a spatial map
 of the tissue coloured by those pairs. Receiver cells are those inside
-hotspot bins; sender cells are drawn from the immediate neighbourhood.
+hotspot bins; sender cells are drawn from the neighbouring bins defined
+by the LR pair's signalling mode.
 
 ## Usage
 
@@ -14,7 +15,8 @@ plotCCIspatial(
   index = 1,
   ligand = NULL,
   receptor = NULL,
-  top_pairs = 30
+  top_pairs = 30,
+  weighted = TRUE
 )
 ```
 
@@ -53,6 +55,15 @@ plotCCIspatial(
 
   Integer. Maximum number of distinct cell-type pairs to show in the
   legend; remaining pairs are grouped as `"rare pairs"`. Default `30`.
+
+- weighted:
+
+  Logical. If `TRUE` (default), the ligand contribution of each sender
+  cell type at hotspot \\h\\ is \\\sum\_{j \in N(h)} w\_{hj} L_j\\,
+  using the same neighbours and row-standardised spatial weights as the
+  bivariate Moran's I test (the hotspot bin itself is excluded). If
+  `FALSE`, ligand counts are summed without weights over the hotspot bin
+  and its neighbours.
 
 ## Value
 
