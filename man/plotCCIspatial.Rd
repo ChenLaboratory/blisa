@@ -10,7 +10,8 @@ plotCCIspatial(
   index = 1,
   ligand = NULL,
   receptor = NULL,
-  top_pairs = 30
+  top_pairs = 30,
+  weighted = TRUE
 )
 }
 \arguments{
@@ -35,6 +36,13 @@ with \code{ligand}.}
 \item{top_pairs}{Integer. Maximum number of distinct cell-type pairs to show
 in the legend; remaining pairs are grouped as \code{"rare pairs"}. Default
 \code{30}.}
+
+\item{weighted}{Logical. If \code{TRUE} (default), the ligand contribution
+of each sender cell type at hotspot \eqn{h} is
+\eqn{\sum_{j \in N(h)} w_{hj} L_j}, using the same neighbours and
+row-standardised spatial weights as the bivariate Moran's I test (the
+hotspot bin itself is excluded). If \code{FALSE}, ligand counts are summed
+without weights over the hotspot bin and its neighbours.}
 }
 \value{
 A \code{ggplot} object.
@@ -43,7 +51,8 @@ A \code{ggplot} object.
 For a selected ligand-receptor pair, identifies the dominant interacting
 cell-type pair at each significant hotspot bin and draws a spatial map of
 the tissue coloured by those pairs. Receiver cells are those inside hotspot
-bins; sender cells are drawn from the immediate neighbourhood.
+bins; sender cells are drawn from the neighbouring bins defined by the
+LR pair's signalling mode.
 }
 \examples{
 \dontrun{

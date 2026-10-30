@@ -8,9 +8,9 @@
 \usage{
 runCCI(x, ...)
 
-\method{runCCI}{blisa}(x, counts_by_group = NULL, overwrite = FALSE, ...)
+\method{runCCI}{blisa}(x, counts_by_group = NULL, overwrite = FALSE, weighted = TRUE, ...)
 
-\method{runCCI}{default}(x, counts_by_group, ...)
+\method{runCCI}{default}(x, counts_by_group, weighted = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{blisa} object.}
@@ -27,6 +27,15 @@ when \code{x$CCI_scores} is \code{NULL} or when \code{overwrite = TRUE}.}
 is already populated, the object is returned unchanged. If \code{TRUE} and
 \code{counts_by_group} is supplied, existing scores are recomputed and
 replaced.}
+
+\item{weighted}{Logical. If \code{TRUE} (default), the ligand count of each
+sender group is the sum over hotspots \eqn{h} of its spatially weighted
+ligand counts around \eqn{h}, \eqn{\sum_h \sum_j w_{hj} L_j}, using the
+same neighbours and row-standardised spatial weights as the bivariate
+Moran's I test. This is the sum of the local ligand terms used by
+\code{\link{plotCCIspatial}}. If \code{FALSE}, ligand counts are summed
+without weights over the hotspot bins and their neighbours, each bin
+counted once.}
 }
 \value{
 See individual method documentation.

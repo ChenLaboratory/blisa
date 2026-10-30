@@ -1,4 +1,4 @@
-#' Run BLISA spatial cell-cell communication analysis
+﻿#' Run BLISA spatial cell-cell communication analysis
 #'
 #' Generic function for running BLISA (Bivariate Local Indicator of Spatial
 #' Association). Dispatches on the class of \code{x}:
@@ -157,7 +157,7 @@ blisa.default <- function(
     keep_bins <- bins[[n_cells_col]] >= min_cells
 
     if (all(keep_bins)) {
-      msg("No bins below ", min_cells, " cells — subsetting skipped.")
+      msg("No bins below ", min_cells, " cells, subsetting skipped.")
     } else {
       if (ncol(x) != nrow(bins))
         stop("ncol(x) (", ncol(x), ") must match nrow(bins) (", nrow(bins),

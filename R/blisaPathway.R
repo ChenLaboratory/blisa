@@ -26,9 +26,9 @@
 #' @details
 #' The per-spot pathway p-value is computed by one of three \code{method}s:
 #' \describe{
-#'   \item{\code{"minP"}}
-#'     {The union of each LR pair's significant hotspot spots, with the minimum
-#'     p-value per spot. \code{p_cutoff} and \code{p_adjust} are ignored.}
+#'   \item{\code{"minP"}}{The union of each LR pair's significant hotspot spots,
+#'     with the minimum p-value per spot. \code{p_cutoff} and \code{p_adjust}
+#'     are ignored.}
 #'   \item{\code{"simes"}}{Per-spot Simes combination across \emph{all} LR pairs
 #'     in the pathway, using the full per-spot p-values (\code{all_pval})
 #'     restricted to the High-High co-expression direction.

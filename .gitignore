@@ -1,4 +1,5 @@
 .Rproj.user
-vignettes/figure/
+vignettes/figure-xenium/
+vignettes/figure-visium/
 vignettes/cache/
 docs/

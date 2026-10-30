@@ -21,9 +21,11 @@ knitr::opts_chunk$set(
   dev = "png",
   dpi = 150,
   fig.cap = "",
-  cache = TRUE,
+  fig.path = "figure-xenium/",
+  cache = FALSE,
   autodep = TRUE
 )
+options(width = 110)
 ```
 
 ## Introduction

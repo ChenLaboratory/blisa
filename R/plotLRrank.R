@@ -125,8 +125,8 @@ plotLRrank.data.frame <- function(x, top = 30, pt_size = 4, flip = FALSE,
 
   # Build the point aesthetic mapping from the active encodings.
   map <- aes()
-  if (has_annotation) map <- modifyList(map, aes(colour = annotation))
-  if (has_size)       map <- modifyList(map, aes(size   = rank_size_val))
+  if (has_annotation) map <- utils::modifyList(map, aes(colour = annotation))
+  if (has_size)       map <- utils::modifyList(map, aes(size   = rank_size_val))
   point_layer <- if (has_size) geom_point(mapping = map) else
     geom_point(mapping = map, size = pt_size)
 
